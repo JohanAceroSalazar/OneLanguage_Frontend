@@ -1,29 +1,34 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Translate.css";
-import { FaSyncAlt, FaCamera } from "react-icons/fa";
+import { FaSyncAlt, FaCamera, FaVolumeUp, FaSave, FaRedo, FaPlay, FaPause } from "react-icons/fa";
 
 function Translate() {
     const [cameraActive, setCameraActive] = useState(false);
     const [flipped, setFlipped] = useState(false);
     const [translatedText, setTranslatedText] = useState("");
+    const [view, setView] = useState("camera"); // "camera" | "result" | "audio"
+    const [isPlaying, setIsPlaying] = useState(false);
     const videoRef = useRef(null);
     const streamRef = useRef(null);
+    const audioRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
 
-    const startCamera = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            streamRef.current = stream;
+const startCamera = async () => {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        streamRef.current = stream;
+        setCameraActive(true);
+        setTimeout(() => {
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
             }
-            setCameraActive(true);
-        } catch (err) {
-            alert("No se pudo acceder a la cámara");
-        }
-    };
+        }, 100);
+    } catch (err) {
+        alert("No se pudo acceder a la cámara");
+    }
+};
 
     const stopCamera = () => {
         if (streamRef.current) {
@@ -31,7 +36,36 @@ function Translate() {
             streamRef.current = null;
         }
         setCameraActive(false);
-        setTranslatedText("");
+        setView("result");
+    };
+
+    const handleGenerateAudio = () => {
+        // aquí conectas tu servicio de audio
+        setView("audio");
+    };
+
+    const handleSave = () => {
+        // aquí conectas tu servicio de guardado
+        alert("Traducción guardada");
+    };
+
+    const togglePlay = () => {
+        if (audioRef.current) {
+            if (isPlaying) {
+                audioRef.current.pause();
+            } else {
+                audioRef.current.play();
+            }
+            setIsPlaying(!isPlaying);
+        }
+    };
+
+    const handleRepeat = () => {
+        if (audioRef.current) {
+            audioRef.current.currentTime = 0;
+            audioRef.current.play();
+            setIsPlaying(true);
+        }
     };
 
     useEffect(() => {
@@ -42,31 +76,93 @@ function Translate() {
         };
     }, []);
 
+    const NavBar = () => (
+        <nav className="navbar">
+            <span className={location.pathname === "/home" ? "nav-item active" : "nav-item"} onClick={() => navigate("/home")}>Home</span>
+            <span className={location.pathname === "/translate" ? "nav-item active" : "nav-item"} onClick={() => navigate("/translate")}>Traducir</span>
+            <span className={location.pathname === "/historial" ? "nav-item active" : "nav-item"} onClick={() => navigate("/historial")}>Historial</span>
+            <span className={location.pathname === "/accesibilidad" ? "nav-item active" : "nav-item"} onClick={() => navigate("/accesibilidad")}>Accesibilidad</span>
+            <span className={location.pathname === "/perfil" ? "nav-item active" : "nav-item"} onClick={() => navigate("/perfil")}>Perfil</span>
+        </nav>
+    );
+
+    // VISTA AUDIO
+    if (view === "audio") {
+        return (
+            <div className="translate-container">
+                <div className="translate-header">
+                    <div className="translate-logo">
+                        <span>ONE<br/>LANGUAGE</span>
+                    </div>
+                    <NavBar />
+                </div>
+
+                <div className="translate-result">
+                    <div className="translate-text-box result">
+                        <p>{translatedText || "El texto traducido aparecerá aquí..."}</p>
+                    </div>
+
+                    {/* REPRODUCTOR */}
+                    <div className="audio-player">
+                        <button className="audio-play-btn" onClick={togglePlay}>
+                            {isPlaying ? <FaPause /> : <FaPlay />}
+                        </button>
+                        <div className="audio-bar">
+                            <div className="audio-progress" />
+                        </div>
+                    </div>
+
+                    <button className="translate-action-btn" onClick={handleRepeat}>
+                        <FaRedo /> Repetir audio
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    // VISTA RESULTADO
+    if (view === "result") {
+        return (
+            <div className="translate-container">
+                <div className="translate-header">
+                    <div className="translate-logo">
+                        <span>ONE<br/>LANGUAGE</span>
+                    </div>
+                    <NavBar />
+                </div>
+
+                <div className="translate-result">
+                    <div className="translate-text-box result">
+                        <p>{translatedText || "El texto traducido aparecerá aquí..."}</p>
+                    </div>
+
+                    <div className="translate-actions">
+                        <button className="translate-action-btn" onClick={handleGenerateAudio}>
+                            <FaVolumeUp /> Generar audio
+                        </button>
+                        <button className="translate-action-btn" onClick={handleSave}>
+                            <FaSave /> Guardar traducción
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // VISTA CÁMARA (principal)
     return (
         <div className="translate-container">
-
-            {/* HEADER */}
             <div className="translate-header">
                 <div className="translate-logo">
                     <span>ONE<br/>LANGUAGE</span>
                 </div>
-
                 <button className="flip-btn" onClick={() => setFlipped(!flipped)}>
                     <FaSyncAlt />
                 </button>
-
-                <nav className="navbar">
-                    <span className={location.pathname === "/home" ? "nav-item active" : "nav-item"} onClick={() => navigate("/home")}>Home</span>
-                    <span className={location.pathname === "/translate" ? "nav-item active" : "nav-item"} onClick={() => navigate("/translate")}>Traducir</span>
-                    <span className={location.pathname === "/historial" ? "nav-item active" : "nav-item"} onClick={() => navigate("/historial")}>Historial</span>
-                    <span className={location.pathname === "/accesibilidad" ? "nav-item active" : "nav-item"} onClick={() => navigate("/accesibilidad")}>Accesibilidad</span>
-                    <span className={location.pathname === "/perfil" ? "nav-item active" : "nav-item"} onClick={() => navigate("/perfil")}>Perfil</span>
-                </nav>
+                <NavBar />
             </div>
 
-            {/* CONTENIDO */}
             <div className={`translate-content ${flipped ? "flipped" : ""}`}>
-
                 <div className="translate-text-box">
                     <p>{translatedText || "El texto traducido aparecerá aquí..."}</p>
                 </div>
@@ -81,14 +177,11 @@ function Translate() {
                         </div>
                     )}
                 </div>
-
             </div>
 
-            {/* BOTÓN */}
             <button className="translate-btn" onClick={cameraActive ? stopCamera : startCamera}>
                 {cameraActive ? "Finalizar traducción" : "Iniciar traducción"}
             </button>
-
         </div>
     );
 }
