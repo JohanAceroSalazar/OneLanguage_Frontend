@@ -1,0 +1,58 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.terms-container {
+    padding: 40px 80px;
+    background: white;
+    color: black;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+.title {
+    text-align: center;
+    color: #999;
+    margin-bottom: 24px;
+    font-size: 28px;
+}
+
+.section {
+    margin-top: 20px;
+}
+
+.subtitle {
+    font-size: 16px;
+    font-weight: bold;
+    color: black;
+    margin-bottom: 6px;
+}
+
+.paragraph {
+    font-size: 14px;
+    color: black;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.checkboxContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-top: 24px;
+    margin-bottom: 40px;
+    justify-content: flex-start;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.checkboxIcon {
+    font-size: 22px;
+    cursor: pointer;
+    color: black;
+}
+
+.checkboxText {
+    font-size: 16px;
+    font-weight: bold;
+    color: black;
+}

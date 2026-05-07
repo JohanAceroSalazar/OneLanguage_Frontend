@@ -1,0 +1,141 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.translate-container {
+    width: 100%;
+    height: 100vh;
+    background: #3A78C2;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 24px;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+.translate-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.translate-logo span {
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+    line-height: 1.2;
+}
+
+.flip-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.flip-btn:hover {
+    transform: rotate(180deg);
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.nav-item {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    padding-bottom: 4px;
+    border-bottom: 3px solid transparent;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.nav-item:hover {
+    color: #F4DC2E;
+}
+
+.nav-item.active {
+    color: #F4DC2E;
+    border-bottom: 3px solid #F4DC2E;
+}
+
+.translate-content {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    flex: 1;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.translate-content.flipped {
+    flex-direction: row-reverse;
+}
+
+.translate-text-box {
+    flex: 1;
+    background: white;
+    border-radius: 15px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.translate-text-box p {
+    font-size: 18px;
+    color: #666;
+    text-align: center;
+}
+
+.translate-camera-box {
+    flex: 1;
+    background: #2a5fa0;
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.translate-camera-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.translate-camera-placeholder p {
+    color: white;
+    font-size: 16px;
+}
+
+.translate-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.translate-btn {
+    width: 100%;
+    max-width: 400px;
+    align-self: center;
+    padding: 14px;
+    background: #F4DC2E;
+    border: 2px solid black;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    color: black;
+    margin-bottom: 8px;
+}
+
+.translate-btn:hover {
+    opacity: 0.9;
+}
