@@ -34,9 +34,7 @@
     transition: transform 0.3s;
 }
 
-.flip-btn:hover {
-    transform: rotate(180deg);
-}
+.flip-btn:hover { transform: rotate(180deg); }
 
 .navbar {
     display: flex;
@@ -54,9 +52,7 @@
     transition: border-color 0.2s, color 0.2s;
 }
 
-.nav-item:hover {
-    color: #F4DC2E;
-}
+.nav-item:hover { color: #F4DC2E; }
 
 .nav-item.active {
     color: #F4DC2E;
@@ -70,11 +66,11 @@
     flex: 1;
     margin-top: 16px;
     margin-bottom: 16px;
+    min-height: 0;
+    overflow: hidden;
 }
 
-.translate-content.flipped {
-    flex-direction: row-reverse;
-}
+.translate-content.flipped { flex-direction: row-reverse; }
 
 .translate-text-box {
     flex: 1;
@@ -84,6 +80,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .translate-text-box p {
@@ -101,6 +99,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    min-height: 0;
 }
 
 .translate-camera-placeholder {
@@ -136,9 +135,7 @@
     margin-bottom: 8px;
 }
 
-.translate-btn:hover {
-    opacity: 0.9;
-}
+.translate-btn:hover { opacity: 0.9; }
 
 .translate-result {
     display: flex;
@@ -179,9 +176,7 @@
     color: black;
 }
 
-.translate-action-btn:hover {
-    opacity: 0.9;
-}
+.translate-action-btn:hover { opacity: 0.9; }
 
 .audio-player {
     display: flex;
@@ -216,4 +211,26 @@
     height: 100%;
     background: black;
     border-radius: 2px;
+}
+
+/* TABLET */
+@media (max-width: 1024px) {
+    .navbar { gap: 20px; }
+    .nav-item { font-size: 15px; }
+    .translate-content { gap: 16px; }
+}
+
+/* MÓVIL */
+@media (max-width: 768px) {
+    .translate-container { padding: 16px; overflow-y: auto; height: auto; min-height: 100vh; }
+    .translate-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .navbar { gap: 10px; flex-wrap: wrap; }
+    .nav-item { font-size: 13px; }
+    .translate-content { flex-direction: column; margin-top: 12px; margin-bottom: 12px; }
+    .translate-content.flipped { flex-direction: column; }
+    .translate-camera-box { min-height: 220px; }
+    .translate-text-box.result { max-width: 100%; }
+    .translate-actions { max-width: 100%; }
+    .translate-btn { max-width: 100%; }
+    .flip-btn { align-self: flex-end; }
 }
