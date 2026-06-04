@@ -18,7 +18,7 @@ function Profile() {
             <span className={location.pathname === "/translate" ? "nav-item active" : "nav-item"} onClick={() => navigate("/translate")}>Traducir</span>
             <span className={location.pathname === "/history" ? "nav-item active" : "nav-item"} onClick={() => navigate("/history")}>Historial</span>
             <span className={location.pathname === "/accessibility" ? "nav-item active" : "nav-item"} onClick={() => navigate("/accessibility")}>Accesibilidad</span>
-            <span className={location.pathname === "/profile" ? "nav-item active" : "nav-item"} onClick={() => navigate("/perfil")}>Profile</span>
+            <span className={location.pathname === "/profile" ? "nav-item active" : "nav-item"} onClick={() => navigate("/profile")}>Perfil</span>
         </nav>
     );
 
