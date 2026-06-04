@@ -1,0 +1,347 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.profile-container {
+    width: 100%;
+    height: 100vh;
+    background: #3A78C2;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 24px;
+    font-family: Arial, sans-serif;
+    overflow-y: auto;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.profile-logo span {
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+    line-height: 1.2;
+}
+
+.profile-header-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.nav-item {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    padding-bottom: 4px;
+    border-bottom: 3px solid transparent;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.nav-item:hover { color: #F4DC2E; }
+
+.nav-item.active {
+    color: #F4DC2E;
+    border-bottom: 3px solid #F4DC2E;
+}
+
+/* TARJETA PRINCIPAL */
+.profile-card {
+    background: white;
+    border-radius: 15px;
+    padding: 24px;
+    margin-top: 16px;
+    width: 100%;
+    max-width: 700px;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.profile-section {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.profile-avatar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 24px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #999;
+}
+
+.profile-info-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: black;
+}
+
+.section-subtitle {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.field-label {
+    font-size: 13px;
+    font-weight: bold;
+    color: black;
+    margin-top: 6px;
+}
+
+.profile-input {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    color: #333;
+}
+
+.change-pass-btn {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: #F4DC2E;
+    border: 2px solid black;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    color: black;
+    align-self: flex-start;
+}
+
+.profile-divider {
+    width: 100%;
+    height: 1px;
+    background: #eee;
+}
+
+/* PERMISOS */
+.permissions-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.permission-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f9f9f9;
+    border-radius: 10px;
+}
+
+.permission-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.perm-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: black;
+}
+
+.perm-desc {
+    font-size: 12px;
+    color: #666;
+}
+
+.activate-btn {
+    padding: 6px 16px;
+    background: #F4DC2E;
+    border: 2px solid black;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    color: black;
+}
+
+/* CERRAR SESIÓN */
+.logout-btn {
+    width: 100%;
+    padding: 12px;
+    background: #e53935;
+    border: 2px solid black;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+}
+
+.logout-btn:hover { opacity: 0.9; }
+
+/* VISTA CONTRASEÑA */
+.profile-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+
+.password-card {
+    background: white;
+    border-radius: 15px;
+    padding: 32px;
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.password-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.save-btn {
+    width: 100%;
+    padding: 12px;
+    background: #F4DC2E;
+    border: 2px solid black;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    color: black;
+    margin-top: 12px;
+}
+
+/* VISTAS PERMISOS */
+.permission-card {
+    background: white;
+    border-radius: 15px;
+    padding: 40px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.yellow-btn {
+    padding: 14px 40px;
+    background: #F4DC2E;
+    border: 2px solid black;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    color: black;
+}
+
+/* MODAL */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+.modal-box {
+    background: #b0c8e8;
+    border-radius: 15px;
+    padding: 40px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    max-width: 320px;
+    width: 100%;
+}
+
+.modal-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: black;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.modal-logout-btn {
+    padding: 10px 24px;
+    background: #F4DC2E;
+    border: 2px solid black;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    color: black;
+}
+
+.modal-cancel-btn {
+    padding: 10px 24px;
+    background: #3A78C2;
+    border: 2px solid black;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+}
+
+/* TABLET */
+@media (max-width: 1024px) {
+    .navbar { gap: 20px; }
+    .nav-item { font-size: 15px; }
+}
+
+/* MÓVIL */
+@media (max-width: 768px) {
+    .profile-container { padding: 16px; }
+    .profile-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .navbar { gap: 12px; flex-wrap: wrap; }
+    .nav-item { font-size: 14px; }
+    .profile-card { max-width: 100%; }
+    .profile-section { flex-direction: column; }
+    .profile-header-title { display: none; }
+}

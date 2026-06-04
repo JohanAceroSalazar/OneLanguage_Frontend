@@ -33,9 +33,9 @@ function Accessibility() {
                 <nav className="navbar">
                     <span className={location.pathname === "/home" ? "nav-item active" : "nav-item"} onClick={() => navigate("/home")}>Home</span>
                     <span className={location.pathname === "/translate" ? "nav-item active" : "nav-item"} onClick={() => navigate("/translate")}>Traducir</span>
-                    <span className={location.pathname === "/historial" ? "nav-item active" : "nav-item"} onClick={() => navigate("/historial")}>Historial</span>
-                    <span className={location.pathname === "/accesibilidad" ? "nav-item active" : "nav-item"} onClick={() => navigate("/accesibilidad")}>Accesibilidad</span>
-                    <span className={location.pathname === "/perfil" ? "nav-item active" : "nav-item"} onClick={() => navigate("/perfil")}>Perfil</span>
+                    <span className={location.pathname === "/history" ? "nav-item active" : "nav-item"} onClick={() => navigate("/history")}>Historial</span>
+                    <span className={location.pathname === "/accessibility" ? "nav-item active" : "nav-item"} onClick={() => navigate("/accessibility")}>Accesibilidad</span>
+                    <span className={location.pathname === "/profile" ? "nav-item active" : "nav-item"} onClick={() => navigate("/profile")}>Perfil</span>
                 </nav>
             </div>
 
