@@ -43,8 +43,7 @@ function History() {
 
             {/* TÍTULO */}
             <div className="history-title-section">
-                <h2 className="history-title">Historial de traducción</h2>
-                <p className="history-subtitle">Revisa tus traducciones anteriores</p>
+                <h2 className="history-title">Revisa tus traducciones anteriores</h2>
             </div>
 
             {/* SIN TRADUCCIONES */}

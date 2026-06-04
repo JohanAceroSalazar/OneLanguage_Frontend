@@ -39,9 +39,6 @@ function Accessibility() {
                 </nav>
             </div>
 
-            {/* TÍTULO */}
-            <p className="access-title">Accesibilidad</p>
-
             {/* TARJETA */}
             <div className="access-card">
 
@@ -135,7 +132,7 @@ function Accessibility() {
                 <div className="access-divider" />
 
                 {/* GUARDAR */}
-                <button className="save-btn" onClick={handleSave}>
+                <button className="access-save-btn" onClick={handleSave}>
                     Guardar cambios
                 </button>
             </div>
@@ -143,9 +140,9 @@ function Accessibility() {
             {/* MODAL ÉXITO */}
             {showSuccess && (
                 <div className="modal-overlay">
-                    <div className="modal-box">
-                        <p className="modal-text">Cambios de accesibilidad<br/>guardados correctamente</p>
-                        <button className="modal-btn" onClick={() => setShowSuccess(false)}>Ok</button>
+                    <div className="access-modal-box">
+                        <p className="access-modal-text">Cambios de accesibilidad<br/>guardados correctamente</p>
+                        <button className="access-modal-btn" onClick={() => setShowSuccess(false)}>Ok</button>
                     </div>
                 </div>
             )}
