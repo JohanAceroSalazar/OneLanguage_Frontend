@@ -6,6 +6,7 @@ import Home from "../pages/home/Home";
 import RecoverPassword from "../pages/recoverpassword/RecoverPassword";
 import Translate from "../pages/translate/Translate";
 import History from "../pages/history/History";
+import Accessibility from "../pages/accessibility/Accessibility";
 
 function AppRoutes() {
     return (
@@ -19,6 +20,7 @@ function AppRoutes() {
             <Route path="/recoverpassword" element={<RecoverPassword />} />
             <Route path="/translate" element={<Translate />} />
             <Route path="/historial" element={<History />} />
+            <Route path="/accesibilidad" element={<Accessibility />} />
         </Routes>
     </BrowserRouter>
     );
