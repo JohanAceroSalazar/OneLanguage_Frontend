@@ -18,7 +18,7 @@ function Profile() {
             <span className={location.pathname === "/translate" ? "nav-item active" : "nav-item"} onClick={() => navigate("/translate")}>Traducir</span>
             <span className={location.pathname === "/history" ? "nav-item active" : "nav-item"} onClick={() => navigate("/history")}>Historial</span>
             <span className={location.pathname === "/accessibility" ? "nav-item active" : "nav-item"} onClick={() => navigate("/accessibility")}>Accesibilidad</span>
-            <span className={location.pathname === "/profile" ? "nav-item active" : "nav-item"} onClick={() => navigate("/perfil")}>Profile</span>
+            <span className={location.pathname === "/profile" ? "nav-item active" : "nav-item"} onClick={() => navigate("/profile")}>Perfil</span>
         </nav>
     );
 
@@ -56,7 +56,7 @@ function Profile() {
                 </div>
                 <div className="profile-center">
                     <div className="permission-card">
-                        <FaCamera size={80} color="#333" />
+                        <FaCamera size={140} color="#333" />
                     </div>
                     <button className="yellow-btn" onClick={() => setView("profile")}>Activar cámara</button>
                 </div>
@@ -74,7 +74,7 @@ function Profile() {
                 </div>
                 <div className="profile-center">
                     <div className="permission-card">
-                        <FaMusic size={80} color="#333" />
+                        <FaMusic size={140} color="#333" />
                     </div>
                     <button className="yellow-btn" onClick={() => setView("profile")}>Activar micrófono</button>
                 </div>
@@ -92,7 +92,7 @@ function Profile() {
                 </div>
                 <div className="profile-center">
                     <div className="permission-card">
-                        <FaFolder size={80} color="#333" />
+                        <FaFolder size={140} color="#333" />
                     </div>
                     <button className="yellow-btn" onClick={() => setView("profile")}>Dar acceso archivos</button>
                 </div>
@@ -105,7 +105,6 @@ function Profile() {
         <div className="profile-container">
             <div className="profile-header">
                 <div className="profile-logo"><span>ONE<br/>LANGUAGE</span></div>
-                <p className="profile-header-title">Perfil de usuario</p>
                 <NavBar />
             </div>
 

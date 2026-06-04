@@ -100,19 +100,19 @@
 }
 
 .section-title {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: bold;
     color: black;
 }
 
 .section-subtitle {
-    font-size: 13px;
+    font-size: 16px;
     color: #666;
     margin-bottom: 4px;
 }
 
 .field-label {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: bold;
     color: black;
     margin-top: 6px;
@@ -120,24 +120,24 @@
 
 .profile-input {
     width: 100%;
-    padding: 8px 12px;
+    padding: 12px 14px;
     border-radius: 8px;
     border: 1px solid #ccc;
-    font-size: 14px;
+    font-size: 16px;
     color: #333;
 }
 
 .change-pass-btn {
     margin-top: 10px;
-    padding: 10px 20px;
+    padding: 12px 28px;
     background: #F4DC2E;
     border: 2px solid black;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: bold;
     cursor: pointer;
     color: black;
-    align-self: flex-start;
+    align-self: center;
 }
 
 .profile-divider {
@@ -157,7 +157,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 12px;
+    padding: 12px 16px;
     background: #f9f9f9;
     border-radius: 10px;
 }
@@ -169,22 +169,23 @@
 }
 
 .perm-name {
-    font-size: 14px;
+    font-size: 17px;
     font-weight: bold;
     color: black;
 }
 
 .perm-desc {
-    font-size: 12px;
+    font-size: 15px;
     color: #666;
 }
 
 .activate-btn {
-    padding: 6px 16px;
+    min-width: 110px;
+    padding: 10px 24px;
     background: #F4DC2E;
     border: 2px solid black;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: bold;
     cursor: pointer;
     color: black;
@@ -227,7 +228,7 @@
 }
 
 .password-title {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     color: black;
     text-align: center;
@@ -251,18 +252,22 @@
 .permission-card {
     background: white;
     border-radius: 15px;
-    padding: 40px 60px;
+    width: 100%;
+    max-width: 520px;
+    min-height: 300px;
+    padding: 70px 90px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .yellow-btn {
-    padding: 14px 40px;
+    min-width: 260px;
+    padding: 18px 48px;
     background: #F4DC2E;
     border: 2px solid black;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 19px;
     font-weight: bold;
     cursor: pointer;
     color: black;
@@ -344,4 +349,6 @@
     .profile-card { max-width: 100%; }
     .profile-section { flex-direction: column; }
     .profile-header-title { display: none; }
+    .permission-card { max-width: 100%; min-height: 240px; padding: 48px 32px; }
+    .yellow-btn { width: 100%; min-width: 0; padding: 16px 24px; font-size: 17px; }
 }
