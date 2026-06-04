@@ -5,6 +5,7 @@ import Terms from "../pages/terms/Terms";
 import Home from "../pages/home/Home";
 import RecoverPassword from "../pages/recoverpassword/RecoverPassword";
 import Translate from "../pages/translate/Translate";
+import History from "../pages/history/History";
 
 function AppRoutes() {
     return (
@@ -17,6 +18,7 @@ function AppRoutes() {
             <Route path="/home" element={<Home />} />
             <Route path="/recoverpassword" element={<RecoverPassword />} />
             <Route path="/translate" element={<Translate />} />
+            <Route path="/historial" element={<History />} />
         </Routes>
     </BrowserRouter>
     );
