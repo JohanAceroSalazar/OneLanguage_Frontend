@@ -1,67 +1,89 @@
-import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { FaFont, FaCheck, FaGlobe, FaMoon, FaSun } from "react-icons/fa";
+import NavBar from "../../components/NavBar/NavBar";
+import BrandLogo from "../../components/BrandLogo/BrandLogo";
 import "./Accessibility.css";
-import { FaFont, FaPalette, FaGlobe, FaCheck } from "react-icons/fa";
+
+const fontSizeOptions = {
+    Pequeño: 0.92,
+    Mediano: 1,
+    Grande: 1.08,
+};
 
 function Accessibility() {
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    const [fontSize, setFontSize] = useState("Mediano");
-    const [language, setLanguage] = useState("Español");
-    const [color, setColor] = useState("#3A78C2");
+    const [fontSize, setFontSize] = useState(() => localStorage.getItem("fontSize") || "Mediano");
+    const [savedTheme, setSavedTheme] = useState(() => localStorage.getItem("theme") || "light");
+    const [selectedTheme, setSelectedTheme] = useState(savedTheme);
+    const [savedLanguage, setSavedLanguage] = useState(() => localStorage.getItem("language") || "Español");
+    const [selectedLanguage, setSelectedLanguage] = useState(savedLanguage);
     const [showFontMenu, setShowFontMenu] = useState(false);
     const [showLangMenu, setShowLangMenu] = useState(false);
-    const [showColorPicker, setShowColorPicker] = useState(false);
+    const [showThemeMenu, setShowThemeMenu] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
+    useEffect(() => {
+        const zoom = fontSizeOptions[fontSize] || 1;
+        document.body.style.zoom = String(zoom);
+        document.documentElement.dataset.textSize = fontSize;
+    }, [fontSize]);
+
+    useEffect(() => {
+        document.documentElement.dataset.theme = savedTheme;
+        document.documentElement.style.colorScheme = savedTheme;
+    }, [savedTheme]);
+
     const handleSave = () => {
+        setSavedTheme(selectedTheme);
+        setSavedLanguage(selectedLanguage);
+
+        localStorage.setItem("theme", selectedTheme);
+        localStorage.setItem("language", selectedLanguage);
+        localStorage.setItem("fontSize", fontSize);
+
+        document.documentElement.dataset.theme = selectedTheme;
+        document.documentElement.style.colorScheme = selectedTheme;
+
         setShowFontMenu(false);
         setShowLangMenu(false);
-        setShowColorPicker(false);
+        setShowThemeMenu(false);
         setShowSuccess(true);
+    };
+
+    const openMenu = (menu) => {
+        setShowFontMenu(menu === "font");
+        setShowLangMenu(menu === "lang");
+        setShowThemeMenu(menu === "theme");
     };
 
     return (
         <div className="access-container">
-
-            {/* HEADER */}
             <div className="access-header">
-                <div className="access-logo">
-                    <span>ONE<br/>LANGUAGE</span>
-                </div>
-                <nav className="navbar">
-                    <span className={location.pathname === "/home" ? "nav-item active" : "nav-item"} onClick={() => navigate("/home")}>Home</span>
-                    <span className={location.pathname === "/translate" ? "nav-item active" : "nav-item"} onClick={() => navigate("/translate")}>Traducir</span>
-                    <span className={location.pathname === "/history" ? "nav-item active" : "nav-item"} onClick={() => navigate("/history")}>Historial</span>
-                    <span className={location.pathname === "/accessibility" ? "nav-item active" : "nav-item"} onClick={() => navigate("/accessibility")}>Accesibilidad</span>
-                    <span className={location.pathname === "/profile" ? "nav-item active" : "nav-item"} onClick={() => navigate("/profile")}>Perfil</span>
-                </nav>
+                <BrandLogo className="access-logo" />
+                <NavBar />
             </div>
 
-            {/* TARJETA */}
             <div className="access-card">
-
-                {/* AJUSTAR TEXTO */}
                 <div className="access-row">
                     <div className="access-label">
                         <FaFont size={20} />
                         <span>Ajustar texto</span>
                     </div>
                     <div className="access-control">
-                        <button className="access-btn" onClick={() => {
-                            setShowFontMenu(!showFontMenu);
-                            setShowLangMenu(false);
-                            setShowColorPicker(false);
-                        }}>
+                        <button type="button" className="access-btn" onClick={() => openMenu(showFontMenu ? null : "font")}>
                             Ajustar
                         </button>
                         {showFontMenu && (
                             <div className="access-dropdown">
-                                {["Pequeño", "Mediano", "Grande"].map(size => (
-                                    <p key={size} className={fontSize === size ? "selected" : ""} onClick={() => { setFontSize(size); }}>
-                                        {size} {fontSize === size && <FaCheck size={12} />}
-                                    </p>
+                                {Object.keys(fontSizeOptions).map((size) => (
+                                    <button
+                                        key={size}
+                                        type="button"
+                                        className={fontSize === size ? "selected" : ""}
+                                        onClick={() => setFontSize(size)}
+                                    >
+                                        <span>{size}</span>
+                                        {fontSize === size && <FaCheck size={12} />}
+                                    </button>
                                 ))}
                             </div>
                         )}
@@ -70,32 +92,37 @@ function Accessibility() {
 
                 <div className="access-divider" />
 
-                {/* CAMBIAR COLORES */}
                 <div className="access-row">
                     <div className="access-label">
-                        <FaPalette size={20} />
+                        <FaMoon size={20} />
                         <span>Cambiar colores</span>
                     </div>
                     <div className="access-control">
-                        <button className="access-btn" onClick={() => {
-                            setShowColorPicker(!showColorPicker);
-                            setShowFontMenu(false);
-                            setShowLangMenu(false);
-                        }}>
+                        <button type="button" className="access-btn" onClick={() => openMenu(showThemeMenu ? null : "theme")}>
                             Ajustar
                         </button>
-                        {showColorPicker && (
-                            <div className="access-color-picker">
-                                <p className="color-title">Colores</p>
-                                <input
-                                    type="color"
-                                    value={color}
-                                    onChange={(e) => setColor(e.target.value)}
-                                    className="color-input"
-                                />
-                                <button className="apply-btn" onClick={() => setShowColorPicker(false)}>
-                                    Aplicar cambios
-                                </button>
+                        {showThemeMenu && (
+                            <div className="access-theme-picker">
+                                <p className="color-title">Tema visual</p>
+                                <div className="theme-options">
+                                    <button
+                                        type="button"
+                                        className={selectedTheme === "light" ? "theme-option selected" : "theme-option"}
+                                        onClick={() => setSelectedTheme("light")}
+                                    >
+                                        <FaSun /> Claro
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={selectedTheme === "dark" ? "theme-option selected" : "theme-option"}
+                                        onClick={() => setSelectedTheme("dark")}
+                                    >
+                                        <FaMoon /> Oscuro
+                                    </button>
+                                </div>
+                                <p className="theme-hint">
+                                    {selectedTheme === "dark" ? "Oscuro" : "Claro"} seleccionado. Se aplica solo al guardar.
+                                </p>
                             </div>
                         )}
                     </div>
@@ -103,26 +130,27 @@ function Accessibility() {
 
                 <div className="access-divider" />
 
-                {/* IDIOMA */}
                 <div className="access-row">
                     <div className="access-label">
                         <FaGlobe size={20} />
                         <span>Idioma</span>
                     </div>
                     <div className="access-control">
-                        <button className="access-btn" onClick={() => {
-                            setShowLangMenu(!showLangMenu);
-                            setShowFontMenu(false);
-                            setShowColorPicker(false);
-                        }}>
+                        <button type="button" className="access-btn" onClick={() => openMenu(showLangMenu ? null : "lang")}>
                             Cambiar
                         </button>
                         {showLangMenu && (
                             <div className="access-dropdown">
-                                {["Español", "Inglés", "Portugués", "Francés"].map(lang => (
-                                    <p key={lang} className={language === lang ? "selected" : ""} onClick={() => { setLanguage(lang); }}>
-                                        {lang} {language === lang && <FaCheck size={12} />}
-                                    </p>
+                                {["Español", "Inglés", "Portugués", "Francés"].map((lang) => (
+                                    <button
+                                        key={lang}
+                                        type="button"
+                                        className={selectedLanguage === lang ? "selected" : ""}
+                                        onClick={() => setSelectedLanguage(lang)}
+                                    >
+                                        <span>{lang}</span>
+                                        {selectedLanguage === lang && <FaCheck size={12} />}
+                                    </button>
                                 ))}
                             </div>
                         )}
@@ -131,22 +159,21 @@ function Accessibility() {
 
                 <div className="access-divider" />
 
-                {/* GUARDAR */}
-                <button className="access-save-btn" onClick={handleSave}>
+                <button type="button" className="access-save-btn" onClick={handleSave}>
                     Guardar cambios
                 </button>
             </div>
 
-            {/* MODAL ÉXITO */}
             {showSuccess && (
                 <div className="modal-overlay">
                     <div className="access-modal-box">
-                        <p className="access-modal-text">Cambios de accesibilidad<br/>guardados correctamente</p>
-                        <button className="access-modal-btn" onClick={() => setShowSuccess(false)}>Ok</button>
+                        <p className="access-modal-text">Cambios de accesibilidad<br />guardados correctamente</p>
+                        <button type="button" className="access-modal-btn" onClick={() => setShowSuccess(false)}>
+                            Ok
+                        </button>
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

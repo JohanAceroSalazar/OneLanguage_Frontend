@@ -1,101 +1,194 @@
 import { useState } from "react";
-import "./Login.css";
+import { Link, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
-import { Link } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import AuthModal from "../../components/AuthModal/AuthModal";
 import logo from "../../assets/Logo.png";
-import { useNavigate } from "react-router-dom";
+import "./Login.css";
+
+const emailRegex = /\S+@\S+\.\S+/;
+
+const initialForm = {
+    email: "",
+    password: "",
+};
+
+const initialErrors = {
+    email: "",
+    password: "",
+};
+
+const initialTouched = {
+    email: false,
+    password: false,
+};
+
+function validateField(field, value) {
+    switch (field) {
+        case "email":
+            if (!value.trim()) return "El correo es obligatorio";
+            if (!emailRegex.test(value)) return "Ingresa un correo válido";
+            return "";
+        case "password":
+            if (!value) return "La contraseña es obligatoria";
+            if (value.length < 6) return "La contraseña debe tener al menos 6 caracteres";
+            return "";
+        default:
+            return "";
+    }
+}
+
+function validateForm(form) {
+    return {
+        email: validateField("email", form.email),
+        password: validateField("password", form.password),
+    };
+}
 
 function Login() {
-    const [form, setForm] = useState({ email: "", password: "" });
-
-    // errores por campo
-    const [errors, setErrors] = useState({
-        email: false,
-        password: false
+    const navigate = useNavigate();
+    const [form, setForm] = useState(initialForm);
+    const [errors, setErrors] = useState(initialErrors);
+    const [touched, setTouched] = useState(initialTouched);
+    const [showPassword, setShowPassword] = useState(false);
+    const [modal, setModal] = useState({
+        open: false,
+        title: "",
+        message: "",
+        tone: "success",
+        confirmText: "Entendido",
+        onConfirm: null,
     });
 
-    const [showPassword, setShowPassword] = useState(false);
+    const openModal = (nextModal) => {
+        setModal({ open: true, ...nextModal });
+    };
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    
-        // quitar error cuando el usuario escribe
-        setErrors({
-            ...errors,
-            [e.target.name]: false
+    const closeModal = () => {
+        setModal((current) => ({ ...current, open: false }));
+    };
+
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+
+        setForm((current) => {
+            const nextForm = { ...current, [name]: value };
+            setErrors(validateForm(nextForm));
+            return nextForm;
+        });
+
+        setTouched((current) => ({ ...current, [name]: true }));
+    };
+
+    const handleBlur = (event) => {
+        const { name } = event.target;
+        setTouched((current) => ({ ...current, [name]: true }));
+        setErrors((current) => ({
+            ...current,
+            [name]: validateField(name, form[name]),
+        }));
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        const nextErrors = validateForm(form);
+        const hasErrors = Object.values(nextErrors).some(Boolean);
+
+        setErrors(nextErrors);
+        setTouched({
+            email: true,
+            password: true,
+        });
+
+        if (hasErrors) {
+            openModal({
+                title: "Revisa tus datos",
+                message: "Todavía hay campos por corregir para poder entrar a la plataforma.",
+                tone: "error",
+                confirmText: "Corregir datos",
+                onConfirm: closeModal,
+            });
+            return;
+        }
+
+        openModal({
+            title: "Sesión lista",
+            message: "Tus datos se validaron correctamente. Vamos a llevarte al panel principal.",
+            tone: "success",
+            confirmText: "Entrar ahora",
+            onConfirm: () => {
+                closeModal();
+                navigate("/home");
+            },
         });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-    // validación por campo
-        const newErrors = {
-            email: !form.email,
-            password: !form.password
-        };
-
-        setErrors(newErrors);
-
-    // si hay errores, no continúa
-        if (newErrors.email || newErrors.password) {
-            setTimeout(() => {
-            setErrors({ email: false, password: false });
-        }, 3000);
-        return;
-    }
-};
-
-        const navigate = useNavigate();
+    const showFieldError = (field) => touched[field] || modal.open;
 
     return (
         <div className="login-container">
+            <AuthModal
+                open={modal.open}
+                title={modal.title}
+                message={modal.message}
+                tone={modal.tone}
+                confirmText={modal.confirmText}
+                onConfirm={modal.onConfirm || closeModal}
+            />
 
-            {/* LADO IZQUIERDO */}
             <div className="login-left">
                 <img src={logo} alt="One Language" className="logo-img" />
-                    <h2 className="brand-name">ONE<br/>LANGUAGE</h2>
+                <h2 className="brand-name">ONE<br />LANGUAGE</h2>
+                <p className="login-brand-copy">
+                    Traduce, revisa tu historial y configura la experiencia de accesibilidad desde un solo lugar.
+                </p>
             </div>
 
-            {/* LADO DERECHO */}
             <div className="login-right">
                 <form className="login-card" onSubmit={handleSubmit}>
-                    <label>Correo electrónico</label>
-                    <Input 
-                    name="email" 
-                    type="email" 
-                    placeholder="andres@gmail.com" 
-                    onChange={handleChange} 
-                    error={errors.email}
+                    <div className="form-header">
+                        <span className="form-step">Acceso seguro</span>
+                        <h1>Inicia sesión</h1>
+                    </div>
+
+                    <label htmlFor="email">Correo electrónico</label>
+                    <Input
+                        name="email"
+                        type="email"
+                        placeholder="andres@gmail.com"
+                        value={form.email}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={showFieldError("email") && !!errors.email}
+                        autoComplete="email"
                     />
+                    {showFieldError("email") && errors.email && <p className="error-text">{errors.email}</p>}
 
-                    <p className="error-text">{errors.email ? "Este campo es obligatorio" : ""}</p>
-
-                    <label>Contraseña</label>
+                    <label htmlFor="password">Contraseña</label>
                     <div className="password-field">
                         <Input
                             name="password"
                             type={showPassword ? "text" : "password"}
                             placeholder="********"
+                            value={form.password}
                             onChange={handleChange}
-                            error={errors.password}
+                            onBlur={handleBlur}
+                            error={showFieldError("password") && !!errors.password}
+                            autoComplete="current-password"
                         />
-                        <span className="toggle-password" 
-                        onClick={() => setShowPassword(!showPassword)}
-                        >
+                        <span className="toggle-password" onClick={() => setShowPassword((current) => !current)}>
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
                     </div>
+                    {showFieldError("password") && errors.password && <p className="error-text">{errors.password}</p>}
 
-                    <p className="error-text">{errors.password ? "Este campo es obligatorio" : ""}</p>
-
-                    <Button text="Iniciar sesión" />
+                    <Button text="Iniciar sesión" className="auth-submit-button" />
                 </form>
 
                 <p className="recover-text" onClick={() => navigate("/recoverpassword")}>
-                   Restablecer contraseña
+                    Restablecer contraseña
                 </p>
                 <p className="register-text">
                     ¿No tienes una cuenta? <Link to="/register">Regístrate</Link>

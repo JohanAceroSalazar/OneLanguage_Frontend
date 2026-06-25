@@ -2,12 +2,13 @@
 
 .profile-container {
     width: 100%;
-    height: 100vh;
-    background: #3A78C2;
+    min-height: 100dvh;
+    background: var(--color-page-bg);
     display: flex;
     flex-direction: column;
     padding: 20px 24px;
     font-family: Arial, sans-serif;
+    overflow-x: hidden;
     overflow-y: auto;
 }
 
@@ -16,29 +17,31 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
-.profile-logo span {
+.profile-logo {
     font-size: 22px;
-    font-weight: bold;
-    color: white;
-    line-height: 1.2;
+    color: var(--color-text-on-page);
 }
 
 .profile-header-title {
     font-size: 22px;
     font-weight: bold;
-    color: white;
+    color: var(--color-text-on-page);
 }
 
 .navbar {
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .nav-item {
-    color: white;
+    color: var(--color-text-on-page);
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
@@ -47,17 +50,16 @@
     transition: border-color 0.2s, color 0.2s;
 }
 
-.nav-item:hover { color: #F4DC2E; }
+.nav-item:hover { color: var(--color-accent); }
 
 .nav-item.active {
-    color: #F4DC2E;
-    border-bottom: 3px solid #F4DC2E;
+    color: var(--color-accent);
+    border-bottom: 3px solid var(--color-accent);
 }
 
-/* TARJETA PRINCIPAL */
 .profile-card {
-    background: white;
-    border-radius: 15px;
+    background: var(--color-surface);
+    border-radius: 18px;
     padding: 24px;
     margin-top: 16px;
     width: 100%;
@@ -66,6 +68,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    box-shadow: var(--color-shadow);
 }
 
 .profile-section {
@@ -84,12 +87,12 @@
 .profile-avatar {
     width: 80px;
     height: 80px;
-    background: #ddd;
+    background: var(--color-surface-soft);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #999;
+    border: 2px solid var(--color-border);
 }
 
 .profile-info-col {
@@ -102,19 +105,19 @@
 .section-title {
     font-size: 20px;
     font-weight: bold;
-    color: black;
+    color: var(--color-text);
 }
 
 .section-subtitle {
     font-size: 16px;
-    color: #666;
+    color: var(--color-text-muted);
     margin-bottom: 4px;
 }
 
 .field-label {
     font-size: 16px;
     font-weight: bold;
-    color: black;
+    color: var(--color-text);
     margin-top: 6px;
 }
 
@@ -122,31 +125,31 @@
     width: 100%;
     padding: 12px 14px;
     border-radius: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border);
     font-size: 16px;
-    color: #333;
+    color: var(--color-text);
+    background: var(--color-surface);
 }
 
 .change-pass-btn {
     margin-top: 10px;
     padding: 12px 28px;
-    background: #F4DC2E;
-    border: 2px solid black;
+    background: var(--color-accent);
+    border: 2px solid #111;
     border-radius: 10px;
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
-    color: black;
+    color: var(--color-accent-text);
     align-self: center;
 }
 
 .profile-divider {
     width: 100%;
     height: 1px;
-    background: #eee;
+    background: var(--color-border-soft);
 }
 
-/* PERMISOS */
 .permissions-section {
     display: flex;
     flex-direction: column;
@@ -158,8 +161,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 16px;
-    background: #f9f9f9;
+    background: var(--color-surface-soft);
     border-radius: 10px;
+    gap: 16px;
 }
 
 .permission-left {
@@ -171,42 +175,40 @@
 .perm-name {
     font-size: 17px;
     font-weight: bold;
-    color: black;
+    color: var(--color-text);
 }
 
 .perm-desc {
     font-size: 15px;
-    color: #666;
+    color: var(--color-text-muted);
 }
 
 .activate-btn {
     min-width: 110px;
     padding: 10px 24px;
-    background: #F4DC2E;
-    border: 2px solid black;
+    background: var(--color-accent);
+    border: 2px solid #111;
     border-radius: 8px;
     font-size: 15px;
     font-weight: bold;
     cursor: pointer;
-    color: black;
+    color: var(--color-accent-text);
 }
 
-/* CERRAR SESIÓN */
 .logout-btn {
     width: 100%;
     padding: 12px;
-    background: #e53935;
-    border: 2px solid black;
+    background: var(--color-danger);
+    border: 2px solid #111;
     border-radius: 12px;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    color: white;
+    color: #ffffff;
 }
 
-.logout-btn:hover { opacity: 0.9; }
+.logout-btn:hover { opacity: 0.92; }
 
-/* VISTA CONTRASEÑA */
 .profile-center {
     flex: 1;
     display: flex;
@@ -214,23 +216,25 @@
     align-items: center;
     justify-content: center;
     gap: 24px;
+    min-height: 0;
 }
 
 .password-card {
-    background: white;
-    border-radius: 15px;
+    background: var(--color-surface);
+    border-radius: 18px;
     padding: 32px;
     width: 100%;
     max-width: 480px;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    box-shadow: var(--color-shadow);
 }
 
 .password-title {
     font-size: 22px;
     font-weight: bold;
-    color: black;
+    color: var(--color-text);
     text-align: center;
     margin-bottom: 12px;
 }
@@ -238,20 +242,19 @@
 .save-btn {
     width: 100%;
     padding: 12px;
-    background: #F4DC2E;
-    border: 2px solid black;
+    background: var(--color-accent);
+    border: 2px solid #111;
     border-radius: 12px;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    color: black;
+    color: var(--color-accent-text);
     margin-top: 12px;
 }
 
-/* VISTAS PERMISOS */
 .permission-card {
-    background: white;
-    border-radius: 15px;
+    background: var(--color-surface);
+    border-radius: 18px;
     width: 100%;
     max-width: 520px;
     min-height: 300px;
@@ -259,37 +262,35 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: var(--color-shadow);
 }
 
 .yellow-btn {
     min-width: 260px;
     padding: 18px 48px;
-    background: #F4DC2E;
-    border: 2px solid black;
+    background: var(--color-accent);
+    border: 2px solid #111;
     border-radius: 12px;
     font-size: 19px;
     font-weight: bold;
     cursor: pointer;
-    color: black;
+    color: var(--color-accent-text);
 }
 
-/* MODAL */
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.3);
+    inset: 0;
+    background: rgba(0, 0, 0, 0.38);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 200;
+    padding: 20px;
 }
 
 .modal-box {
-    background: #b0c8e8;
-    border-radius: 15px;
+    background: var(--color-surface);
+    border-radius: 18px;
     padding: 40px 32px;
     display: flex;
     flex-direction: column;
@@ -297,12 +298,13 @@
     gap: 24px;
     max-width: 320px;
     width: 100%;
+    box-shadow: var(--color-shadow);
 }
 
 .modal-text {
     font-size: 20px;
     font-weight: bold;
-    color: black;
+    color: var(--color-text);
     text-align: center;
     line-height: 1.4;
 }
@@ -312,43 +314,42 @@
     gap: 16px;
 }
 
-.modal-logout-btn {
+.modal-logout-btn,
+.modal-cancel-btn {
     padding: 10px 24px;
-    background: #F4DC2E;
-    border: 2px solid black;
+    border: 2px solid #111;
     border-radius: 10px;
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
-    color: black;
+}
+
+.modal-logout-btn {
+    background: var(--color-accent);
+    color: var(--color-accent-text);
 }
 
 .modal-cancel-btn {
-    padding: 10px 24px;
-    background: #3A78C2;
-    border: 2px solid black;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    color: white;
+    background: var(--color-control-bg);
+    color: var(--color-control-text);
 }
 
-/* TABLET */
 @media (max-width: 1024px) {
-    .navbar { gap: 20px; }
+    .navbar { gap: 14px; }
     .nav-item { font-size: 15px; }
 }
 
-/* MÓVIL */
 @media (max-width: 768px) {
     .profile-container { padding: 16px; }
     .profile-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-    .navbar { gap: 12px; flex-wrap: wrap; }
+    .navbar { gap: 10px; justify-content: flex-start; }
     .nav-item { font-size: 14px; }
     .profile-card { max-width: 100%; }
     .profile-section { flex-direction: column; }
     .profile-header-title { display: none; }
+    .permission-row { flex-direction: column; align-items: stretch; }
     .permission-card { max-width: 100%; min-height: 240px; padding: 48px 32px; }
     .yellow-btn { width: 100%; min-width: 0; padding: 16px 24px; font-size: 17px; }
+    .modal-actions { flex-direction: column; width: 100%; }
+    .modal-logout-btn, .modal-cancel-btn { width: 100%; }
 }

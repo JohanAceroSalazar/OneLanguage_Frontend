@@ -1,9 +1,10 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import BrandLogo from "../../components/BrandLogo/BrandLogo";
+import NavBar from "../../components/NavBar/NavBar";
 import "./Home.css";
 
 function Home() {
     const navigate = useNavigate();
-    const location = useLocation();
     const userName = "usuario";
 
     return (
@@ -11,18 +12,8 @@ function Home() {
 
             {/* HEADER */}
             <div className="home-header">
-                <div className="home-logo">
-                    <span>ONE<br/>LANGUAGE</span>
-                </div>
-
-                {/* NAVBAR */}
-                <nav className="navbar">
-                    <span className={location.pathname === "/home" ? "nav-item active" : "nav-item"} onClick={() => navigate("/home")}>Home</span>
-                    <span className={location.pathname === "/translate" ? "nav-item active" : "nav-item"} onClick={() => navigate("/translate")}>Traducir</span>
-                    <span className={location.pathname === "/history" ? "nav-item active" : "nav-item"} onClick={() => navigate("/history")}>Historial</span>
-                    <span className={location.pathname === "/accessibility" ? "nav-item active" : "nav-item"} onClick={() => navigate("/accessibility")}>Accesibilidad</span>
-                    <span className={location.pathname === "/profile" ? "nav-item active" : "nav-item"} onClick={() => navigate("/profile")}>Perfil</span>
-                </nav>
+                <BrandLogo className="home-logo" />
+                <NavBar />
             </div>
 
             {/* SALUDO */}

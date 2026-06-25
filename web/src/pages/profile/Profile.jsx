@@ -1,33 +1,24 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./Profile.css";
 import { FaCamera, FaMusic, FaFolder, FaUser } from "react-icons/fa";
+import BrandLogo from "../../components/BrandLogo/BrandLogo";
+import NavBar from "../../components/NavBar/NavBar";
 
 function Profile() {
     const navigate = useNavigate();
-    const location = useLocation();
 
     const [view, setView] = useState("profile"); // profile | password | camera | audio | files
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [form, setForm] = useState({ name: "Juan Pablo", email: "juan@gmail.com" });
     const [passwordForm, setPasswordForm] = useState({ current: "", new: "", confirm: "" });
 
-    const NavBar = () => (
-        <nav className="navbar">
-            <span className={location.pathname === "/home" ? "nav-item active" : "nav-item"} onClick={() => navigate("/home")}>Home</span>
-            <span className={location.pathname === "/translate" ? "nav-item active" : "nav-item"} onClick={() => navigate("/translate")}>Traducir</span>
-            <span className={location.pathname === "/history" ? "nav-item active" : "nav-item"} onClick={() => navigate("/history")}>Historial</span>
-            <span className={location.pathname === "/accessibility" ? "nav-item active" : "nav-item"} onClick={() => navigate("/accessibility")}>Accesibilidad</span>
-            <span className={location.pathname === "/profile" ? "nav-item active" : "nav-item"} onClick={() => navigate("/profile")}>Perfil</span>
-        </nav>
-    );
-
     // VISTA CAMBIAR CONTRASEÑA
     if (view === "password") {
         return (
             <div className="profile-container">
                 <div className="profile-header">
-                    <div className="profile-logo"><span>ONE<br/>LANGUAGE</span></div>
+                    <BrandLogo className="profile-logo" />
                     <NavBar />
                 </div>
                 <div className="profile-center">
@@ -51,7 +42,7 @@ function Profile() {
         return (
             <div className="profile-container">
                 <div className="profile-header">
-                    <div className="profile-logo"><span>ONE<br/>LANGUAGE</span></div>
+                    <BrandLogo className="profile-logo" />
                     <NavBar />
                 </div>
                 <div className="profile-center">
@@ -69,7 +60,7 @@ function Profile() {
         return (
             <div className="profile-container">
                 <div className="profile-header">
-                    <div className="profile-logo"><span>ONE<br/>LANGUAGE</span></div>
+                    <BrandLogo className="profile-logo" />
                     <NavBar />
                 </div>
                 <div className="profile-center">
@@ -87,7 +78,7 @@ function Profile() {
         return (
             <div className="profile-container">
                 <div className="profile-header">
-                    <div className="profile-logo"><span>ONE<br/>LANGUAGE</span></div>
+                    <BrandLogo className="profile-logo" />
                     <NavBar />
                 </div>
                 <div className="profile-center">
@@ -104,7 +95,7 @@ function Profile() {
     return (
         <div className="profile-container">
             <div className="profile-header">
-                <div className="profile-logo"><span>ONE<br/>LANGUAGE</span></div>
+                <BrandLogo className="profile-logo" />
                 <NavBar />
             </div>
 

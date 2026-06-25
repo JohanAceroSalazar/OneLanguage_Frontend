@@ -1,117 +1,153 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     margin: 0;
-    overflow: hidden;
     height: 100%;
     font-family: Arial, sans-serif;
 }
 
-/* ===== CONTENEDOR SPLIT ===== */
 .login-container {
     width: 100%;
-    height: 100vh;
-    background: #3A78C2;
-    display: flex;
+    min-height: 100dvh;
+    background:
+        radial-gradient(circle at top left, color-mix(in srgb, var(--color-accent) 20%, transparent), transparent 26%),
+        linear-gradient(135deg, var(--color-page-bg-alt) 0%, var(--color-page-bg) 58%, color-mix(in srgb, var(--color-page-bg) 72%, #000) 100%);
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
     align-items: center;
-    justify-content: center;
-    gap: 4vw;
-    padding: 2rem;
+    gap: clamp(24px, 6vw, 72px);
+    padding: 32px clamp(18px, 4vw, 56px);
+    overflow: hidden;
 }
 
-/* ===== LADO IZQUIERDO ===== */
 .login-left {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 16px;
-    color: white;
-    margin-top: -50px;
+    color: var(--color-text-on-page);
+    max-width: 480px;
+    position: relative;
 }
 
-/* ===== LOGO PIEZAS ===== */
-.logo-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 8px;
-    width: clamp(80px, 12vw, 130px);
-    height: clamp(80px, 12vw, 130px);
+.logo-img {
+    width: clamp(72px, 10vw, 116px);
+    height: auto;
+    filter: drop-shadow(0 18px 28px rgba(6, 20, 43, 0.25));
 }
-
-.logo-piece {
-    background: white;
-    border-radius: 8px;
-}
-
-.piece-1 { transform: rotate(-10deg); }
-.piece-2 { transform: rotate(12deg);  }
-.piece-3 { transform: rotate(8deg);   }
-.piece-4 { transform: rotate(-8deg);  }
 
 .brand-name {
-    font-size: clamp(22px, 4vw, 34px);
-    font-weight: bold;
-    text-align: center;
-    line-height: 1.1;
+    font-size: clamp(38px, 7vw, 82px);
+    font-weight: 800;
+    text-align: left;
+    line-height: 0.92;
     margin: 0;
-    letter-spacing: 2px;
+    letter-spacing: -0.05em;
 }
 
-/* ===== LADO DERECHO ===== */
+.login-brand-copy {
+    margin: 8px 0 0;
+    max-width: 28ch;
+    font-size: 18px;
+    line-height: 1.7;
+    color: color-mix(in srgb, var(--color-text-on-page) 88%, transparent);
+}
+
 .login-right {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 10px;
 }
 
-/* ===== TARJETA ===== */
 .login-card {
-    background: white;
-    border-radius: 15px;
-    padding: clamp(16px, 3vw, 28px);
-    width: clamp(260px, 35vw, 420px);
+    width: min(100%, 460px);
+    background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+    border-radius: 28px;
+    padding: 28px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    color: black;
-    font-weight: bold;
-    border: 2px solid rgba(255,255,255,0.4);
+    gap: 8px;
+    color: var(--color-text);
+    box-shadow: var(--color-shadow);
+    border: 1px solid var(--color-border);
 }
 
-/* ===== INPUTS ===== */
+.form-header {
+    margin-bottom: 10px;
+}
+
+.form-step {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-page-bg) 14%, var(--color-surface));
+    color: var(--color-page-bg-alt);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.form-header h1 {
+    margin: 0;
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.05;
+    color: var(--color-text);
+}
+
+.login-card label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-top: 4px;
+}
+
 .login-card input {
     width: 100%;
-    padding: 10px 40px 10px 10px;
-    border-radius: 8px;
-    border: 1px solid #000;
-    font-size: 14px;
-    color: #2c2929;
-    background: white;
-    margin-bottom: 6px;
+    color: var(--color-text);
+    background: var(--color-surface);
+    padding: 12px 42px 12px 14px;
+    border-radius: 14px;
+    border: 1px solid var(--color-border);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-/* ===== BOTÓN ===== */
-.login-card button {
+.login-card input:focus {
+    border-color: var(--color-page-bg);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-page-bg) 14%, transparent);
+}
+
+.login-card input.input-error {
+    background-color: color-mix(in srgb, var(--color-danger) 14%, var(--color-surface));
+    border-color: var(--color-danger);
+}
+
+.auth-submit-button {
     width: 100%;
-    margin-top: 10px;
-    background: #F4DC2E;
-    border: 2px solid black;
-    padding: 10px;
-    color: black;
-    border-radius: 12px;
-    font-size: clamp(16px, 2vw, 22px);
-    font-weight: bold;
+    margin-top: 12px;
+    background: var(--color-accent);
+    border: 0;
+    color: var(--color-accent-text);
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 800;
     cursor: pointer;
+    box-shadow: 0 14px 28px rgba(244, 220, 46, 0.28);
 }
 
-/* ===== TEXTOS INFERIORES ===== */
 .recover-text,
 .register-text {
-    color: white;
+    color: var(--color-text-on-page);
     font-size: 15px;
     margin-top: 12px;
     text-align: center;
@@ -119,54 +155,74 @@ html, body {
 }
 
 .register-text a {
-    color: white;
+    color: var(--color-text-on-page);
     font-weight: bold;
     text-decoration: underline;
 }
 
-.message {
-    color: white;
-    font-size: 14px;
-    margin-top: 8px;
-    text-align: center;
+.recover-text:hover,
+.register-text:hover {
+    opacity: 0.94;
 }
 
-/* ===== CONTRASEÑA ===== */
 .password-field {
     position: relative;
     width: 100%;
     display: flex;
     align-items: center;
-    margin-bottom: 6px;
 }
 
 .password-field input {
     flex: 1;
-    margin-bottom: 0;
 }
 
 .toggle-password {
     position: absolute;
-    right: 12px;
+    right: 14px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
     font-size: 18px;
-    color: #555;
+    color: var(--color-text-muted);
 }
 
 .error-text {
-    color: red;
+    color: var(--color-danger);
     font-size: 12px;
-    margin-top: 0px;
-    margin-bottom: 0px;
+    margin: 0;
     font-weight: bold;
     min-height: 18px;
 }
 
-/*MÁS ESPECÍFICO que el input normal */
-.login-card input.input-error {
-    background-color: #FFB9B9;
-    border: 1px solid red;
-    transition: 0.3s;
+@media (max-width: 980px) {
+    .login-container {
+        grid-template-columns: 1fr;
+        padding-top: 24px;
+        padding-bottom: 24px;
+    }
+
+    .login-left {
+        align-items: center;
+        text-align: center;
+        max-width: 100%;
+    }
+
+    .login-brand-copy {
+        max-width: 42ch;
+    }
+}
+
+@media (max-width: 640px) {
+    .login-card {
+        padding: 22px 18px;
+        border-radius: 24px;
+    }
+
+    .brand-name {
+        font-size: clamp(34px, 12vw, 54px);
+    }
+
+    .login-brand-copy {
+        font-size: 16px;
+    }
 }

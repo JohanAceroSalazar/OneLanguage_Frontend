@@ -2,13 +2,13 @@
 
 .access-container {
     width: 100%;
-    height: 100vh;
-    background: #3A78C2;
+    min-height: 100dvh;
+    background: var(--color-page-bg);
     display: flex;
     flex-direction: column;
     padding: 20px 24px;
     font-family: Arial, sans-serif;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 .access-header {
@@ -16,23 +16,24 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    gap: 16px;
 }
 
-.access-logo span {
+.access-logo {
     font-size: 22px;
-    font-weight: bold;
-    color: white;
-    line-height: 1.2;
+    color: var(--color-text-on-page);
 }
 
 .navbar {
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .nav-item {
-    color: white;
+    color: var(--color-text-on-page);
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
@@ -41,25 +42,16 @@
     transition: border-color 0.2s, color 0.2s;
 }
 
-.nav-item:hover { color: #F4DC2E; }
+.nav-item:hover { color: var(--color-accent); }
 
 .nav-item.active {
-    color: #F4DC2E;
-    border-bottom: 3px solid #F4DC2E;
+    color: var(--color-accent);
+    border-bottom: 3px solid var(--color-accent);
 }
 
-.access-title {
-    color: white;
-    font-size: 22px;
-    font-weight: bold;
-    margin-top: 16px;
-    margin-left: 4px;
-}
-
-/* TARJETA */
 .access-card {
-    background: white;
-    border-radius: 15px;
+    background: var(--color-surface);
+    border-radius: 18px;
     padding: 42px 48px;
     margin: auto;
     max-width: 760px;
@@ -68,6 +60,7 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
+    box-shadow: var(--color-shadow);
 }
 
 .access-row {
@@ -76,223 +69,232 @@
     align-items: center;
     padding: 18px 0;
     position: relative;
+    gap: 16px;
 }
 
 .access-label {
     display: flex;
     align-items: center;
-    gap: 30px;
-    font-size: 25px;
+    gap: 18px;
+    font-size: 22px;
     font-weight: bold;
-    color: black;
+    color: var(--color-text);
 }
 
 .access-control {
     position: relative;
 }
 
+.access-btn,
+.access-save-btn,
+.access-modal-btn {
+    border: 2px solid #111;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--color-accent-text);
+    background: var(--color-accent);
+}
+
 .access-btn {
     min-width: 130px;
     padding: 12px 26px;
-    background: #F4DC2E;
-    border: 2px solid black;
-    border-radius: 10px;
     font-size: 17px;
-    font-weight: bold;
-    cursor: pointer;
-    color: black;
 }
 
-.access-btn:hover { opacity: 0.9; }
+.access-btn:hover,
+.access-save-btn:hover,
+.access-modal-btn:hover { opacity: 0.92; }
 
 .access-divider {
     width: 100%;
     height: 1px;
-    background: #eee;
+    background: var(--color-border-soft);
 }
 
-/* DROPDOWN */
-.access-dropdown {
+.access-dropdown,
+.access-theme-picker {
     position: absolute;
-    top: 40px;
+    top: 46px;
     right: 0;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 8px 0;
-    min-width: 140px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 10px;
+    min-width: 180px;
     z-index: 100;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: var(--color-shadow);
 }
 
-.access-dropdown p {
-    padding: 8px 16px;
+.access-dropdown button {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    padding: 10px 12px;
     font-size: 14px;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: black;
+    color: var(--color-text);
+    border-radius: 10px;
 }
 
-.access-dropdown p:hover { background: #f5f5f5; }
+.access-dropdown button:hover,
+.theme-option:hover {
+    background: var(--color-surface-soft);
+}
 
-.access-dropdown p.selected { font-weight: bold; }
+.access-dropdown button.selected,
+.theme-option.selected {
+    font-weight: bold;
+    background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
 
-/* COLOR PICKER */
-.access-color-picker {
-    position: absolute;
-    top: 40px;
-    right: 0;
-    background: #555;
-    border-radius: 12px;
-    padding: 16px;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    min-width: 220px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+.access-theme-picker {
+    min-width: 260px;
 }
 
 .color-title {
-    color: white;
-    font-size: 16px;
+    color: var(--color-text);
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.theme-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.theme-option {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-soft);
+    color: var(--color-text);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
     font-weight: bold;
 }
 
-.color-input {
-    width: 100%;
-    height: 120px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    padding: 0;
+.theme-hint {
+    margin-top: 10px;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.5;
 }
 
-.apply-btn {
-    width: 100%;
-    padding: 10px;
-    background: #F4DC2E;
-    border: 2px solid black;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    color: black;
-}
-
-/* GUARDAR */
 .access-save-btn {
     width: 100%;
     padding: 17px;
-    background: #F4DC2E;
-    border: 2px solid black;
-    border-radius: 12px;
-    font-size: 22px;
-    font-weight: bold;
-    cursor: pointer;
-    color: black;
+    font-size: 20px;
     margin-top: 14px;
 }
 
-.access-save-btn:hover { opacity: 0.9; }
-
-/* MODAL */
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.3);
+    inset: 0;
+    background: rgba(0, 0, 0, 0.38);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 200;
-}
-
-.modal-box {
-    background: #b0c8e8;
-    border-radius: 15px;
-    padding: 40px 32px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 24px;
-    max-width: 320px;
-    width: 100%;
+    padding: 20px;
 }
 
 .access-modal-box {
-    background: #b0c8e8;
-    border-radius: 15px;
-    padding: 54px 48px;
+    background: var(--color-surface);
+    border-radius: 18px;
+    padding: 42px 36px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 40px;
+    gap: 28px;
     max-width: 430px;
     width: 100%;
-}
-
-.modal-text {
-    font-size: 30px;
-    color: black;
-    text-align: center;
-    line-height: 1.0;
+    box-shadow: var(--color-shadow);
+    border: 1px solid var(--color-border);
 }
 
 .access-modal-text {
-    font-size: 35px;
+    font-size: clamp(22px, 3vw, 34px);
     font-weight: bold;
-    color: black;
+    color: var(--color-text);
     text-align: center;
-    line-height: 1.3;
-}
-
-.modal-btn {
-    padding: 10px 40px;
-    background: #F4DC2E;
-    border: 2px solid black;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    color: black;
+    line-height: 1.25;
 }
 
 .access-modal-btn {
     padding: 14px 56px;
-    background: #F4DC2E;
-    border: 2px solid black;
-    border-radius: 10px;
-    font-size: 30px;
-    font-weight: bold;
-    cursor: pointer;
-    color: black;
+    font-size: 20px;
 }
 
-.modal-btn:hover { opacity: 0.9; }
-.access-modal-btn:hover { opacity: 0.9; }
-
-/* TABLET */
 @media (max-width: 1024px) {
-    .navbar { gap: 20px; }
+    .navbar { gap: 14px; }
     .nav-item { font-size: 15px; }
 }
 
-/* MÓVIL */
 @media (max-width: 768px) {
-    .access-container { padding: 16px; overflow-y: auto; height: auto; min-height: 100vh; }
-    .access-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-    .navbar { gap: 12px; flex-wrap: wrap; }
-    .nav-item { font-size: 14px; }
-    .access-card { max-width: 100%; padding: 28px 22px; margin: 32px auto; }
-    .access-row { align-items: flex-start; gap: 16px; }
-    .access-label { font-size: 17px; }
-    .access-btn { min-width: 104px; padding: 10px 16px; font-size: 15px; }
-    .access-modal-box { max-width: calc(100% - 32px); padding: 40px 24px; }
-    .access-modal-text { font-size: 19px; }
+    .access-container {
+        padding: 16px;
+    }
+
+    .access-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar {
+        justify-content: flex-start;
+    }
+
+    .access-card {
+        max-width: 100%;
+        padding: 26px 20px;
+        margin: 28px auto;
+    }
+
+    .access-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .access-label {
+        font-size: 17px;
+        gap: 12px;
+    }
+
+    .access-btn {
+        width: 100%;
+        min-width: 0;
+        padding: 12px 16px;
+        font-size: 15px;
+    }
+
+    .access-dropdown,
+    .access-theme-picker {
+        position: static;
+        margin-top: 12px;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .theme-options {
+        grid-template-columns: 1fr;
+    }
+
+    .access-save-btn {
+        font-size: 18px;
+        padding: 15px;
+    }
+
+    .access-modal-box {
+        max-width: 100%;
+        padding: 32px 22px;
+    }
 }

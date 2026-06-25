@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./RecoverPassword.css";
 import logo from "../../assets/Logo.png";
+import BrandLogo from "../../components/BrandLogo/BrandLogo";
 
 function RecoverPassword() {
     const [email, setEmail] = useState("");
@@ -24,9 +25,7 @@ function RecoverPassword() {
         <div className="recover-container">
 
             {/* LOGO ARRIBA IZQUIERDA */}
-            <div className="recover-logo">
-                <span>ONE<br/>LANGUAGE</span>
-            </div>
+            <BrandLogo className="recover-logo" />
 
             {/* TÍTULO */}
             <h2 className="recover-title">Restablecer<br/>contraseña</h2>
