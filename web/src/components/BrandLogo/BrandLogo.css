@@ -1,0 +1,22 @@
+.brand-logo {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    line-height: 1.15;
+}
+
+.brand-logo span {
+    display: inline-block;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+}
+
+.brand-logo:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+    border-radius: 8px;
+}

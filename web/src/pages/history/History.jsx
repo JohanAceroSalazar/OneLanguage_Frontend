@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
 import "./History.css";
 import { FaTrash, FaClock, FaCamera, FaChevronDown } from "react-icons/fa";
+import BrandLogo from "../../components/BrandLogo/BrandLogo";
+import NavBar from "../../components/NavBar/NavBar";
 
 const mockTranslations = [
     { id: 1, title: "Traducción", date: "10/12/25", image: null },
@@ -13,8 +14,6 @@ const mockTranslations = [
 function History() {
     const [translations, setTranslations] = useState(mockTranslations);
     const [filterOpen, setFilterOpen] = useState(false);
-    const navigate = useNavigate();
-    const location = useLocation();
 
     const deleteOne = (id) => {
         setTranslations(translations.filter(t => t.id !== id));
@@ -29,16 +28,8 @@ function History() {
 
             {/* HEADER */}
             <div className="history-header">
-                <div className="history-logo">
-                    <span>ONE<br/>LANGUAGE</span>
-                </div>
-                <nav className="navbar">
-                    <span className={location.pathname === "/home" ? "nav-item active" : "nav-item"} onClick={() => navigate("/home")}>Home</span>
-                    <span className={location.pathname === "/translate" ? "nav-item active" : "nav-item"} onClick={() => navigate("/translate")}>Traducir</span>
-                    <span className={location.pathname === "/history" ? "nav-item active" : "nav-item"} onClick={() => navigate("/history")}>Historial</span>
-                    <span className={location.pathname === "/accessibility" ? "nav-item active" : "nav-item"} onClick={() => navigate("/accessibility")}>Accesibilidad</span>
-                    <span className={location.pathname === "/profile" ? "nav-item active" : "nav-item"} onClick={() => navigate("/profile")}>Perfil</span>
-                </nav>
+                <BrandLogo className="history-logo" />
+                <NavBar />
             </div>
 
             {/* TÍTULO */}
