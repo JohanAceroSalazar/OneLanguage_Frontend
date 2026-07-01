@@ -6,6 +6,7 @@ import Button from "../../components/Button/Button";
 import AuthModal from "../../components/AuthModal/AuthModal";
 import logo from "../../assets/Logo.png";
 import "./Login.css";
+import { loginUser } from "../../services/authService";
 
 const emailRegex = /\S+@\S+\.\S+/;
 
@@ -90,7 +91,7 @@ function Login() {
         }));
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         const nextErrors = validateForm(form);
@@ -113,17 +114,38 @@ function Login() {
             return;
         }
 
+        try {
+
+        const response = await loginUser({
+            email: form.email,
+            password: form.password,
+        });
+
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("user", JSON.stringify(response.user));
+
         openModal({
-            title: "Sesión lista",
-            message: "Tus datos se validaron correctamente. Vamos a llevarte al panel principal.",
+            title: "Sesión Exitosa",
+            message: "Inicio de sesión exitoso. Vamos a llevarte al panel principal.",
             tone: "success",
             confirmText: "Entrar ahora",
-            onConfirm: () => {
-                closeModal();
-                navigate("/home");
-            },
+        onConfirm: () => {
+            closeModal();
+            navigate("/home");
+        },
+    });
+
+        } catch (error) {
+
+        openModal({
+            title: "No se pudo iniciar sesión",
+            message: "Correo o contraseña incorrectos.",
+            tone: "error",
+            confirmText: "Intentar nuevamente",
+        onConfirm: closeModal,
         });
-    };
+    }
+};
 
     const showFieldError = (field) => touched[field] || modal.open;
 
