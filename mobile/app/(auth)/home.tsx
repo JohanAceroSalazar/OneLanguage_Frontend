@@ -7,16 +7,19 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import { useTheme } from "../../src/theme/ThemeContext";
 
 export default function Home() {
+    const { colors, fontScale } = useTheme();
+
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
         <View style={styles.cameraDot} />
 
-        <Text style={styles.logo}>ONE{"\n"}LANGUAGE</Text>
+        <Text style={[styles.logo, { color: colors.text, fontSize: 20 * fontScale }]}>ONE{"\n"}LANGUAGE</Text>
 
         <View style={styles.header}>
-            <Text style={styles.greeting}>Hola usuario{"\n"}bienvenido</Text>
+            <Text style={[styles.greeting, { color: colors.text, fontSize: 24 * fontScale }]}>Hola usuario{"\n"}bienvenido</Text>
         <Image
             source={require("../../assets/images/Logo.png")}
             style={styles.avatar}
@@ -24,17 +27,17 @@ export default function Home() {
             />
         </View>
 
-        <View style={styles.card}>
-            <Text style={styles.cardTitle}>¡Bienvenido a{"\n"}One Language!</Text>
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, shadowColor: colors.shadow }]}> 
+            <Text style={[styles.cardTitle, { color: colors.textOnSurface, fontSize: 30 * fontScale }]}>¡Bienvenido a{"\n"}One Language!</Text>
 
-        <Text style={styles.description}>
+        <Text style={[styles.description, { color: colors.textOnSurface, fontSize: 19 * fontScale }]}> 
             One Language es una aplicación diseñada para traducir el lenguaje de
             señas colombiano a texto y audio en tiempo real, promoviendo la
             inclusión y la comunicación sin barreras en Colombia.
         </Text>
 
-        <TouchableOpacity activeOpacity={0.85} style={styles.button}>
-            <Text style={styles.buttonText}>Comenzar a{"\n"}traducir</Text>
+        <TouchableOpacity activeOpacity={0.85} style={[styles.button, { backgroundColor: colors.accent }]}> 
+            <Text style={[styles.buttonText, { color: colors.textOnSurface, fontSize: 25 * fontScale }]}>Comenzar a{"\n"}traducir</Text>
         </TouchableOpacity>
         </View>
 

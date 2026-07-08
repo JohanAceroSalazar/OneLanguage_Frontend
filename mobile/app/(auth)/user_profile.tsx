@@ -11,6 +11,7 @@ import {
     View,
 } from "react-native";
 import { BottomNav } from "../../components/bottom-nav";
+import { useTheme } from "../../src/theme/ThemeContext";
 
 type PermissionItemProps = {
     icon: keyof typeof Ionicons.glyphMap;
@@ -19,17 +20,19 @@ type PermissionItemProps = {
 };
 
 function PermissionItem({ icon, title, description }: PermissionItemProps) {
+    const { colors, fontScale } = useTheme();
+
     return (
-    <View style={styles.permissionItem}>
-        <Ionicons name={icon} size={34} color="#333333" />
+    <View style={[styles.permissionItem, { borderColor: colors.border, backgroundColor: colors.surfaceAlt }]}> 
+        <Ionicons name={icon} size={34} color={colors.primary} />
 
     <View style={styles.permissionText}>
-        <Text style={styles.permissionTitle}>{title}</Text>
-        <Text style={styles.permissionDescription}>{description}</Text>
+        <Text style={[styles.permissionTitle, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>{title}</Text>
+        <Text style={[styles.permissionDescription, { color: colors.textMuted, fontSize: 12 * fontScale }]}>{description}</Text>
     </View>
 
-    <TouchableOpacity activeOpacity={0.85} style={styles.activateButton}>
-        <Text style={styles.activateText}>Activar</Text>
+    <TouchableOpacity activeOpacity={0.85} style={[styles.activateButton, { backgroundColor: colors.accent }]}> 
+        <Text style={[styles.activateText, { color: colors.textOnSurface, fontSize: 13 * fontScale }]}>Activar</Text>
     </TouchableOpacity>
     </View>
     );
@@ -37,15 +40,16 @@ function PermissionItem({ icon, title, description }: PermissionItemProps) {
 
 export default function UserProfile() {
     const router = useRouter();
+    const { colors, fontScale } = useTheme();
 
     return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
         <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
     >
         <View style={styles.header}>
-            <Text style={styles.logo}>ONE{"\n"}LANGUAGE</Text>
+            <Text style={[styles.logo, { color: colors.text, fontSize: 20 * fontScale }]}>ONE{"\n"}LANGUAGE</Text>
         <Image
             source={require("../../assets/images/Logo.png")}
             style={styles.avatar}
@@ -53,40 +57,40 @@ export default function UserProfile() {
         />
         </View>
 
-        <Text style={styles.title}>Perfil de usuario</Text>
+        <Text style={[styles.title, { color: colors.text, fontSize: 26 * fontScale }]}>Perfil de usuario</Text>
 
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
             <View style={styles.sectionHeader}>
-            <Ionicons name="person-circle" size={34} color="#000000" />
+            <Ionicons name="person-circle" size={34} color={colors.primary} />
 
             <View>
-                <Text style={styles.sectionTitle}>Información personal</Text>
-                <Text style={styles.sectionSubtitle}>
+                <Text style={[styles.sectionTitle, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>Información personal</Text>
+                <Text style={[styles.sectionSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}> 
                 Visualiza tus datos personales
             </Text>
             </View>
         </View>
 
-        <Text style={styles.label}>Nombre completo</Text>
+        <Text style={[styles.label, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>Nombre completo</Text>
         <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: colors.border }]}
             value="Johan Acero"
             editable={false}
         />
 
-        <Text style={styles.label}>Correo electrónico</Text>
+        <Text style={[styles.label, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>Correo electrónico</Text>
         <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: colors.border }]}
             value="johan@gmail.com"
             editable={false}
         />
 
-        <TouchableOpacity activeOpacity={0.85} style={styles.passwordButton}>
-            <Text style={styles.passwordButtonText}>Cambiar contraseña</Text>
+        <TouchableOpacity activeOpacity={0.85} style={[styles.passwordButton, { backgroundColor: colors.accent }]}> 
+            <Text style={[styles.passwordButtonText, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>Cambiar contraseña</Text>
         </TouchableOpacity>
 
-        <Text style={styles.permissionsTitle}>Permisos del dispositivo</Text>
-        <Text style={styles.permissionsSubtitle}>
+        <Text style={[styles.permissionsTitle, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>Permisos del dispositivo</Text>
+        <Text style={[styles.permissionsSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}> 
             Gestiona los permisos de acceso a{"\n"}funciones del dispositivo
         </Text>
 
@@ -112,7 +116,7 @@ export default function UserProfile() {
             style={styles.logoutButton}
             onPress={() => router.push("/(auth)/login")}
         >
-            <Text style={styles.logoutText}>Cerrar sesión</Text>
+            <Text style={[styles.logoutText, { color: "#FFFFFF", fontSize: 20 * fontScale }]}>Cerrar sesión</Text>
         </TouchableOpacity>
     </ScrollView>
 

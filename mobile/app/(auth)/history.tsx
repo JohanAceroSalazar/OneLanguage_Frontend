@@ -1,25 +1,28 @@
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { BottomNav } from "../../components/bottom-nav";
+import { useTheme } from "../../src/theme/ThemeContext";
 
 export default function History() {
+    const { colors, fontScale } = useTheme();
+
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
         <View style={styles.cameraDot} />
 
-        <Text style={styles.logo}>ONE{"\n"}LANGUAGE</Text>
+        <Text style={[styles.logo, { color: colors.text, fontSize: 20 * fontScale }]}>ONE{"\n"}LANGUAGE</Text>
 
     <View style={styles.headerText}>
-        <Text style={styles.title}>Historial de traducción</Text>
-        <Text style={styles.subtitle}>Revisa tus traducciones anteriores</Text>
+        <Text style={[styles.title, { color: colors.text, fontSize: 23 * fontScale }]}>Historial de traducción</Text>
+        <Text style={[styles.subtitle, { color: colors.textMuted, fontSize: 14 * fontScale }]}>Revisa tus traducciones anteriores</Text>
     </View>
 
-    <View style={styles.card}>
-        <Ionicons name="camera-outline" size={42} color="#000000" />
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+        <Ionicons name="camera-outline" size={42} color={colors.primary} />
 
-        <Text style={styles.emptyTitle}>No hay traducciones</Text>
+        <Text style={[styles.emptyTitle, { color: colors.textOnSurface, fontSize: 22 * fontScale }]}>No hay traducciones</Text>
 
-        <Text style={styles.emptyText}>
+        <Text style={[styles.emptyText, { color: colors.textOnSurface, fontSize: 22 * fontScale }]}> 
             Comienza a usar el{"\n"}reconocimiento de{"\n"}señas para guardar{"\n"}
             traducciones.
         </Text>

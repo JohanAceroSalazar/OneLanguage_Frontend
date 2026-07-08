@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTheme } from "../src/theme/ThemeContext";
 
 type BottomNavTab = "home" | "camera" | "history" | "accessibility" | "profile";
 
@@ -29,15 +30,18 @@ const tabs: {
 
 export function BottomNav({ active }: BottomNavProps) {
   const router = useRouter();
+  const { colors, theme } = useTheme();
+
+  const isDark = theme === "dark";
 
   return (
-    <View style={styles.tabBar}>
+    <View style={[styles.tabBar, { backgroundColor: isDark ? "#0f172a" : "#1D1B3D" }]}> 
       {tabs.map((tab) => {
-        const icon = <Ionicons name={tab.icon} size={tab.size} color="#FFEB3B" />;
+        const icon = <Ionicons name={tab.icon} size={tab.size} color={isDark ? colors.accent : "#FFEB3B"} />;
 
         if (tab.name === active) {
           return (
-            <View key={tab.name} style={styles.activeTab}>
+            <View key={tab.name} style={[styles.activeTab, { borderColor: isDark ? colors.accent : "#FFEB3B", backgroundColor: isDark ? "#0f172a" : "#1D1B3D" }]}> 
               {icon}
             </View>
           );
