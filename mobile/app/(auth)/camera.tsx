@@ -8,17 +8,20 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import { useTheme } from "../../src/theme/ThemeContext";
 
 export default function Camera() {
+    const { colors, fontScale } = useTheme();
+
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
         <View style={styles.cameraDot} />
 
         <View style={styles.header}>
-        <Text style={styles.logo}>ONE{"\n"}LANGUAGE</Text>
+        <Text style={[styles.logo, { color: colors.text, fontSize: 20 * fontScale }]}>ONE{"\n"}LANGUAGE</Text>
 
         <TouchableOpacity activeOpacity={0.8} style={styles.switchButton}>
-            <Ionicons name="camera-reverse-outline" size={35} color="#000000" />
+            <Ionicons name="camera-reverse-outline" size={35} color={colors.accent} />
         </TouchableOpacity>
     </View>
 
@@ -28,12 +31,12 @@ export default function Camera() {
         resizeMode="cover"
     />
 
-    <View style={styles.resultCard}>
-        <Text style={styles.resultText}>El texto traducido{"\n"}aparecerá aquí...</Text>
+    <View style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+        <Text style={[styles.resultText, { color: colors.textOnSurface, fontSize: 27 * fontScale }]}>El texto traducido{"\n"}aparecerá aquí...</Text>
     </View>
 
-    <TouchableOpacity activeOpacity={0.85} style={styles.finishButton}>
-        <Text style={styles.finishButtonText}>Finalizar traducción</Text>
+    <TouchableOpacity activeOpacity={0.85} style={[styles.finishButton, { backgroundColor: colors.accent }]}> 
+        <Text style={[styles.finishButtonText, { color: colors.textOnSurface, fontSize: 22 * fontScale }]}>Finalizar traducción</Text>
     </TouchableOpacity>
 
     <BottomNav active="camera" />

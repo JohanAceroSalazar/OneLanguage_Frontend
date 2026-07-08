@@ -1,135 +1,147 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet
+  View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { registerUser } from "../../src/services/authService";
+import { useTheme } from "../../src/theme/ThemeContext";
+
+const emailRegex = /\S+@\S+\.\S+/;
+const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
 export default function Register() {
   const router = useRouter();
-
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: ""
-  });
-
-  // Estado de errores por campo
-  const [errors, setErrors] = useState({
-    name: false,
-    email: false,
-    password: false
-  });
-
+  const { colors } = useTheme();
+  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "", acceptedTerms: false });
+  const [errors, setErrors] = useState({ name: "", email: "", password: "", confirmPassword: "", acceptedTerms: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (field: string, value: string) => {
-    setForm({
-      ...form,
-      [field]: value
-    });
+  const passwordStrength = useMemo(() => {
+    if (!form.password) return "";
+    if (form.password.length < 8) return "Débil";
+    return passwordRegex.test(form.password) ? "Fuerte" : "Media";
+  }, [form.password]);
+
+  const validate = (nextForm = form) => ({
+    name: !nextForm.name.trim() ? "El nombre es obligatorio" : nextForm.name.trim().length < 3 ? "Ingresa al menos 3 caracteres" : "",
+    email: !nextForm.email.trim() ? "El correo es obligatorio" : !emailRegex.test(nextForm.email) ? "Ingresa un correo válido" : "",
+    password: !nextForm.password ? "La contraseña es obligatoria" : !passwordRegex.test(nextForm.password) ? "Usa 8+ caracteres, una letra y un número" : "",
+    confirmPassword: !nextForm.confirmPassword ? "Confirma tu contraseña" : nextForm.confirmPassword !== nextForm.password ? "Las contraseñas no coinciden" : "",
+    acceptedTerms: nextForm.acceptedTerms ? "" : "Debes aceptar los términos y condiciones",
+  });
+
+  const handleChange = (field: keyof typeof form, value: string | boolean) => {
+    const nextForm = { ...form, [field]: value };
+    setForm(nextForm);
+    setErrors(validate(nextForm));
   };
 
-  const handleRegister = () => {
-    const emailRegex = /\S+@\S+\.\S+/;
+  const handleRegister = async () => {
+    const nextErrors = validate();
+    setErrors(nextErrors);
 
-    //Validación por campo
-    const newErrors = {
-      name: !form.name,
-      email: !form.email,
-      password: !form.password
-    };
-
-    setErrors(newErrors);
-
-    //si hay campos vacíos, no continúa
-    if (newErrors.name || newErrors.email || newErrors.password) {
-      setTimeout(() => 
-        setErrors({ name: false, email: false, password: false }), 3000);
+    if (Object.values(nextErrors).some(Boolean)) {
       return;
     }
 
-    //Validación de email
-    if (!emailRegex.test(form.email)) {
-      setTimeout(() => 
-        setErrors({ name: false, email: false, password: false }), 3000);
-      return;
+    setLoading(true);
+    try {
+      await registerUser({ name: form.name, email: form.email, password: form.password });
+      Alert.alert("Registro exitoso", "Tu cuenta quedó lista. Ahora puedes iniciar sesión.", [
+        { text: "Ir a iniciar sesión", onPress: () => router.replace("/(auth)/login") },
+      ]);
+    } catch (error: any) {
+      Alert.alert("No pudimos registrar tu cuenta", error?.message || "Ocurrió un problema al crear la cuenta.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.logo}>ONE{"\n"}LANGUAGE </Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}> 
+      <View style={styles.topBar}>
+        <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
+      </View>
 
-      <Text style={styles.title}>Crea tu cuenta</Text>
+      <Text style={[styles.title, { color: colors.text }]}>Crea tu cuenta</Text>
 
-      <View style={styles.card}>
-        <Text>Nombre completo</Text>
+      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+        <Text style={styles.label}>Nombre completo</Text>
         <TextInput
-          //estilo de error
-          style={[styles.input, errors.name && styles.inputError]}
-          placeholder="Nombre"
+          style={[styles.input, { backgroundColor: colors.surfaceAlt, color: "#111827", borderColor: errors.name ? "#ef4444" : "#d1d5db" }]}
+          placeholder="Nombre completo"
+          placeholderTextColor="#6b7280"
+          value={form.name}
           onChangeText={(text) => handleChange("name", text)}
         />
-        {/* ✅ mensaje debajo */}
-        {errors.name && <Text style={styles.errorText}>Este campo es obligatorio</Text>}
+        {errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
 
-        <Text>Correo electrónico</Text>
+        <Text style={styles.label}>Correo electrónico</Text>
         <TextInput
-          style={[styles.input, errors.email && styles.inputError]}
-          placeholder="johan@gmail.com"
+          style={[styles.input, { backgroundColor: colors.surfaceAlt, color: "#111827", borderColor: errors.email ? "#ef4444" : "#d1d5db" }]}
+          placeholder="andres@gmail.com"
+          placeholderTextColor="#6b7280"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={form.email}
           onChangeText={(text) => handleChange("email", text)}
         />
-        {errors.email && <Text style={styles.errorText}>Este campo es obligatorio</Text>}
+        {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
-        <Text>Contraseña</Text>
-
+        <Text style={styles.label}>Contraseña</Text>
         <View style={styles.passwordField}>
           <TextInput
-            style={[styles.inputPassword, errors.password && styles.inputError]}
-            placeholder="********"
+            style={[styles.inputPassword, { backgroundColor: colors.surfaceAlt, color: "#111827", borderColor: errors.password ? "#ef4444" : "#d1d5db" }]}
+            placeholder="Mínimo 8 caracteres"
+            placeholderTextColor="#6b7280"
             secureTextEntry={!showPassword}
+            value={form.password}
             onChangeText={(text) => handleChange("password", text)}
           />
-          <TouchableOpacity
-            style={styles.icon}
-            onPress={() => setShowPassword(!showPassword)}
-          >
-            <Ionicons
-              name={showPassword ? "eye-off" : "eye"}
-              size={20}
-              color="#555"
-            />
+          <TouchableOpacity style={styles.icon} onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color="#6b7280" />
           </TouchableOpacity>
         </View>
-        {errors.password && <Text style={styles.errorText}>Este campo es obligatorio</Text>}
+        {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
 
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
-          <Text style={styles.buttonText}>Registrarse</Text>
+        <Text style={styles.label}>Confirmar contraseña</Text>
+        <View style={styles.passwordField}>
+          <TextInput
+            style={[styles.inputPassword, { backgroundColor: colors.surfaceAlt, color: "#111827", borderColor: errors.confirmPassword ? "#ef4444" : "#d1d5db" }]}
+            placeholder="Repite tu contraseña"
+            placeholderTextColor="#6b7280"
+            secureTextEntry={!showConfirmPassword}
+            value={form.confirmPassword}
+            onChangeText={(text) => handleChange("confirmPassword", text)}
+          />
+          <TouchableOpacity style={styles.icon} onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+            <Ionicons name={showConfirmPassword ? "eye-off" : "eye"} size={20} color="#6b7280" />
+          </TouchableOpacity>
+        </View>
+        {errors.confirmPassword ? <Text style={styles.errorText}>{errors.confirmPassword}</Text> : null}
+
+        <TouchableOpacity style={styles.checkboxRow} onPress={() => handleChange("acceptedTerms", !form.acceptedTerms)}>
+          <Ionicons name={form.acceptedTerms ? "checkbox" : "square-outline"} size={20} color={colors.primary} />
+          <Text style={styles.termsLink} onPress={() => router.push("/(auth)/terms")}>Acepto los términos y condiciones</Text>
+        </TouchableOpacity>
+        {errors.acceptedTerms ? <Text style={styles.errorText}>{errors.acceptedTerms}</Text> : null}
+
+        <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleRegister} disabled={loading}>
+          {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>Crear cuenta</Text>}
         </TouchableOpacity>
       </View>
 
-        <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-          <Text style={styles.link}>
-          ¿Ya tienes una cuenta?{" "}
-          <Text style={{ fontWeight: "bold", textDecorationLine: "underline", color: "white" }}>
-          Inicia sesión
-          </Text>
-          </Text>
-          </TouchableOpacity>
-
-      <Text style={styles.terms}>
-        Acepto los{" "}
-        <Text
-          style={{ textDecorationLine: "underline", fontWeight: "bold" }}
-          onPress={() => router.push("/(auth)/terms")} // navegación
-        >
-          términos y condiciones
-        </Text>
+      <Text style={[styles.loginText, { color: "#ffffff" }]}> 
+        ¿Ya tienes una cuenta? <Text style={styles.loginLink} onPress={() => router.push("/(auth)/login")}>Inicia sesión</Text>
       </Text>
     </View>
   );
@@ -138,110 +150,118 @@ export default function Register() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#3A78C2",
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingTop: 70,
-    paddingHorizontal: 16,
+    paddingTop: 72,
+    paddingHorizontal: 20,
+  },
+  topBar: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
   },
   logo: {
-    position: "absolute",
-    top: 30,
-    left: 25,
     fontWeight: "bold",
     fontSize: 20,
-    color: "white",
     lineHeight: 22,
   },
   title: {
-    marginBottom: 16,
-    fontSize: 35,
-    color: "white",
+    fontSize: 28,
     textAlign: "center",
-    marginTop: 70,
+    marginTop: 30,
+    fontWeight: "700",
+    marginBottom: 12,
   },
   card: {
     width: "100%",
-    maxWidth: 330,
-    minHeight: 420,
-    backgroundColor: "#fff",
-    padding: 25,
-    borderRadius: 15,
-    marginTop: 60,
+    maxWidth: 380,
+    borderRadius: 18,
+    padding: 20,
+    borderWidth: 1,
+    elevation: 4,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#111827",
+    marginBottom: 4,
+    marginTop: 6,
   },
   input: {
     width: "100%",
-    marginBottom: 25,
-    backgroundColor: "white",
-    paddingVertical: 14,
+    paddingVertical: 12,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#000000",
     fontSize: 14,
-    color: "#2c2929",
+    marginBottom: 2,
   },
   passwordField: {
     position: "relative",
     justifyContent: "center",
-    marginBottom: 30,
+    marginBottom: 2,
   },
   inputPassword: {
     width: "100%",
-    backgroundColor: "white",
-    paddingVertical: 14,
+    paddingVertical: 12,
     paddingHorizontal: 12,
-    paddingRight: 40,
-    borderRadius: 8,
+    paddingRight: 44,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#000",
+    fontSize: 14,
+  },
+  hint: {
+    fontSize: 12,
+    marginBottom: 4,
+    marginTop: 2,
   },
   icon: {
     position: "absolute",
     right: 12,
   },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 12,
+  },
+  termsLink: {
+    fontSize: 13,
+    color: "#6b7280",
+    fontWeight: "700",
+    textDecorationLine: "underline",
+  },
   button: {
     width: "100%",
-    marginTop: 8,
-    backgroundColor: "#F4DC2E",
+    marginTop: 12,
     borderWidth: 2,
-    borderColor: "black",
-    padding: 10,
+    borderColor: "#000",
+    paddingVertical: 12,
     borderRadius: 12,
     alignItems: "center",
   },
   buttonText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 16,
+    fontWeight: "700",
     color: "#000",
   },
-  link: {
-    color: "#FFFFFF",
-    marginTop: 40,
-    
-    
-  },
-  terms: {
-    marginTop: 20,
-    fontSize: 15,
-    color: "white",
-    textAlign: "center",
-  },
-  message: {
-    marginTop: 10,
+  loginText: {
+    marginTop: 14,
     fontSize: 14,
-    color: "white",
     textAlign: "center",
   },
-  inputError: {
-    borderColor: "red",
-    backgroundColor: "#ffcccc",
+  loginLink: {
+    fontWeight: "700",
+    color: "#ffffff",
+    textDecorationLine: "underline",
   },
   errorText: {
-    color: "red",
+    color: "#ef4444",
     fontSize: 12,
-    marginBottom: 10,
-    marginTop: -20,
-    fontWeight: "bold",
+    marginBottom: 6,
+    marginTop: 4,
+    fontWeight: "600",
   },
 });

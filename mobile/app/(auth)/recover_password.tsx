@@ -9,9 +9,11 @@ import {
     View,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useTheme } from "../../src/theme/ThemeContext";
 
 export default function RecoverPassword() {
     const router = useRouter();
+    const { colors, fontScale } = useTheme();
     const [email, setEmail] = useState("");
     const [error, setError] = useState(false);
 
@@ -24,10 +26,10 @@ export default function RecoverPassword() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
         <View style={styles.cameraDot} />
 
-        <Text style={styles.logo}>ONE{"\n"}LANGUAGE</Text>
+        <Text style={[styles.logo, { color: colors.text, fontSize: 20 * fontScale }]}>ONE{"\n"}LANGUAGE</Text>
 
     <Image
         source={require("../../assets/images/Logo.png")}
@@ -35,13 +37,13 @@ export default function RecoverPassword() {
         resizeMode="contain"
     />
 
-    <Text style={styles.title}>Restablecer{"\n"}contraseña</Text>
+    <Text style={[styles.title, { color: colors.text, fontSize: 36 * fontScale }]}>Restablecer{"\n"}contraseña</Text>
 
-    <View style={styles.card}>
-        <Text style={styles.label}>Correo electrónico</Text>
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+        <Text style={[styles.label, { color: colors.textOnSurface }]}>Correo electrónico</Text>
 
         <TextInput
-            style={[styles.input, error && styles.inputError]}
+            style={[styles.input, error && styles.inputError, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: error ? "red" : colors.border }]}
             placeholder="johan@gmail.com"
             placeholderTextColor="#777777"
             keyboardType="email-address"
@@ -54,15 +56,15 @@ export default function RecoverPassword() {
 
         <TouchableOpacity
             activeOpacity={0.85}
-            style={styles.button}
+            style={[styles.button, { backgroundColor: colors.accent }]}
             onPress={handleSendCode}
         >
-            <Text style={styles.buttonText}>Enviar código al correo</Text>
+            <Text style={[styles.buttonText, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>Enviar código al correo</Text>
         </TouchableOpacity>
     </View>
 
     <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-        <Text style={styles.loginLink}>← Volver al inicio de sesión</Text>
+        <Text style={[styles.loginLink, { color: colors.text, fontSize: 15 * fontScale }]}>← Volver al inicio de sesión</Text>
     </TouchableOpacity>
     </SafeAreaView>
     );

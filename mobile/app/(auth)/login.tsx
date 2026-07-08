@@ -1,76 +1,115 @@
 import { useState } from "react";
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Image
+  View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { loginUser } from "../../src/services/authService";
+import { useTheme } from "../../src/theme/ThemeContext";
+
+const emailRegex = /\S+@\S+\.\S+/;
 
 export default function Login() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({ email: false, password: false });
+  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
-    const newErrors = {
-      email: !form.email,
-      password: !form.password,
-    };
-    setErrors(newErrors);
+  const validate = (nextForm = form) => ({
+    email: !nextForm.email.trim()
+      ? "El correo es obligatorio"
+      : !emailRegex.test(nextForm.email)
+        ? "Ingresa un correo válido"
+        : "",
+    password: !nextForm.password
+      ? "La contraseña es obligatoria"
+      : nextForm.password.length < 6
+        ? "La contraseña debe tener al menos 6 caracteres"
+        : "",
+  });
 
-    if (newErrors.email || newErrors.password) {
-      setTimeout(() => setErrors({ email: false, password: false }), 3000);
+  const handleChange = (field: keyof typeof form, value: string) => {
+    const nextForm = { ...form, [field]: value };
+    setForm(nextForm);
+    setErrors(validate(nextForm));
+  };
+
+  const handleSubmit = async () => {
+    const nextErrors = validate();
+    setErrors(nextErrors);
+
+    if (nextErrors.email || nextErrors.password) {
       return;
     }
-    // tu loginUser aquí
+
+    setLoading(true);
+    try {
+      const response = await loginUser({ email: form.email, password: form.password });
+      if (response?.token) {
+        // persistencia mínima para que la app recuerde la sesión
+        // @ts-ignore
+        globalThis.localStorage?.setItem?.("token", response.token);
+      }
+      Alert.alert("Sesión Exitosa", "Inicio de sesión exitoso.", [
+        { text: "Entrar", onPress: () => router.replace("/(auth)/home") },
+      ]);
+    } catch (error: any) {
+      Alert.alert("No se pudo iniciar sesión", error?.message || "Correo o contraseña incorrectos.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.logo}>ONE{"\n"}LANGUAGE</Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}> 
+      <View style={styles.topBar}>
+        <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
+      </View>
 
-      <Text style={styles.title}>Iniciar sesión</Text>
+      <Text style={[styles.title, { color: colors.text }]}>Iniciar sesión</Text>
 
-      <Image
-        source={require("../../assets/images/Logo.png")}
-        style={styles.logoImg}
-        resizeMode="contain"
-      />
+      <Image source={require("../../assets/images/Logo.png")} style={styles.logoImg} resizeMode="contain" />
 
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
         <Text style={styles.label}>Correo electrónico</Text>
         <TextInput
-          style={[styles.input, errors.email && styles.inputError]}
+          style={[styles.input, { backgroundColor: colors.surfaceAlt, color: "#111827", borderColor: errors.email ? "#ef4444" : "#d1d5db" }]}
           placeholder="andres@gmail.com"
           keyboardType="email-address"
           autoCapitalize="none"
-          placeholderTextColor="#999"
-          onChangeText={(val) => setForm({ ...form, email: val })}
+          placeholderTextColor="#6b7280"
+          value={form.email}
+          onChangeText={(val) => handleChange("email", val)}
         />
-        {errors.email && <Text style={styles.errorText}>Este campo es obligatorio</Text>}
+        {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
         <Text style={styles.label}>Contraseña</Text>
         <View style={styles.passwordField}>
           <TextInput
-            style={[styles.inputPassword, errors.password && styles.inputError]}
+            style={[styles.inputPassword, { backgroundColor: colors.surfaceAlt, color: "#111827", borderColor: errors.password ? "#ef4444" : "#d1d5db" }]}
             placeholder="********"
-            placeholderTextColor="#999"
+            placeholderTextColor="#6b7280"
             secureTextEntry={!showPassword}
-            onChangeText={(val) => setForm({ ...form, password: val })}
+            value={form.password}
+            onChangeText={(val) => handleChange("password", val)}
           />
           <TouchableOpacity style={styles.icon} onPress={() => setShowPassword(!showPassword)}>
-            <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color="#555" />
+            <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color="#6b7280" />
           </TouchableOpacity>
         </View>
-        {errors.password && <Text style={styles.errorText}>Este campo es obligatorio</Text>}
+        {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Iniciar sesión</Text>
+        <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleSubmit} disabled={loading}>
+          {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>Iniciar sesión</Text>}
         </TouchableOpacity>
       </View>
 
@@ -78,11 +117,8 @@ export default function Login() {
         <Text style={styles.link}>Restablecer contraseña</Text>
       </TouchableOpacity>
 
-      <Text style={styles.registerText}>
-        ¿No tienes una cuenta?{" "}
-        <Text style={styles.registerLink} onPress={() => router.push("/(auth)/register")}>
-          Regístrate
-        </Text>
+      <Text style={[styles.registerText, { color: "#ffffff" }]}> 
+        ¿No tienes una cuenta? <Text style={styles.registerLink} onPress={() => router.push("/(auth)/register")}>Regístrate</Text>
       </Text>
     </View>
   );
@@ -91,48 +127,48 @@ export default function Login() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#3A78C2",
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingTop: 100,
+    paddingTop: 56,
     paddingHorizontal: 24,
   },
+  topBar: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
   logo: {
-    position: "absolute",
-    top: 30,
-    left: 25,
     fontWeight: "bold",
     fontSize: 20,
-    color: "white",
     lineHeight: 22,
   },
   title: {
-    fontSize: 35,
-    color: "white",
+    fontSize: 32,
     textAlign: "center",
-    marginTop: 40,
-    marginBottom: 20,
+    marginTop: 60,
+    marginBottom: 8,
+    fontWeight: "700",
   },
   logoImg: {
-    width: 300,
-    height: 200,
-    marginBottom: 24,
+    width: 220,
+    height: 140,
+    marginBottom: 16,
   },
   card: {
     width: "100%",
     maxWidth: 380,
-    backgroundColor: "#3A78C2",
-    borderRadius: 15,
+    borderRadius: 18,
     padding: 24,
-    borderWidth: 2,
-    borderColor: "white",
-    elevation: 6,
-    marginTop: 20,
+    borderWidth: 1,
+    elevation: 4,
+    marginTop: 4,
   },
   label: {
     fontSize: 14,
-    fontWeight: "bold",
-    color: "white",
+    fontWeight: "700",
+    color: "#111827",
     marginBottom: 4,
     marginTop: 8,
   },
@@ -140,35 +176,26 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingVertical: 12,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#000",
     fontSize: 14,
-    color: "#2c2929",
     marginBottom: 2,
-    backgroundColor: "white",
   },
   inputPassword: {
     width: "100%",
     paddingVertical: 12,
     paddingHorizontal: 12,
     paddingRight: 44,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#000",
     fontSize: 14,
-    color: "#2c2929",
-    backgroundColor: "white",
-  },
-  inputError: {
-    borderColor: "red",
-    backgroundColor: "#ffcccc",
   },
   errorText: {
-    color: "red",
+    color: "#ef4444",
     fontSize: 12,
-    marginBottom: 4,
-    fontWeight: "bold",
+    marginBottom: 8,
+    marginTop: 4,
+    fontWeight: "600",
   },
   passwordField: {
     position: "relative",
@@ -182,33 +209,32 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     marginTop: 12,
-    backgroundColor: "#F4DC2E",
     borderWidth: 2,
-    borderColor: "black",
+    borderColor: "#000",
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: "center",
   },
   buttonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "black",
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#000",
   },
   link: {
-    color: "white",
     fontSize: 15,
-    marginTop: 20,
+    marginTop: 18,
+    color: "#ffffff",
+    fontWeight: "700",
     textDecorationLine: "underline",
   },
   registerText: {
-    color: "white",
     fontSize: 15,
-    marginTop: 12,
+    marginTop: 10,
     textAlign: "center",
   },
   registerLink: {
-    fontWeight: "bold",
+    fontWeight: "700",
+    color: "#ffffff",
     textDecorationLine: "underline",
-    color: "white",
   },
 });
