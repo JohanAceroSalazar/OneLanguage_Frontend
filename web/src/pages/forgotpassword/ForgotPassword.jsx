@@ -1,24 +1,45 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./RecoverPassword.css";
+import "./ForgotPassword.css";
 import logo from "../../assets/Logo.png";
 import BrandLogo from "../../components/BrandLogo/BrandLogo";
+import { forgotPassword } from "../../services/authService";
 
 function RecoverPassword() {
     const [email, setEmail] = useState("");
     const [errors, setErrors] = useState({ email: false });
     const [sent, setSent] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!email) {
+
+        setSent(false);
+        setErrorMessage("");
+
+        if (!email.trim()) {
             setErrors({ email: true });
+
             setTimeout(() => setErrors({ email: false }), 3000);
             return;
         }
-        setSent(true);
-        // aquí conectas tu servicio de recuperación
+
+        try {
+            setLoading(true);
+
+            await forgotPassword(email);
+
+            setSent(true);
+        } catch(error) {
+            setErrorMessage(
+                error.message ||
+                "No se pudo enviar el enlace de recuperación."
+            );
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -44,6 +65,8 @@ function RecoverPassword() {
                     onChange={(e) => {
                         setEmail(e.target.value);
                         setErrors({ email: false });
+                        setErrorMessage("");
+                        setSent(false);
                     }}
                 />
                 <p className="recover-error-text">
@@ -51,11 +74,22 @@ function RecoverPassword() {
                 </p>
 
                 {sent && (
-                    <p className="recover-success">¡Código enviado a tu correo!</p>
+                    <p className="recover-success">¡Enlace de recuperación enviado a tu correo!</p>
                 )}
 
-                <button className="recover-btn" onClick={handleSubmit}>
-                    Enviar código al correo
+                {errorMessage && (
+                    <p className="recover-error-text">
+                        {errorMessage}
+                    </p>
+                )}
+
+                <button className="recover-btn" 
+                    onClick={handleSubmit}
+                    disabled={loading}
+                >
+                    {loading
+                        ? "Enviando..."
+                        : "Enviar enlace de recuperación"}
                 </button>
             </div>
 

@@ -14,7 +14,7 @@ export default function History() {
 
     <View style={styles.headerText}>
         <Text style={[styles.title, { color: colors.text, fontSize: 23 * fontScale }]}>Historial de traducción</Text>
-        <Text style={[styles.subtitle, { color: colors.textMuted, fontSize: 14 * fontScale }]}>Revisa tus traducciones anteriores</Text>
+        <Text style={[styles.subtitle, { color: "#FFFFFF", fontSize: 14 * fontScale }]}>Revisa tus traducciones anteriores</Text>
     </View>
 
     <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
@@ -70,7 +70,7 @@ title: {
     lineHeight: 28,
     },
 subtitle: {
-    color: "#FFFFFF",
+    color: "#6E6574",
     fontSize: 14,
     marginTop: 2,
     },

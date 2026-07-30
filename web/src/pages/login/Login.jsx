@@ -209,7 +209,7 @@ function Login() {
                     <Button text="Iniciar sesión" className="auth-submit-button" />
                 </form>
 
-                <p className="recover-text" onClick={() => navigate("/recoverpassword")}>
+                <p className="recover-text" onClick={() => navigate("/forgotPassword")}>
                     Restablecer contraseña
                 </p>
                 <p className="register-text">

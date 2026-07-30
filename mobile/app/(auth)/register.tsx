@@ -74,10 +74,10 @@ export default function Register() {
 
       <Text style={[styles.title, { color: colors.text }]}>Crea tu cuenta</Text>
 
-      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+      <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}> 
         <Text style={styles.label}>Nombre completo</Text>
         <TextInput
-          style={[styles.input, { backgroundColor: colors.surfaceAlt, color: "#111827", borderColor: errors.name ? "#ef4444" : "#d1d5db" }]}
+          style={[styles.input, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.name ? "#ef4444" : "#d1d5db" }]}
           placeholder="Nombre completo"
           placeholderTextColor="#6b7280"
           value={form.name}
@@ -87,7 +87,7 @@ export default function Register() {
 
         <Text style={styles.label}>Correo electrónico</Text>
         <TextInput
-          style={[styles.input, { backgroundColor: colors.surfaceAlt, color: "#111827", borderColor: errors.email ? "#ef4444" : "#d1d5db" }]}
+          style={[styles.input, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.email ? "#ef4444" : "#d1d5db" }]}
           placeholder="andres@gmail.com"
           placeholderTextColor="#6b7280"
           keyboardType="email-address"
@@ -100,7 +100,7 @@ export default function Register() {
         <Text style={styles.label}>Contraseña</Text>
         <View style={styles.passwordField}>
           <TextInput
-            style={[styles.inputPassword, { backgroundColor: colors.surfaceAlt, color: "#111827", borderColor: errors.password ? "#ef4444" : "#d1d5db" }]}
+            style={[styles.inputPassword, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.password ? "#ef4444" : "#d1d5db" }]}
             placeholder="Mínimo 8 caracteres"
             placeholderTextColor="#6b7280"
             secureTextEntry={!showPassword}
@@ -116,7 +116,7 @@ export default function Register() {
         <Text style={styles.label}>Confirmar contraseña</Text>
         <View style={styles.passwordField}>
           <TextInput
-            style={[styles.inputPassword, { backgroundColor: colors.surfaceAlt, color: "#111827", borderColor: errors.confirmPassword ? "#ef4444" : "#d1d5db" }]}
+            style={[styles.inputPassword, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.confirmPassword ? "#ef4444" : "#d1d5db" }]}
             placeholder="Repite tu contraseña"
             placeholderTextColor="#6b7280"
             secureTextEntry={!showConfirmPassword}

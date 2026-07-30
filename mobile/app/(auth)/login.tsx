@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { loginUser } from "../../src/services/authService";
 import { useTheme } from "../../src/theme/ThemeContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const emailRegex = /\S+@\S+\.\S+/;
 
@@ -53,12 +54,14 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const response = await loginUser({ email: form.email, password: form.password });
-      if (response?.token) {
-        // persistencia mínima para que la app recuerde la sesión
-        // @ts-ignore
-        globalThis.localStorage?.setItem?.("token", response.token);
-      }
+      const response = await loginUser({
+      email: form.email,
+      password: form.password,
+    });
+
+    if (response?.token) {
+      await AsyncStorage.setItem("token", response.token);
+    }
       Alert.alert("Sesión Exitosa", "Inicio de sesión exitoso.", [
         { text: "Entrar", onPress: () => router.replace("/(auth)/home") },
       ]);
@@ -79,10 +82,10 @@ export default function Login() {
 
       <Image source={require("../../assets/images/Logo.png")} style={styles.logoImg} resizeMode="contain" />
 
-      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+      <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}> 
         <Text style={styles.label}>Correo electrónico</Text>
         <TextInput
-          style={[styles.input, { backgroundColor: colors.surfaceAlt, color: "#111827", borderColor: errors.email ? "#ef4444" : "#d1d5db" }]}
+          style={[styles.input, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.email ? "#ef4444" : "#d1d5db" }]}
           placeholder="andres@gmail.com"
           keyboardType="email-address"
           autoCapitalize="none"
@@ -95,7 +98,7 @@ export default function Login() {
         <Text style={styles.label}>Contraseña</Text>
         <View style={styles.passwordField}>
           <TextInput
-            style={[styles.inputPassword, { backgroundColor: colors.surfaceAlt, color: "#111827", borderColor: errors.password ? "#ef4444" : "#d1d5db" }]}
+            style={[styles.inputPassword, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.password ? "#ef4444" : "#d1d5db" }]}
             placeholder="********"
             placeholderTextColor="#6b7280"
             secureTextEntry={!showPassword}
@@ -157,6 +160,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   card: {
+    color: "#ffffff",
     width: "100%",
     maxWidth: 380,
     borderRadius: 18,
@@ -168,7 +172,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#111827",
+    color: "#000000",
     marginBottom: 4,
     marginTop: 8,
   },
