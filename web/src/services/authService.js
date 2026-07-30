@@ -27,3 +27,41 @@ export const loginUser = async (data) => {
         throw error.response?.data || { message: "Error del servidor" };
     }
 };
+
+export const forgotPassword = async (email) => {
+
+    try {
+        const response = await api.post("/auth/forgot-password", {
+        email,
+    });
+
+    return response.data;
+        } catch (error) {
+            throw error.response?.data || {
+        message: "No se pudo enviar el enlace de recuperación.",
+        };
+    }
+};
+
+export const resetPassword = async (
+    tokenIdentifier,
+    token,
+    newPassword,
+    confirmPassword
+) => {
+
+    try{
+    const response = await api.post("/auth/reset-password", {
+        tokenIdentifier,
+        token,
+        newPassword,
+        confirmPassword,
+        });
+
+    return response.data;
+        } catch (error) {
+            throw error.response?.data || {
+        message: "No se pudo restablecer la contraseña.",
+        };
+    }
+};

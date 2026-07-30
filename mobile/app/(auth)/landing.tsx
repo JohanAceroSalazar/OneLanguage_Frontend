@@ -19,7 +19,7 @@ export default function Landing() {
       <View style={styles.heroCard}>
         <Text style={[styles.badge, { color: colors.accent }]}>Plataforma de inclusión</Text>
         <Text style={[styles.title, { color: colors.text }]}>Conecta personas sin barreras.</Text>
-        <Text style={[styles.description, { color: colors.textMuted }]}>Traduce, consulta tu historial y activa accesibilidad desde una experiencia clara y moderna.</Text>
+        <Text style={[styles.description]}>Traduce, consulta tu historial y activa accesibilidad desde una experiencia clara y moderna.</Text>
 
         <View style={styles.actions}>
           <TouchableOpacity style={[styles.primaryButton, { backgroundColor: colors.accent }]} onPress={() => router.push("/(auth)/register")}>
@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     marginBottom: 20,
+    color : "#fff",
   },
   actions: {
     gap: 12,

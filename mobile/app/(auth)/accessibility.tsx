@@ -140,8 +140,8 @@ export default function Accessibility() {
             <Modal transparent visible={showSuccess} animationType="fade">
                 <View style={styles.modalOverlay}>
                     <View style={[styles.modalBox, { backgroundColor: colors.surface }]}> 
-                        <Text style={[styles.modalTitle, { color: colors.textOnSurface }]}>Cambios guardados</Text>
-                        <Text style={[styles.modalText, { color: colors.textOnSurface }]}>La apariencia y el contraste se actualizaron correctamente.</Text>
+                        <Text style={[styles.modalTitle, { color: colors.textOnSurface }]}>Cambios de accesibilidad</Text>
+                        <Text style={[styles.modalText, { color: colors.textOnSurface }]}>Guardados correctamente</Text>
                         <TouchableOpacity activeOpacity={0.9} style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={() => setShowSuccess(false)}>
                             <Text style={styles.modalButtonText}>Aceptar</Text>
                         </TouchableOpacity>
@@ -179,12 +179,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 30,
         fontWeight: "bold",
-        marginTop: 85,
+        marginTop: 70,
         marginLeft: 8,
     },
     card: {
         width: "100%",
-        marginTop: 70,
+        marginTop: 60,
         minHeight: 405,
         borderRadius: 25,
         borderWidth: 2,
