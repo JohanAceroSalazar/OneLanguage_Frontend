@@ -62,6 +62,14 @@ export default function Login() {
     if (response?.token) {
       await AsyncStorage.setItem("token", response.token);
     }
+
+    if (response?.user) {
+      await AsyncStorage.setItem(
+        "user",
+        JSON.stringify(response.user)
+      );
+    }
+
       Alert.alert("Sesión Exitosa", "Inicio de sesión exitoso.", [
         { text: "Entrar", onPress: () => router.replace("/(auth)/home") },
       ]);

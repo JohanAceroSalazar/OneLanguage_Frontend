@@ -78,11 +78,11 @@ export default function RecoverPassword() {
           />
 
           <Text style={[styles.title, { color: colors.text, fontSize: 31 * fontScale }]}>
-            Restablecer contrasena
+            Restablecer contraseña
           </Text>
 
           <Text style={[styles.subtitle, { color: colors.text }]}>
-            Escribe tu correo y te enviaremos el enlace para crear una nueva contrasena.
+            Escribe tu correo y te enviaremos el enlace para crear una nueva contraseña.
           </Text>
 
           <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}>

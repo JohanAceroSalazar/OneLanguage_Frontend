@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { BottomNav } from "../../components/bottom-nav";
 import { useTheme } from "../../src/theme/ThemeContext";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type PermissionItemProps = {
     icon: keyof typeof Ionicons.glyphMap;
@@ -41,6 +43,23 @@ function PermissionItem({ icon, title, description }: PermissionItemProps) {
 export default function UserProfile() {
     const router = useRouter();
     const { colors, fontScale } = useTheme();
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+    const loadUser = async () => {
+        try {
+            const storedUser = await AsyncStorage.getItem("user");
+
+            if (storedUser) {
+                setUser(JSON.parse(storedUser));
+            }
+        } catch (error) {
+            console.error("Error al cargar los datos del usuario:", error);
+        }
+    };
+
+    loadUser();
+}, []);
 
     return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
@@ -74,14 +93,14 @@ export default function UserProfile() {
         <Text style={[styles.label, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>Nombre completo</Text>
         <TextInput
             style={[styles.input, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: colors.border }]}
-            value="Johan Acero"
+            value={user?.fullName || ""}
             editable={false}
         />
 
         <Text style={[styles.label, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>Correo electrónico</Text>
         <TextInput
             style={[styles.input, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: colors.border }]}
-            value="johan@gmail.com"
+            value={user?.email || ""}
             editable={false}
         />
 
