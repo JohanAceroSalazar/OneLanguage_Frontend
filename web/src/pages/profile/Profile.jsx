@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
 import { FaCamera, FaMusic, FaFolder, FaUser } from "react-icons/fa";
@@ -10,7 +10,14 @@ function Profile() {
 
     const [view, setView] = useState("profile"); // profile | password | camera | audio | files
     const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const [form, setForm] = useState({ name: "Juan Pablo", email: "juan@gmail.com" });
+
+    const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+
+    const [form, setForm] = useState({
+        name: storedUser?.fullName || "",
+        email: storedUser?.email || "",
+    });
+
     const [passwordForm, setPasswordForm] = useState({ current: "", new: "", confirm: "" });
 
     // VISTA CAMBIAR CONTRASEÑA
