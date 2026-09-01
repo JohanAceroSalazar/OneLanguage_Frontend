@@ -1,20 +1,29 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { AppAlert } from "../../components/app-alert";
 import { registerUser } from "../../src/services/authService";
 import { useTheme } from "../../src/theme/ThemeContext";
 
 const emailRegex = /\S+@\S+\.\S+/;
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+
+type AlertState = {
+  visible: boolean;
+  title: string;
+  message: string;
+  actionText: string;
+  variant: "success" | "error";
+  onAction: () => void;
+};
 
 export default function Register() {
   const router = useRouter();
@@ -24,6 +33,16 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState<AlertState>({
+    visible: false,
+    title: "",
+    message: "",
+    actionText: "Aceptar",
+    variant: "success",
+    onAction: () => setAlert((current) => ({ ...current, visible: false })),
+  });
+
+  const closeAlert = () => setAlert((current) => ({ ...current, visible: false }));
 
   const passwordStrength = useMemo(() => {
     if (!form.password) return "";
@@ -56,25 +75,40 @@ export default function Register() {
     setLoading(true);
     try {
       await registerUser({ name: form.name, email: form.email, password: form.password });
-      Alert.alert("Registro exitoso", "Tu cuenta quedó lista. Ahora puedes iniciar sesión.", [
-        { text: "Ir a iniciar sesión", onPress: () => router.replace("/(auth)/login") },
-      ]);
+      setAlert({
+        visible: true,
+        title: "Registro exitoso",
+        message: "Tu cuenta quedó lista. Ahora puedes iniciar sesión.",
+        actionText: "Ir a iniciar sesión",
+        variant: "success",
+        onAction: () => {
+          closeAlert();
+          router.replace("/(auth)/login");
+        },
+      });
     } catch (error: any) {
-      Alert.alert("No pudimos registrar tu cuenta", error?.message || "Ocurrió un problema al crear la cuenta.");
+      setAlert({
+        visible: true,
+        title: "No pudimos registrar tu cuenta",
+        message: error?.message || "Ocurrió un problema al crear la cuenta.",
+        actionText: "Intentar de nuevo",
+        variant: "error",
+        onAction: closeAlert,
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}> 
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.topBar}>
         <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
       </View>
 
       <Text style={[styles.title, { color: colors.text }]}>Crea tu cuenta</Text>
 
-      <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}> 
+      <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}>
         <Text style={styles.label}>Nombre completo</Text>
         <TextInput
           style={[styles.input, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.name ? "#ef4444" : "#d1d5db" }]}
@@ -112,6 +146,7 @@ export default function Register() {
           </TouchableOpacity>
         </View>
         {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
+        {passwordStrength ? <Text style={styles.hint}>Seguridad: {passwordStrength}</Text> : null}
 
         <Text style={styles.label}>Confirmar contraseña</Text>
         <View style={styles.passwordField}>
@@ -140,9 +175,19 @@ export default function Register() {
         </TouchableOpacity>
       </View>
 
-      <Text style={[styles.loginText, { color: "#ffffff" }]}> 
+      <Text style={styles.loginText}>
         ¿Ya tienes una cuenta? <Text style={styles.loginLink} onPress={() => router.push("/(auth)/login")}>Inicia sesión</Text>
       </Text>
+
+      <AppAlert
+        visible={alert.visible}
+        label={alert.variant === "success" ? "LISTO" : "AVISO"}
+        title={alert.title}
+        message={alert.message}
+        actionText={alert.actionText}
+        variant={alert.variant}
+        onAction={alert.onAction}
+      />
     </View>
   );
 }
@@ -216,6 +261,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 4,
     marginTop: 2,
+    color: "#6b7280",
+    fontWeight: "600",
   },
   icon: {
     position: "absolute",
@@ -248,6 +295,7 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   loginText: {
+    color: "#ffffff",
     marginTop: 14,
     fontSize: 14,
     textAlign: "center",
