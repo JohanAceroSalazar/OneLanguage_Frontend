@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useMemo, useState } from "react";
-import { Alert, Modal, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { AppAlert } from "../../components/app-alert";
 import { BottomNav } from "../../components/bottom-nav";
 import { useTheme } from "../../src/theme/ThemeContext";
 
@@ -137,17 +138,15 @@ export default function Accessibility() {
 
             <BottomNav active="accessibility" />
 
-            <Modal transparent visible={showSuccess} animationType="fade">
-                <View style={styles.modalOverlay}>
-                    <View style={[styles.modalBox, { backgroundColor: colors.surface }]}> 
-                        <Text style={[styles.modalTitle, { color: colors.textOnSurface }]}>Cambios de accesibilidad</Text>
-                        <Text style={[styles.modalText, { color: colors.textOnSurface }]}>Guardados correctamente</Text>
-                        <TouchableOpacity activeOpacity={0.9} style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={() => setShowSuccess(false)}>
-                            <Text style={styles.modalButtonText}>Aceptar</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
+            <AppAlert
+                visible={showSuccess}
+                label="LISTO"
+                title="Cambios guardados"
+                message="Tus ajustes de accesibilidad se guardaron correctamente."
+                actionText="Aceptar"
+                variant="success"
+                onAction={() => setShowSuccess(false)}
+            />
         </SafeAreaView>
     );
 }

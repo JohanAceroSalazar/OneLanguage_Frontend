@@ -1,7 +1,9 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   StyleSheet,
   Text,
@@ -9,13 +11,20 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { AppAlert } from "../../components/app-alert";
 import { loginUser } from "../../src/services/authService";
 import { useTheme } from "../../src/theme/ThemeContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const emailRegex = /\S+@\S+\.\S+/;
+
+type AlertState = {
+  visible: boolean;
+  title: string;
+  message: string;
+  actionText: string;
+  variant: "success" | "error";
+  onAction: () => void;
+};
 
 export default function Login() {
   const router = useRouter();
@@ -24,6 +33,16 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState<AlertState>({
+    visible: false,
+    title: "",
+    message: "",
+    actionText: "Aceptar",
+    variant: "success",
+    onAction: () => setAlert((current) => ({ ...current, visible: false })),
+  });
+
+  const closeAlert = () => setAlert((current) => ({ ...current, visible: false }));
 
   const validate = (nextForm = form) => ({
     email: !nextForm.email.trim()
@@ -55,33 +74,45 @@ export default function Login() {
     setLoading(true);
     try {
       const response = await loginUser({
-      email: form.email,
-      password: form.password,
-    });
+        email: form.email,
+        password: form.password,
+      });
 
-    if (response?.token) {
-      await AsyncStorage.setItem("token", response.token);
-    }
+      if (response?.token) {
+        await AsyncStorage.setItem("token", response.token);
+      }
 
-    if (response?.user) {
-      await AsyncStorage.setItem(
-        "user",
-        JSON.stringify(response.user)
-      );
-    }
+      if (response?.user) {
+        await AsyncStorage.setItem("user", JSON.stringify(response.user));
+      }
 
-      Alert.alert("Sesión Exitosa", "Inicio de sesión exitoso.", [
-        { text: "Entrar", onPress: () => router.replace("/(auth)/home") },
-      ]);
+      setAlert({
+        visible: true,
+        title: "Sesión Exitosa",
+        message: "Inicio de sesión exitoso. Vamos a llevarte al panel principal.",
+        actionText: "Entrar ahora",
+        variant: "success",
+        onAction: () => {
+          closeAlert();
+          router.replace("/(auth)/home");
+        },
+      });
     } catch (error: any) {
-      Alert.alert("No se pudo iniciar sesión", error?.message || "Correo o contraseña incorrectos.");
+      setAlert({
+        visible: true,
+        title: "No se pudo iniciar sesión",
+        message: error?.message || "Correo o contraseña incorrectos.",
+        actionText: "Intentar de nuevo",
+        variant: "error",
+        onAction: closeAlert,
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}> 
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.topBar}>
         <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
       </View>
@@ -90,7 +121,7 @@ export default function Login() {
 
       <Image source={require("../../assets/images/Logo.png")} style={styles.logoImg} resizeMode="contain" />
 
-      <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}> 
+      <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}>
         <Text style={styles.label}>Correo electrónico</Text>
         <TextInput
           style={[styles.input, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.email ? "#ef4444" : "#d1d5db" }]}
@@ -128,9 +159,19 @@ export default function Login() {
         <Text style={styles.link}>Restablecer contraseña</Text>
       </TouchableOpacity>
 
-      <Text style={[styles.registerText, { color: "#ffffff" }]}> 
+      <Text style={styles.registerText}>
         ¿No tienes una cuenta? <Text style={styles.registerLink} onPress={() => router.push("/(auth)/register")}>Regístrate</Text>
       </Text>
+
+      <AppAlert
+        visible={alert.visible}
+        label={alert.variant === "success" ? "LISTO" : "AVISO"}
+        title={alert.title}
+        message={alert.message}
+        actionText={alert.actionText}
+        variant={alert.variant}
+        onAction={alert.onAction}
+      />
     </View>
   );
 }
@@ -240,6 +281,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   registerText: {
+    color: "#ffffff",
     fontSize: 15,
     marginTop: 10,
     textAlign: "center",
