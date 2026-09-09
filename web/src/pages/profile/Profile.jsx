@@ -1,15 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
 import { FaCamera, FaMusic, FaFolder, FaUser } from "react-icons/fa";
 import BrandLogo from "../../components/BrandLogo/BrandLogo";
 import NavBar from "../../components/NavBar/NavBar";
+import { clearAuthSession } from "../../services/authSession";
 
 function Profile() {
     const navigate = useNavigate();
 
     const [view, setView] = useState("profile"); // profile | password | camera | audio | files
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+    const handleLogout = () => {
+        clearAuthSession();
+        navigate("/login", { replace: true });
+    };
 
     const storedUser = JSON.parse(localStorage.getItem("user") || "null");
 
@@ -181,7 +187,7 @@ function Profile() {
                     <div className="modal-box">
                         <p className="modal-text">¿Está seguro que<br/>desea cerrar sesión?</p>
                         <div className="modal-actions">
-                            <button className="modal-logout-btn" onClick={() => navigate("/login")}>Cerrar sesión</button>
+                            <button className="modal-logout-btn" onClick={handleLogout}>Cerrar sesión</button>
                             <button className="modal-cancel-btn" onClick={() => setShowLogoutModal(false)}>Cancelar</button>
                         </div>
                     </div>

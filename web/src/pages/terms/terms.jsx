@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
-import "./terms.css";
+import "./Terms.css";
 
 function Terms() {
     const navigate = useNavigate();

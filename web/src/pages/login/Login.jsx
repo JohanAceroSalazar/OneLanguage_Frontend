@@ -135,7 +135,7 @@ function Login() {
         },
     });
 
-        } catch (error) {
+        } catch {
 
         openModal({
             title: "No se pudo iniciar sesión",
