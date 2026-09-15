@@ -237,13 +237,16 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     marginTop: 18,
-    borderWidth: 2,
-    borderColor: "#000",
     paddingVertical: 13,
     borderRadius: 12,
     alignItems: "center",
     minHeight: 50,
     justifyContent: "center",
+    shadowColor: "#06142B",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    elevation: 3,
   },
   buttonText: {
     fontWeight: "700",

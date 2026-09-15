@@ -18,6 +18,7 @@ export default function Landing() {
 
       <View style={styles.heroCard}>
         <Text style={[styles.badge, { color: colors.accent }]}>Plataforma de inclusión</Text>
+        <Text style={[styles.valuePromise, { color: colors.accent }]}>De señas a texto/audio</Text>
         <Text style={[styles.title, { color: colors.text }]}>Conecta personas sin barreras.</Text>
         <Text style={[styles.description]}>Traduce, consulta tu historial y activa accesibilidad desde una experiencia clara y moderna.</Text>
 
@@ -94,6 +95,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     lineHeight: 38,
   },
+  valuePromise: {
+    fontSize: 17,
+    fontWeight: "800",
+    letterSpacing: 1.1,
+    textTransform: "uppercase",
+    marginBottom: 8,
+  },
   description: {
     fontSize: 16,
     lineHeight: 24,
@@ -108,6 +116,11 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: "center",
     marginBottom: 10,
+    shadowColor: "#06142B",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    elevation: 3,
   },
   primaryButtonText: {
     color: "#fff",
@@ -117,8 +130,12 @@ const styles = StyleSheet.create({
   secondaryButton: {
     paddingVertical: 14,
     borderRadius: 14,
-    borderWidth: 1,
     alignItems: "center",
+    shadowColor: "#06142B",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    elevation: 3,
   },
   secondaryButtonText: {
     fontSize: 16,

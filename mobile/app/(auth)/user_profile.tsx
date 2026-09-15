@@ -6,7 +6,6 @@ import {
     ScrollView,
     StyleSheet,
     Text,
-    TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
@@ -91,22 +90,14 @@ export default function UserProfile() {
         </View>
 
         <Text style={[styles.label, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>Nombre completo</Text>
-        <TextInput
-            style={[styles.input, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: colors.border }]}
-            value={user?.fullName || ""}
-            editable={false}
-        />
+        <Text style={[styles.readonlyValue, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: colors.border }]}>
+            {user?.fullName || "No disponible"}
+        </Text>
 
         <Text style={[styles.label, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>Correo electrónico</Text>
-        <TextInput
-            style={[styles.input, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: colors.border }]}
-            value={user?.email || ""}
-            editable={false}
-        />
-
-        <TouchableOpacity activeOpacity={0.85} style={[styles.passwordButton, { backgroundColor: colors.accent }]}> 
-            <Text style={[styles.passwordButtonText, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>Cambiar contraseña</Text>
-        </TouchableOpacity>
+        <Text style={[styles.readonlyValue, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: colors.border }]}>
+            {user?.email || "No disponible"}
+        </Text>
 
         <Text style={[styles.permissionsTitle, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>Permisos del dispositivo</Text>
         <Text style={[styles.permissionsSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}> 
@@ -215,7 +206,7 @@ label: {
     marginLeft: 6,
     marginBottom: 7,
     },
-input: {
+readonlyValue: {
     width: "100%",
     height: 40,
     borderWidth: 1,
@@ -226,6 +217,7 @@ input: {
     fontSize: 14,
     marginBottom: 13,
     backgroundColor: "#FFFFFF",
+    textAlignVertical: "center",
     },
 passwordButton: {
     alignSelf: "center",
@@ -284,12 +276,15 @@ permissionDescription: {
 activateButton: {
     width: 64,
     minHeight: 42,
-    borderWidth: 1,
-    borderColor: "#000000",
     borderRadius: 10,
     backgroundColor: "#FFEB3B",
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#06142B",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 7,
+    elevation: 3,
     },
 activateText: {
     color: "#000000",
@@ -300,12 +295,15 @@ logoutButton: {
     width: "92%",
     alignSelf: "center",
     backgroundColor: "#D91414",
-    borderWidth: 2,
-    borderColor: "#000000",
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: "center",
     marginTop: 20,
+    shadowColor: "#06142B",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
     },
 logoutText: {
     color: "#FFFFFF",

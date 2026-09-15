@@ -74,3 +74,13 @@ select,
 textarea {
     font: inherit;
 }
+
+/* Buttons share the same borderless, elevated treatment throughout the app. */
+button {
+    border: 0 !important;
+    box-shadow: 0 5px 12px rgba(6, 20, 43, 0.18);
+}
+
+button:disabled {
+    box-shadow: none;
+}

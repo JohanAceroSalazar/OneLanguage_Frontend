@@ -121,14 +121,16 @@
     margin-top: 6px;
 }
 
-.profile-input {
+.profile-value {
     width: 100%;
     padding: 12px 14px;
     border-radius: 8px;
     border: 1px solid var(--color-border);
     font-size: 16px;
     color: var(--color-text);
-    background: var(--color-surface);
+    background: var(--color-surface-soft);
+    margin: 0;
+    overflow-wrap: anywhere;
 }
 
 .change-pass-btn {

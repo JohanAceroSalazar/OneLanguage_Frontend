@@ -19,37 +19,6 @@ function Profile() {
 
     const storedUser = JSON.parse(localStorage.getItem("user") || "null");
 
-    const [form, setForm] = useState({
-        name: storedUser?.fullName || "",
-        email: storedUser?.email || "",
-    });
-
-    const [passwordForm, setPasswordForm] = useState({ current: "", new: "", confirm: "" });
-
-    // VISTA CAMBIAR CONTRASEÑA
-    if (view === "password") {
-        return (
-            <div className="profile-container">
-                <div className="profile-header">
-                    <BrandLogo className="profile-logo" />
-                    <NavBar />
-                </div>
-                <div className="profile-center">
-                    <div className="password-card">
-                        <p className="password-title">Cambiar la contraseña</p>
-                        <label>Contraseña actual</label>
-                        <input type="password" className="profile-input" value={passwordForm.current} onChange={e => setPasswordForm({...passwordForm, current: e.target.value})} />
-                        <label>Nueva contraseña</label>
-                        <input type="password" className="profile-input" value={passwordForm.new} onChange={e => setPasswordForm({...passwordForm, new: e.target.value})} />
-                        <label>Confirmar la contraseña nueva</label>
-                        <input type="password" className="profile-input" value={passwordForm.confirm} onChange={e => setPasswordForm({...passwordForm, confirm: e.target.value})} />
-                        <button className="save-btn" onClick={() => setView("profile")}>Guardar cambios</button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     // VISTA CÁMARA
     if (view === "camera") {
         return (
@@ -125,10 +94,9 @@ function Profile() {
                         <p className="section-title">Información personal</p>
                         <p className="section-subtitle">Visualiza tus datos personales</p>
                         <label className="field-label">Nombre Completo</label>
-                        <input className="profile-input" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+                        <p className="profile-value">{storedUser?.fullName || "No disponible"}</p>
                         <label className="field-label">Correo Electrónico</label>
-                        <input className="profile-input" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
-                        <button className="change-pass-btn" onClick={() => setView("password")}>Cambiar contraseña</button>
+                        <p className="profile-value">{storedUser?.email || "No disponible"}</p>
                     </div>
                 </div>
 

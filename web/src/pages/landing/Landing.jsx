@@ -33,6 +33,7 @@ function Landing() {
             <section className="landing-hero">
                 <div className="landing-copy">
                     <p className="landing-badge">Traducción de lengua de señas colombiana</p>
+                    <p className="landing-value">De señas a texto/audio</p>
                     <h2>Una app pensada para conectar personas sin barreras.</h2>
                     <p className="landing-description">
                         Traduce, consulta tu historial y ajusta la accesibilidad desde una experiencia
