@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../src/theme/ThemeContext";
@@ -8,8 +7,6 @@ export default function Terms() {
 
     const router = useRouter();
     const { colors, fontScale } = useTheme();
-    const [accepted, setAccepted] = useState(false);
-
     return (
         <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={styles.content}>
         <View style={styles.headerRow}>

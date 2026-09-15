@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useMemo, useState } from "react";
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useMemo, useState } from "react";
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AppAlert } from "../../components/app-alert";
 import { BottomNav } from "../../components/bottom-nav";
 import { useTheme } from "../../src/theme/ThemeContext";
@@ -10,7 +10,7 @@ type DropdownOption = {
     value: string;
 };
 
-function Dropdown({ title, icon, options, selectedValue, onSelect, accentColor, textColor, borderColor, menuBackgroundColor, menuTextColor, selectedBackgroundColor, selectedTextColor }: {
+function Dropdown({ title, icon, options, selectedValue, onSelect, accentColor, textColor, borderColor, menuBackgroundColor, menuTextColor, selectedBackgroundColor, selectedTextColor, open, onToggle }: {
     title: string;
     icon: keyof typeof Ionicons.glyphMap;
     options: DropdownOption[];
@@ -23,15 +23,15 @@ function Dropdown({ title, icon, options, selectedValue, onSelect, accentColor, 
     menuTextColor: string;
     selectedBackgroundColor: string;
     selectedTextColor: string;
+    open: boolean;
+    onToggle: () => void;
 }) {
-    const [open, setOpen] = useState(false);
-
     return (
         <View style={styles.optionRow}>
             <Ionicons name={icon} size={46} color={accentColor} style={styles.optionIcon} />
             <View style={styles.optionContent}>
                 <Text style={[styles.optionText, { color: textColor }]}>{title}</Text>
-                <TouchableOpacity activeOpacity={0.9} style={[styles.dropdownButton, { borderColor, backgroundColor: accentColor }]} onPress={() => setOpen((value) => !value)}>
+                <TouchableOpacity activeOpacity={0.9} style={[styles.dropdownButton, { backgroundColor: accentColor }]} onPress={onToggle}>
                     <Text style={[styles.dropdownButtonText, { color: "#111827" }]}>{selectedValue}</Text>
                     <Ionicons name="chevron-down" size={18} color="#111827" />
                 </TouchableOpacity>
@@ -40,7 +40,7 @@ function Dropdown({ title, icon, options, selectedValue, onSelect, accentColor, 
                         {options.map((option) => {
                             const isSelected = option.label === selectedValue;
                             return (
-                                <TouchableOpacity key={option.value} style={[styles.dropdownItem, isSelected && { backgroundColor: selectedBackgroundColor }]} onPress={() => { onSelect(option.value); setOpen(false); }}>
+                                <TouchableOpacity key={option.value} style={[styles.dropdownItem, isSelected && { backgroundColor: selectedBackgroundColor }]} onPress={() => onSelect(option.value)}>
                                     <Text style={[styles.dropdownItemText, { color: isSelected ? selectedTextColor : menuTextColor }]}>{option.label}</Text>
                                 </TouchableOpacity>
                             );
@@ -54,14 +54,9 @@ function Dropdown({ title, icon, options, selectedValue, onSelect, accentColor, 
 
 export default function Accessibility() {
     const { colors, theme, fontScale, fontSizeMode, setThemeMode, setFontSizeMode } = useTheme();
-    const [draftTheme, setDraftTheme] = useState(theme);
     const [draftFontSize, setDraftFontSize] = useState(fontSizeMode);
     const [showSuccess, setShowSuccess] = useState(false);
-
-    useEffect(() => {
-        setDraftTheme(theme);
-        setDraftFontSize(fontSizeMode);
-    }, [theme, fontSizeMode]);
+    const [openDropdown, setOpenDropdown] = useState<"font" | "theme" | null>(null);
 
     const fontOptions = useMemo<DropdownOption[]>(() => [
         { label: "Pequeño", value: "small" },
@@ -75,16 +70,16 @@ export default function Accessibility() {
     ], []);
 
     const selectedFontLabel = fontOptions.find((option) => option.value === draftFontSize)?.label ?? "Mediano";
-    const selectedThemeLabel = themeOptions.find((option) => option.value === draftTheme)?.label ?? "Claro";
+    const selectedThemeLabel = themeOptions.find((option) => option.value === theme)?.label ?? "Claro";
 
     const handleSave = () => {
-        setThemeMode(draftTheme);
+        setThemeMode(theme);
         setFontSizeMode(draftFontSize);
         setShowSuccess(true);
     };
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
+        <Pressable style={[styles.container, { backgroundColor: colors.background }]} onPress={() => setOpenDropdown(null)}>
             <View style={styles.cameraDot} />
             <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
             <Text style={[styles.title, { color: colors.text, fontSize: 30 * fontScale }]}>Accesibilidad</Text>
@@ -95,7 +90,10 @@ export default function Accessibility() {
                     icon="text-outline"
                     options={fontOptions}
                     selectedValue={selectedFontLabel}
-                    onSelect={(value) => setDraftFontSize(value as typeof draftFontSize)}
+                    onSelect={(value) => {
+                        setDraftFontSize(value as typeof draftFontSize);
+                        setOpenDropdown(null);
+                    }}
                     accentColor={colors.accent}
                     textColor={colors.textOnSurface}
                     borderColor={colors.border}
@@ -103,6 +101,8 @@ export default function Accessibility() {
                     menuTextColor={theme === "dark" ? "#f8fafc" : "#111827"}
                     selectedBackgroundColor={theme === "dark" ? "#1f2937" : "#f3f4f6"}
                     selectedTextColor={theme === "dark" ? "#f4dc2e" : "#111827"}
+                    open={openDropdown === "font"}
+                    onToggle={() => setOpenDropdown((current) => current === "font" ? null : "font")}
                 />
 
                 <Dropdown
@@ -110,7 +110,11 @@ export default function Accessibility() {
                     icon="color-palette-outline"
                     options={themeOptions}
                     selectedValue={selectedThemeLabel}
-                    onSelect={(value) => setDraftTheme(value as typeof draftTheme)}
+                    onSelect={(value) => {
+                        const nextTheme = value as typeof theme;
+                        setThemeMode(nextTheme);
+                        setOpenDropdown(null);
+                    }}
                     accentColor={colors.accent}
                     textColor={colors.textOnSurface}
                     borderColor={colors.border}
@@ -118,13 +122,15 @@ export default function Accessibility() {
                     menuTextColor={theme === "dark" ? "#f8fafc" : "#111827"}
                     selectedBackgroundColor={theme === "dark" ? "#1f2937" : "#f3f4f6"}
                     selectedTextColor={theme === "dark" ? "#f4dc2e" : "#111827"}
+                    open={openDropdown === "theme"}
+                    onToggle={() => setOpenDropdown((current) => current === "theme" ? null : "theme")}
                 />
 
                 <View style={styles.optionRow}>
                     <Ionicons name="globe-outline" size={46} color={colors.accent} style={styles.optionIcon} />
                     <View style={styles.optionContent}>
                         <Text style={[styles.optionText, { color: colors.textOnSurface }]}>Idioma</Text>
-                        <TouchableOpacity activeOpacity={0.9} style={[styles.dropdownButton, { borderColor: colors.border, backgroundColor: colors.accent }]}> 
+                        <TouchableOpacity activeOpacity={0.9} style={[styles.dropdownButton, { backgroundColor: colors.accent }]}>
                             <Text style={styles.dropdownButtonText}>Español</Text>
                             <Ionicons name="chevron-down" size={18} color="#111827" />
                         </TouchableOpacity>
@@ -147,7 +153,7 @@ export default function Accessibility() {
                 variant="success"
                 onAction={() => setShowSuccess(false)}
             />
-        </SafeAreaView>
+        </Pressable>
     );
 }
 
@@ -221,8 +227,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 10,
         borderRadius: 10,
-        borderWidth: 1,
         marginBottom: 6,
+        shadowColor: "#06142B",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.16,
+        shadowRadius: 7,
+        elevation: 2,
     },
     dropdownButtonText: {
         color: "#111827",
@@ -248,11 +258,14 @@ const styles = StyleSheet.create({
         width: "92%",
         alignSelf: "center",
         marginTop: 36,
-        borderWidth: 3,
-        borderColor: "#000000",
         borderRadius: 15,
         alignItems: "center",
         paddingVertical: 13,
+        shadowColor: "#06142B",
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 3,
     },
     saveButtonText: {
         color: "#000000",

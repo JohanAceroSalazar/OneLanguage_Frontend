@@ -126,8 +126,6 @@ button: {
     width: "92%",
     marginTop: 30,
     backgroundColor: "#FFEB3B",
-    borderWidth: 2,
-    borderColor: "#000000",
     borderRadius: 14,
     paddingVertical: 3,
     alignItems: "center",

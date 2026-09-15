@@ -98,13 +98,11 @@
 .landing-link-button {
     background: var(--color-surface-alt);
     color: var(--color-text-on-page);
-    border: 1px solid color-mix(in srgb, var(--color-surface) 18%, transparent);
 }
 
 .landing-secondary-button {
     background: color-mix(in srgb, var(--color-surface) 8%, transparent);
     color: var(--color-text-on-page);
-    border: 1px solid color-mix(in srgb, var(--color-surface) 16%, transparent);
 }
 
 .landing-primary-button {
@@ -150,8 +148,17 @@
     font-size: clamp(38px, 6vw, 72px);
     line-height: 0.96;
     letter-spacing: -0.04em;
-    max-width: 10.5ch;
+    max-width: 16ch;
     color: var(--color-text-on-page);
+}
+
+.landing-value {
+    margin: 0 0 12px;
+    color: var(--color-accent);
+    font-size: clamp(17px, 2.2vw, 24px);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .landing-description {

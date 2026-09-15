@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaFont, FaCheck, FaGlobe, FaMoon, FaSun } from "react-icons/fa";
 import NavBar from "../../components/NavBar/NavBar";
 import BrandLogo from "../../components/BrandLogo/BrandLogo";
@@ -20,6 +20,7 @@ function Accessibility() {
     const [showLangMenu, setShowLangMenu] = useState(false);
     const [showThemeMenu, setShowThemeMenu] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const controlsRef = useRef(null);
 
     useEffect(() => {
         const zoom = fontSizeOptions[fontSize] || 1;
@@ -31,6 +32,19 @@ function Accessibility() {
         document.documentElement.dataset.theme = savedTheme;
         document.documentElement.style.colorScheme = savedTheme;
     }, [savedTheme]);
+
+    useEffect(() => {
+        const closeMenusOnOutsideClick = (event) => {
+            if (!controlsRef.current?.contains(event.target)) {
+                setShowFontMenu(false);
+                setShowLangMenu(false);
+                setShowThemeMenu(false);
+            }
+        };
+
+        document.addEventListener("pointerdown", closeMenusOnOutsideClick);
+        return () => document.removeEventListener("pointerdown", closeMenusOnOutsideClick);
+    }, []);
 
     const handleSave = () => {
         setSavedTheme(selectedTheme);
@@ -55,6 +69,12 @@ function Accessibility() {
         setShowThemeMenu(menu === "theme");
     };
 
+    const previewTheme = (theme) => {
+        setSelectedTheme(theme);
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+    };
+
     return (
         <div className="access-container">
             <div className="access-header">
@@ -62,7 +82,7 @@ function Accessibility() {
                 <NavBar />
             </div>
 
-            <div className="access-card">
+            <div className="access-card" ref={controlsRef}>
                 <div className="access-row">
                     <div className="access-label">
                         <FaFont size={20} />
@@ -108,20 +128,20 @@ function Accessibility() {
                                     <button
                                         type="button"
                                         className={selectedTheme === "light" ? "theme-option selected" : "theme-option"}
-                                        onClick={() => setSelectedTheme("light")}
+                                        onClick={() => previewTheme("light")}
                                     >
                                         <FaSun /> Claro
                                     </button>
                                     <button
                                         type="button"
                                         className={selectedTheme === "dark" ? "theme-option selected" : "theme-option"}
-                                        onClick={() => setSelectedTheme("dark")}
+                                        onClick={() => previewTheme("dark")}
                                     >
                                         <FaMoon /> Oscuro
                                     </button>
                                 </div>
                                 <p className="theme-hint">
-                                    {selectedTheme === "dark" ? "Oscuro" : "Claro"} seleccionado. Se aplica solo al guardar.
+                                    Vista previa en {selectedTheme === "dark" ? "oscuro" : "claro"}. Guarda los cambios para conservarla.
                                 </p>
                             </div>
                         )}

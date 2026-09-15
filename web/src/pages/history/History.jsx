@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./History.css";
 import { FaTrash, FaClock, FaCamera, FaChevronDown } from "react-icons/fa";
 import BrandLogo from "../../components/BrandLogo/BrandLogo";
@@ -14,6 +14,16 @@ const mockTranslations = [
 function History() {
     const [translations, setTranslations] = useState(mockTranslations);
     const [filterOpen, setFilterOpen] = useState(false);
+    const filterRef = useRef(null);
+
+    useEffect(() => {
+        const closeFilterOnOutsideClick = (event) => {
+            if (!filterRef.current?.contains(event.target)) setFilterOpen(false);
+        };
+
+        document.addEventListener("pointerdown", closeFilterOnOutsideClick);
+        return () => document.removeEventListener("pointerdown", closeFilterOnOutsideClick);
+    }, []);
 
     const deleteOne = (id) => {
         setTranslations(translations.filter(t => t.id !== id));
@@ -50,7 +60,7 @@ function History() {
                 <>
                     {/* FILTRO Y BORRAR TODO */}
                     <div className="history-controls">
-                        <div className="filter-wrapper">
+                        <div className="filter-wrapper" ref={filterRef}>
                             <button className="filter-btn" onClick={() => setFilterOpen(!filterOpen)}>
                                 Filtrar por fecha <FaChevronDown />
                             </button>
