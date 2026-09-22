@@ -123,17 +123,7 @@ function Login() {
 
         localStorage.setItem("token", response.token);
         localStorage.setItem("user", JSON.stringify(response.user));
-
-        openModal({
-            title: "Sesión Exitosa",
-            message: "Inicio de sesión exitoso. Vamos a llevarte al panel principal.",
-            tone: "success",
-            confirmText: "Entrar ahora",
-        onConfirm: () => {
-            closeModal();
-            navigate("/home");
-        },
-    });
+        navigate("/home", { replace: true });
 
         } catch {
 
@@ -209,7 +199,7 @@ function Login() {
                     <Button text="Iniciar sesión" className="auth-submit-button" />
                 </form>
 
-                <p className="recover-text" onClick={() => navigate("/forgotPassword")}>
+                <p className="recover-text" onClick={() => navigate("/forgotpassword")}>
                     Restablecer contraseña
                 </p>
                 <p className="register-text">

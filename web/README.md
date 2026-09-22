@@ -1,5 +1,16 @@
 # React + Vite
 
+## Traduccion LSC en tiempo real
+
+La pantalla `/translate` usa la camara del navegador y se conecta al servicio Python del repositorio `OneLanguage-AI`. No procesa TensorFlow en el navegador ni almacena los frames de la camara.
+
+1. Inicia `OneLanguage-AI` con `python web_service.py`.
+2. Copia `.env.example` a `.env` y verifica `VITE_AI_WS_URL`.
+3. Ejecuta `npm run dev` dentro de `web/`.
+4. Abre `/translate` e inicia la camara.
+
+El frontend no contiene una lista fija de senas: recibe las etiquetas activas desde el modelo. Para publicar nuevas senas se reemplaza el paquete compatible dentro de `OneLanguage-AI/model/` y se reinicia el servicio de IA.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
