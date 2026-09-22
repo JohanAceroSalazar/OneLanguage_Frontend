@@ -1,173 +1,304 @@
-import { useEffect, useRef, useState } from "react";
-import { FaCamera, FaPause, FaPlay, FaRedo, FaSave, FaSyncAlt, FaVolumeUp } from "react-icons/fa";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FaCamera, FaExchangeAlt, FaSave, FaStop, FaTrash, FaVolumeUp } from "react-icons/fa";
 import BrandLogo from "../../components/BrandLogo/BrandLogo";
 import NavBar from "../../components/NavBar/NavBar";
+import { saveTranslation } from "../../services/translationService";
 import "./Translate.css";
+
+const FRAME_INTERVAL_MS = 40;
+const JPEG_QUALITY = 0.82;
+const CAMERA_CONSTRAINTS = {
+    audio: false,
+    video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
+};
+
+const statusMessages = {
+    inactive: "Activa la camara para interpretar senas.",
+    connecting: "Conectando el modelo de interpretacion...",
+    ready: "Modelo listo. Muestra una sena a la camara.",
+    analyzing: "Analizando el movimiento...",
+    waiting: "Aun no hay suficiente certeza para traducir.",
+    no_hands: "No se detecta una sena. Muestra tus manos dentro del encuadre.",
+    idle: "No se detecta una sena en este momento.",
+    saved: "Traduccion guardada en tu historial.",
+    save_error: "No se pudo guardar la traduccion. Intenta nuevamente.",
+    camera_insecure: "La camara requiere HTTPS o localhost.",
+    camera_denied: "El navegador no tiene permiso para usar la camara.",
+    camera_unavailable: "No se encontro una camara disponible.",
+    camera_busy: "La camara esta siendo usada por otra aplicacion.",
+    camera_error: "No se pudo iniciar la camara.",
+    model_error: "No fue posible conectar con el modelo de IA.",
+};
+
+function getAiSocketUrl() {
+    const configuredUrl = import.meta.env.VITE_AI_WS_URL?.trim();
+    if (configuredUrl) return configuredUrl;
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    return `${protocol}://${window.location.host}/ws/recognize`;
+}
+
+function getCameraErrorStatus(error) {
+    if (error?.name === "NotAllowedError" || error?.name === "SecurityError") return "camera_denied";
+    if (error?.name === "NotFoundError") return "camera_unavailable";
+    if (error?.name === "NotReadableError") return "camera_busy";
+    return "camera_error";
+}
 
 function Translate() {
     const [cameraActive, setCameraActive] = useState(false);
     const [flipped, setFlipped] = useState(false);
-    const [view, setView] = useState("camera"); // "camera" | "result" | "audio"
-    const [isPlaying, setIsPlaying] = useState(false);
+    const [modelStatus, setModelStatus] = useState("inactive");
+    const [translation, setTranslation] = useState("");
+    const [sessionTranslations, setSessionTranslations] = useState([]);
+    const [confidence, setConfidence] = useState(null);
+    const [automaticSpeech, setAutomaticSpeech] = useState(true);
+    const [reviewPending, setReviewPending] = useState(false);
+    const [saving, setSaving] = useState(false);
+
     const videoRef = useRef(null);
+    const canvasRef = useRef(null);
     const streamRef = useRef(null);
-    const audioRef = useRef(null);
+    const socketRef = useRef(null);
+    const captureTimerRef = useRef(null);
+    const reconnectTimerRef = useRef(null);
+    const connectModelRef = useRef(null);
+    const sessionTranslationsRef = useRef([]);
+    const confidenceRef = useRef(null);
+    const speechSupported = "speechSynthesis" in window;
 
-    const startCamera = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            streamRef.current = stream;
-            setCameraActive(true);
-
-            setTimeout(() => {
-                if (videoRef.current) {
-                    videoRef.current.srcObject = stream;
-                }
-            }, 100);
-        } catch {
-            alert("No se pudo acceder a la cámara");
+    const attachVideo = useCallback((node) => {
+        videoRef.current = node;
+        if (node && streamRef.current) {
+            node.srcObject = streamRef.current;
+            node.play().catch(() => undefined);
         }
-    };
+    }, []);
 
-    const stopCamera = () => {
+    const stopCapture = useCallback(() => {
+        if (captureTimerRef.current) {
+            window.clearInterval(captureTimerRef.current);
+            captureTimerRef.current = null;
+        }
+    }, []);
+
+    const stopCamera = useCallback((nextStatus = "inactive") => {
+        stopCapture();
+        if (reconnectTimerRef.current) {
+            window.clearTimeout(reconnectTimerRef.current);
+            reconnectTimerRef.current = null;
+        }
+        if (socketRef.current) {
+            socketRef.current.close();
+            socketRef.current = null;
+        }
         if (streamRef.current) {
             streamRef.current.getTracks().forEach((track) => track.stop());
             streamRef.current = null;
         }
+        if (videoRef.current) videoRef.current.srcObject = null;
         setCameraActive(false);
-        setView("result");
-    };
+        setModelStatus(nextStatus);
+    }, [stopCapture]);
 
-    const handleGenerateAudio = () => {
-        setView("audio");
-    };
+    const speakTranslation = useCallback((text = translation) => {
+        if (!speechSupported || !text) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "es-CO";
+        window.speechSynthesis.speak(utterance);
+    }, [speechSupported, translation]);
 
-    const handleSave = () => {
-        alert("Traducción guardada");
-    };
+    const handleModelMessage = useCallback((event) => {
+        let message;
+        try {
+            message = JSON.parse(event.data);
+        } catch {
+            setModelStatus("model_error");
+            return;
+        }
+        if (message.type === "ready") {
+            setModelStatus("ready");
+            return;
+        }
+        if (message.type === "error") {
+            setModelStatus("model_error");
+            return;
+        }
+        if (message.type !== "prediction") return;
 
-    const togglePlay = () => {
-        if (!audioRef.current) {
+        setModelStatus(message.status || "analyzing");
+        if (message.status === "no_hands" || message.status === "idle") {
+            setTranslation("");
+            setConfidence(null);
+            confidenceRef.current = null;
             return;
         }
 
-        if (isPlaying) {
-            audioRef.current.pause();
-        } else {
-            audioRef.current.play();
-        }
+        const nextConfidence = typeof message.confidence === "number" ? message.confidence : null;
+        setConfidence(nextConfidence);
+        confidenceRef.current = nextConfidence;
+        if (message.status !== "translated" || !message.text || !message.is_new_translation) return;
 
-        setIsPlaying(!isPlaying);
-    };
+        const currentSession = sessionTranslationsRef.current;
+        const nextSession = currentSession.at(-1) === message.text
+            ? currentSession
+            : [...currentSession, message.text];
+        sessionTranslationsRef.current = nextSession;
+        setSessionTranslations(nextSession);
+        const assembledText = nextSession.join(" ");
+        setTranslation(assembledText);
+        if (automaticSpeech && speechSupported) speakTranslation(message.text);
+    }, [automaticSpeech, speakTranslation, speechSupported]);
 
-    const handleRepeat = () => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = 0;
-            audioRef.current.play();
-            setIsPlaying(true);
-        }
-    };
+    const startCapture = useCallback(() => {
+        stopCapture();
+        captureTimerRef.current = window.setInterval(() => {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            const socket = socketRef.current;
+            if (!video || !canvas || !socket || socket.readyState !== WebSocket.OPEN || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
+            if (!video.videoWidth || !video.videoHeight) return;
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext("2d");
+            if (!context) return;
+            context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+            canvas.toBlob((blob) => {
+                if (blob && socket.readyState === WebSocket.OPEN) socket.send(blob);
+            }, "image/jpeg", JPEG_QUALITY);
+        }, FRAME_INTERVAL_MS);
+    }, [stopCapture]);
+
+    const connectModel = useCallback(() => {
+        if (socketRef.current?.readyState === WebSocket.OPEN || socketRef.current?.readyState === WebSocket.CONNECTING) return;
+        setModelStatus("connecting");
+        const socket = new WebSocket(getAiSocketUrl());
+        socketRef.current = socket;
+        socket.addEventListener("message", handleModelMessage);
+        socket.addEventListener("open", startCapture);
+        socket.addEventListener("error", () => setModelStatus("model_error"));
+        socket.addEventListener("close", () => {
+            if (socketRef.current !== socket) return;
+            socketRef.current = null;
+            stopCapture();
+            if (!streamRef.current || reconnectTimerRef.current) return;
+            setModelStatus("connecting");
+            reconnectTimerRef.current = window.setTimeout(() => {
+                reconnectTimerRef.current = null;
+                connectModelRef.current?.();
+            }, 1000);
+        });
+    }, [handleModelMessage, startCapture, stopCapture]);
 
     useEffect(() => {
-        return () => {
-            if (streamRef.current) {
-                streamRef.current.getTracks().forEach((track) => track.stop());
-            }
-        };
+        connectModelRef.current = connectModel;
+    }, [connectModel]);
+
+    const resetSession = useCallback(() => {
+        sessionTranslationsRef.current = [];
+        confidenceRef.current = null;
+        setSessionTranslations([]);
+        setTranslation("");
+        setConfidence(null);
+        setReviewPending(false);
     }, []);
 
-    if (view === "audio") {
-        return (
-            <div className="translate-container">
-                <div className="translate-header">
-                    <div className="translate-header-main">
-                        <BrandLogo className="translate-logo" />
-                    </div>
-                    <NavBar />
-                </div>
+    const startCamera = useCallback(async () => {
+        if (reviewPending) return;
+        if (!window.isSecureContext && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+            setModelStatus("camera_insecure");
+            return;
+        }
+        if (!navigator.mediaDevices?.getUserMedia) {
+            setModelStatus("camera_unavailable");
+            return;
+        }
 
-                <div className="translate-result">
-                    <div className="translate-text-box result">
-                        <p>El texto traducido aparecerá aquí...</p>
-                    </div>
+        resetSession();
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia(CAMERA_CONSTRAINTS);
+            streamRef.current = stream;
+            setCameraActive(true);
+            setModelStatus("connecting");
+            connectModel();
+        } catch (error) {
+            stopCamera(getCameraErrorStatus(error));
+        }
+    }, [connectModel, resetSession, reviewPending, stopCamera]);
 
-                    <div className="audio-player">
-                        <button className="audio-play-btn" onClick={togglePlay}>
-                            {isPlaying ? <FaPause /> : <FaPlay />}
-                        </button>
-                        <div className="audio-bar">
-                            <div className="audio-progress" />
-                        </div>
-                    </div>
+    const finishTranslation = useCallback(() => {
+        stopCamera();
+        setReviewPending(sessionTranslationsRef.current.length > 0);
+    }, [stopCamera]);
 
-                    <button className="translate-action-btn" onClick={handleRepeat}>
-                        <FaRedo /> Repetir audio
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    const discardTranslation = useCallback(() => {
+        resetSession();
+        setModelStatus("inactive");
+    }, [resetSession]);
 
-    if (view === "result") {
-        return (
-            <div className="translate-container">
-                <div className="translate-header">
-                    <div className="translate-header-main">
-                        <BrandLogo className="translate-logo" />
-                    </div>
-                    <NavBar />
-                </div>
+    const saveCompletedTranslation = useCallback(async () => {
+        const translatedText = sessionTranslationsRef.current.join(" ");
+        if (!translatedText || saving) return;
 
-                <div className="translate-result">
-                    <div className="translate-text-box result">
-                        <p>El texto traducido aparecerá aquí...</p>
-                    </div>
+        setSaving(true);
+        try {
+            await saveTranslation({ translatedText, confidence: confidenceRef.current });
+            resetSession();
+            setModelStatus("saved");
+        } catch {
+            setModelStatus("save_error");
+        } finally {
+            setSaving(false);
+        }
+    }, [resetSession, saving]);
 
-                    <div className="translate-actions">
-                        <button className="translate-action-btn" onClick={handleGenerateAudio}>
-                            <FaVolumeUp /> Generar audio
-                        </button>
-                        <button className="translate-action-btn" onClick={handleSave}>
-                            <FaSave /> Guardar traducción
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    useEffect(() => () => {
+        stopCamera();
+        if (speechSupported) window.speechSynthesis.cancel();
+    }, [speechSupported, stopCamera]);
+
+    const sessionText = sessionTranslations.join(" ");
+    const displayedTranslation = reviewPending ? sessionText : translation;
+    const confidenceText = confidence === null ? null : `${Math.round(confidence * 100)}% de confianza`;
+    const statusText = statusMessages[modelStatus] || statusMessages.model_error;
 
     return (
         <div className="translate-container">
-            <div className="translate-header">
+            <header className="translate-header">
                 <div className="translate-header-main">
                     <BrandLogo className="translate-logo" />
-                    <button className="flip-btn" onClick={() => setFlipped(!flipped)}>
-                        <FaSyncAlt />
-                    </button>
+                    <button className="icon-button" type="button" onClick={() => setFlipped((value) => !value)} aria-label="Intercambiar posicion de camara y traduccion" title="Intercambiar posicion"><FaExchangeAlt aria-hidden="true" /></button>
+                    <button className={`speech-toggle ${automaticSpeech ? "is-active" : ""}`} type="button" onClick={() => setAutomaticSpeech((value) => !value)} aria-label={automaticSpeech ? "Desactivar voz automatica" : "Activar voz automatica"} disabled={!speechSupported}><FaVolumeUp aria-hidden="true" /><span>{automaticSpeech ? "Voz activa" : "Voz apagada"}</span></button>
                 </div>
                 <NavBar />
-            </div>
+            </header>
 
-            <div className={`translate-content ${flipped ? "flipped" : ""}`}>
-                <div className="translate-text-box">
-                    <p>El texto traducido aparecerá aquí...</p>
+            <main className={`translate-content ${flipped ? "flipped" : ""}`}>
+                <section className="translate-text-box" aria-live="polite">
+                    <p className="translation-eyebrow">Traduccion en tiempo real</p>
+                    <h1>{displayedTranslation || "Aun no hay una sena reconocida"}</h1>
+                    <p className="translation-status">{statusText}</p>
+                    {confidenceText && <p className="translation-confidence">{confidenceText}</p>}
+                    <button className="listen-translation" type="button" onClick={() => speakTranslation(displayedTranslation)} disabled={!displayedTranslation || !speechSupported}><FaVolumeUp aria-hidden="true" />Escuchar traduccion</button>
+                </section>
+                <section className="translate-camera-box">
+                    {cameraActive ? <video ref={attachVideo} autoPlay playsInline muted className="translate-video" /> : <div className="translate-camera-placeholder"><FaCamera size={48} aria-hidden="true" /><p>Activa la camara para interpretar senas</p></div>}
+                </section>
+            </main>
+
+            {reviewPending ? (
+                <div className="translation-review-actions">
+                    <button className="review-save-btn" type="button" onClick={saveCompletedTranslation} disabled={saving}><FaSave aria-hidden="true" />{saving ? "Guardando..." : "Guardar en historial"}</button>
+                    <button className="review-discard-btn" type="button" onClick={discardTranslation} disabled={saving}><FaTrash aria-hidden="true" />Descartar</button>
                 </div>
-
-                <div className="translate-camera-box" onClick={!cameraActive ? startCamera : undefined}>
-                    {cameraActive ? (
-                        <video ref={videoRef} autoPlay playsInline className="translate-video" />
-                    ) : (
-                        <div className="translate-camera-placeholder">
-                            <FaCamera size={48} color="white" />
-                            <p>Toca para activar la cámara</p>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            <button className="translate-btn" onClick={cameraActive ? stopCamera : startCamera}>
-                {cameraActive ? "Finalizar traducción" : "Iniciar traducción"}
-            </button>
+            ) : (
+                <button className="translate-btn" type="button" onClick={cameraActive ? finishTranslation : startCamera}>
+                    {cameraActive ? <FaStop aria-hidden="true" /> : <FaCamera aria-hidden="true" />}
+                    {cameraActive ? "Finalizar traduccion" : "Iniciar traduccion"}
+                </button>
+            )}
+            <canvas ref={canvasRef} className="capture-canvas" aria-hidden="true" />
         </div>
     );
 }
