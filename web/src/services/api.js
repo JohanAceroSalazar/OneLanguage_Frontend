@@ -12,7 +12,7 @@ const isPublicAuthenticationRequest = (url = "") =>
   publicAuthenticationEndpoints.some((endpoint) => url.endsWith(endpoint));
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL?.trim() || "",
   headers: {
     'Content-Type': 'application/json',
   },
