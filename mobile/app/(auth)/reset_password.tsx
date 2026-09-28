@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { resetPassword } from "../../src/services/authService";
 import { useTheme } from "../../src/theme/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 const getParam = (value: string | string[] | undefined) => {
   if (Array.isArray(value)) {
@@ -25,6 +26,7 @@ const getParam = (value: string | string[] | undefined) => {
 };
 
 export default function ResetPassword() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ id?: string; token?: string }>();
   const { colors, fontScale } = useTheme();
@@ -60,35 +62,35 @@ export default function ResetPassword() {
     setSuccess("");
 
     if (!tokenIdentifier || !token) {
-      setError("El enlace de recuperacion no es valido o esta incompleto.");
+      setError(t("auth.invalidLink"));
       return;
     }
 
     if (!passwordValid) {
-      setError("La contrasena debe tener minimo 8 caracteres, una mayuscula, una minuscula y un numero.");
+      setError(t("auth.passwordRules"));
       return;
     }
 
     if (!form.confirmPassword) {
-      setError("Debes confirmar tu nueva contrasena.");
+      setError(t("auth.confirmRequired"));
       return;
     }
 
     if (!passwordsMatch) {
-      setError("Las contrasenas no coinciden.");
+      setError(t("misc.passwordMismatch"));
       return;
     }
 
     setLoading(true);
     try {
       await resetPassword(tokenIdentifier, token, form.password, form.confirmPassword);
-      setSuccess("Contrasena restablecida correctamente. Te llevaremos al inicio de sesion.");
+      setSuccess(t("auth.resetSuccess"));
 
       setTimeout(() => {
         router.replace("/(auth)/login");
       }, 2000);
     } catch (err: any) {
-      setError(err?.message || "No se pudo restablecer la contrasena.");
+      setError(err?.message || t("auth.resetError"));
     } finally {
       setLoading(false);
     }
@@ -108,9 +110,7 @@ export default function ResetPassword() {
           <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
         </View>
 
-        <Text style={[styles.title, { color: colors.text, fontSize: 32 * fontScale }]}>
-          Restablecer{"\n"}contrasena
-        </Text>
+        <Text style={[styles.title, { color: colors.text, fontSize: 32 * fontScale }]}>{t("auth.resetTitle")}</Text>
 
         <Image
           source={require("../../assets/images/Logo.png")}
@@ -119,7 +119,7 @@ export default function ResetPassword() {
         />
 
         <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}>
-          <Text style={styles.label}>Nueva contrasena</Text>
+          <Text style={styles.label}>{t("auth.newPassword")}</Text>
           <View style={styles.passwordField}>
             <TextInput
               style={[
@@ -130,7 +130,7 @@ export default function ResetPassword() {
                   borderColor: form.password && !passwordValid ? "#ef4444" : "#d1d5db",
                 },
               ]}
-              placeholder="Minimo 8 caracteres"
+              placeholder={t("auth.passwordMin")}
               placeholderTextColor="#6b7280"
               secureTextEntry={!showPassword}
               value={form.password}
@@ -147,7 +147,7 @@ export default function ResetPassword() {
             Minimo 8 caracteres, una mayuscula, una minuscula y un numero.
           </Text>
 
-          <Text style={styles.label}>Confirmar contrasena</Text>
+          <Text style={styles.label}>{t("common.confirmPassword")}</Text>
           <View style={styles.passwordField}>
             <TextInput
               style={[
@@ -158,7 +158,7 @@ export default function ResetPassword() {
                   borderColor: confirmError ? "#ef4444" : "#d1d5db",
                 },
               ]}
-              placeholder="Confirma tu contrasena"
+              placeholder={t("auth.confirmNew")}
               placeholderTextColor="#6b7280"
               secureTextEntry={!showConfirmPassword}
               value={form.confirmPassword}
@@ -171,8 +171,8 @@ export default function ResetPassword() {
             </TouchableOpacity>
           </View>
 
-          {confirmError ? <Text style={styles.errorText}>Las contrasenas no coinciden.</Text> : null}
-          {confirmSuccess ? <Text style={styles.successInline}>Las contrasenas coinciden.</Text> : null}
+          {confirmError ? <Text style={styles.errorText}>{t("misc.passwordMismatch")}</Text> : null}
+          {confirmSuccess ? <Text style={styles.successInline}>{t("misc.passwordMatch")}</Text> : null}
 
           {error ? <Text style={styles.errorBox}>{error}</Text> : null}
           {success ? <Text style={styles.successBox}>{success}</Text> : null}
@@ -186,9 +186,7 @@ export default function ResetPassword() {
             {loading ? (
               <ActivityIndicator color="#000" />
             ) : (
-              <Text style={[styles.buttonText, { fontSize: 16 * fontScale }]}>
-                Restablecer contrasena
-              </Text>
+              <Text style={[styles.buttonText, { fontSize: 16 * fontScale }]}>{t("auth.resetButton")}</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -345,3 +343,5 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+
+

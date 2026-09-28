@@ -8,8 +8,10 @@ import {
     View,
 } from "react-native";
 import { useTheme } from "../../src/theme/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
+    const { t } = useTranslation();
     const { colors, fontScale } = useTheme();
 
     return (
@@ -19,7 +21,7 @@ export default function Home() {
         <Text style={[styles.logo, { color: colors.text, fontSize: 20 * fontScale }]}>ONE{"\n"}LANGUAGE</Text>
 
         <View style={styles.header}>
-            <Text style={[styles.greeting, { color: colors.text, fontSize: 24 * fontScale }]}>Hola usuario{"\n"}bienvenido</Text>
+        <Text style={[styles.greeting, { color: colors.text, fontSize: 24 * fontScale }]}>{t("home.greeting")}</Text>
         <Image
             source={require("../../assets/images/Logo.png")}
             style={styles.avatar}
@@ -28,7 +30,7 @@ export default function Home() {
         </View>
 
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, shadowColor: colors.shadow }]}> 
-            <Text style={[styles.cardTitle, { color: colors.textOnSurface, fontSize: 30 * fontScale }]}>¡Bienvenido a{"\n"}One Language!</Text>
+            <Text style={[styles.cardTitle, { color: colors.textOnSurface, fontSize: 30 * fontScale }]}>{t("home.title")}</Text>
 
         <Text style={[styles.description, { color: colors.textOnSurface, fontSize: 19 * fontScale }]}> 
             One Language es una aplicación diseñada para traducir el lenguaje de
@@ -37,7 +39,7 @@ export default function Home() {
         </Text>
 
         <TouchableOpacity activeOpacity={0.85} style={[styles.button, { backgroundColor: colors.accent }]}> 
-            <Text style={[styles.buttonText, { color: colors.textOnSurface, fontSize: 25 * fontScale }]}>Comenzar a{"\n"}traducir</Text>
+            <Text style={[styles.buttonText, { color: colors.textOnSurface, fontSize: 25 * fontScale }]}>{t("home.start")}</Text>
         </TouchableOpacity>
         </View>
 

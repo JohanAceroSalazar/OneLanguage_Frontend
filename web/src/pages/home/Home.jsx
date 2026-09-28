@@ -2,8 +2,10 @@ import { useNavigate } from "react-router-dom";
 import BrandLogo from "../../components/BrandLogo/BrandLogo";
 import NavBar from "../../components/NavBar/NavBar";
 import "./Home.css";
+import { useTranslation } from "react-i18next";
 
 function Home() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const userName = "usuario";
 
@@ -17,11 +19,11 @@ function Home() {
             </div>
 
             {/* SALUDO */}
-            <p className="home-greeting">Hola {userName} bienvenido</p>
+            <p className="home-greeting">{t("home.greeting", { name: userName })}</p>
 
             {/* TARJETA */}
             <div className="home-card">
-                <h1>¡Bienvenido a One Language!</h1>
+                <h1>{t("home.title")}</h1>
                 <p>
                     One Language es una aplicación diseñada para traducir el lenguaje
                     de señas colombiano a texto y audio en tiempo real, promoviendo

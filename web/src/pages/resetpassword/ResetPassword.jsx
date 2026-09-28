@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./ResetPassword.css";
@@ -8,6 +9,7 @@ import Input from "../../components/Input/Input";
 import { resetPassword } from "../../services/authService";
 
 function ResetPassword() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const tokenIdentifier = searchParams.get("id");
@@ -52,24 +54,22 @@ function ResetPassword() {
         setSuccess("");
 
         if (!tokenIdentifier || !token) {
-            setError("El enlace de recuperacion no es valido o esta incompleto.");
+            setError(t("auth.invalidLink"));
             return;
         }
 
         if (!passwordValid) {
-            setError(
-                "La contrasena debe tener minimo 8 caracteres, una mayuscula, una minuscula y un numero."
-            );
+            setError(t("auth.passwordRules"));
             return;
         }
 
         if (!form.confirmPassword) {
-            setError("Debes confirmar tu nueva contrasena.");
+            setError(t("auth.confirmRequired"));
             return;
         }
 
         if (!passwordsMatch) {
-            setError("Las contrasenas no coinciden.");
+            setError(t("misc.passwordMismatch"));
             return;
         }
 
@@ -83,13 +83,13 @@ function ResetPassword() {
                 form.confirmPassword
             );
 
-            setSuccess("Contrasena restablecida correctamente. Te llevaremos al inicio de sesion.");
+            setSuccess(t("auth.resetSuccess"));
 
             setTimeout(() => {
                 navigate("/login");
             }, 2000);
         } catch (err) {
-            setError(err.message || "No se pudo restablecer la contrasena.");
+            setError(err.message || t("auth.resetError"));
         } finally {
             setLoading(false);
         }
@@ -99,10 +99,7 @@ function ResetPassword() {
         <div className="reset-container">
             <BrandLogo className="reset-logo" />
 
-            <h2 className="reset-title">
-                Restablecer<br />
-                contrasena
-            </h2>
+            <h2 className="reset-title">{t("auth.resetTitle")}</h2>
 
             <img
                 src={logo}
@@ -114,15 +111,13 @@ function ResetPassword() {
                 className="reset-card"
                 onSubmit={handleSubmit}
             >
-                <label htmlFor="password">
-                    Nueva contrasena
-                </label>
+                <label htmlFor="password">{t("auth.newPassword")}</label>
 
                 <div className="password-field">
                     <Input
                         name="password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="Minimo 8 caracteres"
+                        placeholder={t("auth.passwordMin")}
                         value={form.password}
                         onChange={handleChange}
                         error={form.password.length > 0 && !passwordValid}
@@ -133,7 +128,7 @@ function ResetPassword() {
                         type="button"
                         className="toggle-password"
                         onClick={() => setShowPassword((current) => !current)}
-                        aria-label={showPassword ? "Ocultar contrasena" : "Mostrar contrasena"}
+                        aria-label={showPassword ? t("auth.hide") : t("auth.show")}
                     >
                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                     </button>
@@ -143,15 +138,13 @@ function ResetPassword() {
                     Minimo 8 caracteres, una mayuscula, una minuscula y un numero.
                 </p>
 
-                <label htmlFor="confirmPassword">
-                    Confirmar contrasena
-                </label>
+                <label htmlFor="confirmPassword">{t("common.confirmPassword")}</label>
 
                 <div className="password-field">
                     <Input
                         name="confirmPassword"
                         type={showConfirm ? "text" : "password"}
-                        placeholder="Confirma tu contrasena"
+                        placeholder={t("auth.confirmNew")}
                         value={form.confirmPassword}
                         onChange={handleChange}
                         error={confirmError}
@@ -162,7 +155,7 @@ function ResetPassword() {
                         type="button"
                         className="toggle-password"
                         onClick={() => setShowConfirm((current) => !current)}
-                        aria-label={showConfirm ? "Ocultar confirmacion" : "Mostrar confirmacion"}
+                        aria-label={showConfirm ? t("auth.hide") : t("auth.show")}
                     >
                         {showConfirm ? <FaEyeSlash /> : <FaEye />}
                     </button>
@@ -205,7 +198,7 @@ function ResetPassword() {
                 className="reset-back"
                 onClick={() => navigate("/login")}
             >
-                ← Volver al inicio de sesión
+                {t("auth.backLogin")}
             </p>
         </div>
     );

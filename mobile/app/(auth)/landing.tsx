@@ -2,8 +2,10 @@ import { useRouter } from "expo-router";
 import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../src/theme/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 export default function Landing() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { colors } = useTheme();
 
@@ -17,17 +19,17 @@ export default function Landing() {
       </View>
 
       <View style={styles.heroCard}>
-        <Text style={[styles.badge, { color: colors.accent }]}>Plataforma de inclusión</Text>
-        <Text style={[styles.valuePromise, { color: colors.accent }]}>De señas a texto/audio</Text>
-        <Text style={[styles.title, { color: colors.text }]}>Conecta personas sin barreras.</Text>
-        <Text style={[styles.description]}>Traduce, consulta tu historial y activa accesibilidad desde una experiencia clara y moderna.</Text>
+        <Text style={[styles.badge, { color: colors.accent }]}>{t("landing.badge")}</Text>
+        <Text style={[styles.valuePromise, { color: colors.accent }]}>{t("landing.value")}</Text>
+        <Text style={[styles.title, { color: colors.text }]}>{t("landing.title")}</Text>
+        <Text style={[styles.description]}>{t("landing.description")}</Text>
 
         <View style={styles.actions}>
           <TouchableOpacity style={[styles.primaryButton, { backgroundColor: colors.accent }]} onPress={() => router.push("/(auth)/register")}>
-            <Text style={styles.primaryButtonText}>Crear cuenta</Text>
+            <Text style={styles.primaryButtonText}>{t("landing.create")}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.secondaryButton, { borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => router.push("/(auth)/login")}>
-            <Text style={[styles.secondaryButtonText, { color: colors.primary }]}>Iniciar sesión</Text>
+            <Text style={[styles.secondaryButtonText, { color: colors.primary }]}>{t("landing.login")}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -35,18 +37,18 @@ export default function Landing() {
       <View style={[styles.infoCard, { backgroundColor: colors.surface, borderColor: colors.border, shadowColor: colors.shadow }]}> 
         <View style={styles.infoItem}>
           <Ionicons name="flash-outline" size={20} color={colors.primary} />
-          <Text style={styles.infoTitle}>Tiempo real</Text>
-          <Text style={styles.infoText}>Flujo pensado para traducir rápido.</Text>
+          <Text style={styles.infoTitle}>{t("landing.realtime")}</Text>
+          <Text style={styles.infoText}>{t("landing.realtimeText")}</Text>
         </View>
         <View style={styles.infoItem}>
           <Ionicons name="time-outline" size={20} color={colors.primary} />
-          <Text style={styles.infoTitle}>Historial</Text>
-          <Text style={styles.infoText}>Guarda conversaciones y revisa resultados.</Text>
+          <Text style={styles.infoTitle}>{t("landing.history")}</Text>
+          <Text style={styles.infoText}>{t("landing.historyText")}</Text>
         </View>
         <View style={styles.infoItem}>
           <Ionicons name="accessibility-outline" size={20} color={colors.primary} />
-          <Text style={styles.infoTitle}>Accesible</Text>
-          <Text style={styles.infoText}>Diseño contrastado y fácil de navegar.</Text>
+          <Text style={styles.infoTitle}>{t("landing.accessible")}</Text>
+          <Text style={styles.infoText}>{t("landing.accessibleText")}</Text>
         </View>
       </View>
     </SafeAreaView>

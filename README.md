@@ -14,12 +14,13 @@ Ambas aplicaciones consumen el backend Spring Boot del proyecto para autenticar 
 La arquitectura del frontend esta separada por plataforma:
 
 - **Web**
+
   - Interfaz accesible desde navegador
   - Rutas con `react-router-dom`
   - Llamadas HTTP al backend con `axios`
   - Empaquetado para produccion con `Dockerfile` + `nginx`
-
 - **Movil**
+
   - Aplicacion para Android/iOS usando Expo
   - Navegacion por carpetas con `expo-router`
   - Llamadas HTTP al backend con `fetch`
@@ -64,16 +65,17 @@ OneLanguage_Frontend/
 La web esta organizada por funcionalidad:
 
 - `src/routes`
-  - Define las rutas principales de la aplicacion.
 
+  - Define las rutas principales de la aplicacion.
 - `src/pages`
+
   - Contiene las vistas o pantallas.
   - Ejemplos: `login`, `register`, `home`, `history`, `translate`.
-
 - `src/components`
-  - Contiene componentes reutilizables como `Button` e `Input`.
 
+  - Contiene componentes reutilizables como `Button` e `Input`.
 - `src/services`
+
   - Contiene la capa de acceso a API.
   - Aqui esta configurado `axios` y el servicio de autenticacion/registro.
 
@@ -94,15 +96,16 @@ http://localhost:8084
 ### Endpoints usados por ahora
 
 - `POST /api/users`
+
   - Registro de usuario
-
 - `GET /api/users`
+
   - Listado de usuarios
-
 - `GET /api/users/{id}`
-  - Consulta de usuario por id
 
+  - Consulta de usuario por id
 - `DELETE /api/users/{id}`
+
   - Borrado logico de usuario
 
 ### Ajuste importante
@@ -161,21 +164,22 @@ Luego puedes abrir:
 La app movil usa una estructura por rutas en la carpeta `app`:
 
 - `app/_layout.tsx`
+
   - Define el stack general de navegacion.
-
 - `app/(auth)/`
+
   - Agrupa pantallas de autenticacion y flujo principal.
-
 - `components/`
+
   - Componentes reutilizables de UI.
-
 - `hooks/`
+
   - Hooks compartidos de tema y color.
-
 - `constants/`
-  - Valores globales de estilo o tema.
 
+  - Valores globales de estilo o tema.
 - `src/services/`
+
   - Llamadas al backend.
 
 ### Conexion con el backend
@@ -218,6 +222,12 @@ VITE_API_URL=http://localhost:8084
 
 ```bash
 npm run dev
+```
+
+5. Levantar en intranet
+
+```bash
+npm run dev -- --host 0.0.0.0
 ```
 
 ### Opcion 2: correr la web con Docker
@@ -313,4 +323,3 @@ Lo mas util ahora seria:
 1. crear un `docker-compose.yml` global para levantar frontend, backend y base de datos juntos,
 2. o documentar en detalle las variables de entorno de cada app,
 3. o terminar el flujo real de login y registro consumiendo el backend.
-

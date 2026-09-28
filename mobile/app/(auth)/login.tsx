@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Image,
@@ -27,6 +28,7 @@ type AlertState = {
 };
 
 export default function Login() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { colors } = useTheme();
   const [form, setForm] = useState({ email: "", password: "" });
@@ -37,7 +39,7 @@ export default function Login() {
     visible: false,
     title: "",
     message: "",
-    actionText: "Aceptar",
+    actionText: t("common.ok"),
     variant: "success",
     onAction: () => setAlert((current) => ({ ...current, visible: false })),
   });
@@ -46,14 +48,14 @@ export default function Login() {
 
   const validate = (nextForm = form) => ({
     email: !nextForm.email.trim()
-      ? "El correo es obligatorio"
+      ? t("auth.emailRequired")
       : !emailRegex.test(nextForm.email)
-        ? "Ingresa un correo válido"
+        ? t("auth.emailInvalid")
         : "",
     password: !nextForm.password
-      ? "La contraseña es obligatoria"
+      ? t("auth.passwordRequired")
       : nextForm.password.length < 6
-        ? "La contraseña debe tener al menos 6 caracteres"
+        ? t("auth.passwordLength")
         : "",
   });
 
@@ -88,9 +90,9 @@ export default function Login() {
 
       setAlert({
         visible: true,
-        title: "Sesión Exitosa",
-        message: "Inicio de sesión exitoso. Vamos a llevarte al panel principal.",
-        actionText: "Entrar ahora",
+        title: t("auth.loginSuccess"),
+        message: t("auth.loginSuccessMessage"),
+        actionText: t("auth.enterNow"),
         variant: "success",
         onAction: () => {
           closeAlert();
@@ -100,9 +102,9 @@ export default function Login() {
     } catch (error: any) {
       setAlert({
         visible: true,
-        title: "No se pudo iniciar sesión",
-        message: error?.message || "Correo o contraseña incorrectos.",
-        actionText: "Intentar de nuevo",
+        title: t("auth.loginError"),
+        message: error?.message || t("auth.credentialsError"),
+        actionText: t("common.ok"),
         variant: "error",
         onAction: closeAlert,
       });
@@ -117,12 +119,12 @@ export default function Login() {
         <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
       </View>
 
-      <Text style={[styles.title, { color: colors.text }]}>Iniciar sesión</Text>
+      <Text style={[styles.title, { color: colors.text }]}>{t("auth.login")}</Text>
 
       <Image source={require("../../assets/images/Logo.png")} style={styles.logoImg} resizeMode="contain" />
 
       <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}>
-        <Text style={styles.label}>Correo electrónico</Text>
+        <Text style={styles.label}>{t("common.email")}</Text>
         <TextInput
           style={[styles.input, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.email ? "#ef4444" : "#d1d5db" }]}
           placeholder="andres@gmail.com"
@@ -134,7 +136,7 @@ export default function Login() {
         />
         {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
-        <Text style={styles.label}>Contraseña</Text>
+        <Text style={styles.label}>{t("common.password")}</Text>
         <View style={styles.passwordField}>
           <TextInput
             style={[styles.inputPassword, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.password ? "#ef4444" : "#d1d5db" }]}
@@ -151,21 +153,21 @@ export default function Login() {
         {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
 
         <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleSubmit} disabled={loading}>
-          {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>Iniciar sesión</Text>}
+          {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>{t("auth.login")}</Text>}
         </TouchableOpacity>
       </View>
 
       <TouchableOpacity onPress={() => router.push("/(auth)/recover_password")}>
-        <Text style={styles.link}>Restablecer contraseña</Text>
+        <Text style={styles.link}>{t("auth.forgot")}</Text>
       </TouchableOpacity>
 
       <Text style={styles.registerText}>
-        ¿No tienes una cuenta? <Text style={styles.registerLink} onPress={() => router.push("/(auth)/register")}>Regístrate</Text>
+        {t("auth.noAccount")} <Text style={styles.registerLink} onPress={() => router.push("/(auth)/register")}>{t("auth.register")}</Text>
       </Text>
 
       <AppAlert
         visible={alert.visible}
-        label={alert.variant === "success" ? "LISTO" : "AVISO"}
+        label={t("common.ok")}
         title={alert.title}
         message={alert.message}
         actionText={alert.actionText}

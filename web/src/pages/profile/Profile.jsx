@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
 import { FaCamera, FaMusic, FaFolder, FaUser } from "react-icons/fa";
@@ -7,6 +8,7 @@ import NavBar from "../../components/NavBar/NavBar";
 import { clearAuthSession } from "../../services/authSession";
 
 function Profile() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const [view, setView] = useState("profile"); // profile | password | camera | audio | files
@@ -31,7 +33,7 @@ function Profile() {
                     <div className="permission-card">
                         <FaCamera size={140} color="#333" />
                     </div>
-                    <button className="yellow-btn" onClick={() => setView("profile")}>Activar cámara</button>
+                    <button className="yellow-btn" onClick={() => setView("profile")}>{t("profile.activateCamera")}</button>
                 </div>
             </div>
         );
@@ -49,7 +51,7 @@ function Profile() {
                     <div className="permission-card">
                         <FaMusic size={140} color="#333" />
                     </div>
-                    <button className="yellow-btn" onClick={() => setView("profile")}>Activar micrófono</button>
+                    <button className="yellow-btn" onClick={() => setView("profile")}>{t("profile.activateMic")}</button>
                 </div>
             </div>
         );
@@ -67,7 +69,7 @@ function Profile() {
                     <div className="permission-card">
                         <FaFolder size={140} color="#333" />
                     </div>
-                    <button className="yellow-btn" onClick={() => setView("profile")}>Dar acceso archivos</button>
+                    <button className="yellow-btn" onClick={() => setView("profile")}>{t("profile.grantFiles")}</button>
                 </div>
             </div>
         );
@@ -91,12 +93,12 @@ function Profile() {
                         </div>
                     </div>
                     <div className="profile-info-col">
-                        <p className="section-title">Información personal</p>
-                        <p className="section-subtitle">Visualiza tus datos personales</p>
-                        <label className="field-label">Nombre Completo</label>
-                        <p className="profile-value">{storedUser?.fullName || "No disponible"}</p>
-                        <label className="field-label">Correo Electrónico</label>
-                        <p className="profile-value">{storedUser?.email || "No disponible"}</p>
+                        <p className="section-title">{t("profile.personal")}</p>
+                        <p className="section-subtitle">{t("profile.personalText")}</p>
+                        <label className="field-label">{t("common.fullName")}</label>
+                        <p className="profile-value">{storedUser?.fullName || t("common.noAvailable")}</p>
+                        <label className="field-label">{t("common.email")}</label>
+                        <p className="profile-value">{storedUser?.email || t("common.noAvailable")}</p>
                     </div>
                 </div>
 
@@ -104,40 +106,40 @@ function Profile() {
 
                 {/* PERMISOS */}
                 <div className="permissions-section">
-                    <p className="section-title">Permisos del dispositivo</p>
-                    <p className="section-subtitle">Gestiona los permisos de acceso a funciones del dispositivo</p>
+                    <p className="section-title">{t("profile.permissions")}</p>
+                    <p className="section-subtitle">{t("profile.permissionsText")}</p>
 
                     <div className="permission-row">
                         <div className="permission-left">
                             <FaCamera size={20} />
                             <div>
-                                <p className="perm-name">Cámara</p>
-                                <p className="perm-desc">Necesaria para reconocimiento de señas</p>
+                                <p className="perm-name">{t("common.camera")}</p>
+                                <p className="perm-desc">{t("profile.cameraText")}</p>
                             </div>
                         </div>
-                        <button className="activate-btn" onClick={() => setView("camera")}>Activar</button>
+                        <button className="activate-btn" onClick={() => setView("camera")}>{t("common.activate")}</button>
                     </div>
 
                     <div className="permission-row">
                         <div className="permission-left">
                             <FaMusic size={20} />
                             <div>
-                                <p className="perm-name">Audio</p>
-                                <p className="perm-desc">Para funciones de convertir y escuchar el audio</p>
+                                <p className="perm-name">{t("common.audio")}</p>
+                                <p className="perm-desc">{t("profile.audioText")}</p>
                             </div>
                         </div>
-                        <button className="activate-btn" onClick={() => setView("audio")}>Activar</button>
+                        <button className="activate-btn" onClick={() => setView("audio")}>{t("common.activate")}</button>
                     </div>
 
                     <div className="permission-row">
                         <div className="permission-left">
                             <FaFolder size={20} />
                             <div>
-                                <p className="perm-name">Archivos</p>
-                                <p className="perm-desc">Acceso para los archivos</p>
+                                <p className="perm-name">{t("common.files")}</p>
+                                <p className="perm-desc">{t("profile.filesText")}</p>
                             </div>
                         </div>
-                        <button className="activate-btn" onClick={() => setView("files")}>Activar</button>
+                        <button className="activate-btn" onClick={() => setView("files")}>{t("common.activate")}</button>
                     </div>
                 </div>
 
@@ -145,7 +147,7 @@ function Profile() {
 
                 {/* CERRAR SESIÓN */}
                 <button className="logout-btn" onClick={() => setShowLogoutModal(true)}>
-                    Cerrar Sesión
+                    {t("common.logout")}
                 </button>
             </div>
 
@@ -153,10 +155,10 @@ function Profile() {
             {showLogoutModal && (
                 <div className="modal-overlay">
                     <div className="modal-box">
-                        <p className="modal-text">¿Está seguro que<br/>desea cerrar sesión?</p>
+                        <p className="modal-text">{t("profile.logoutQuestion")}</p>
                         <div className="modal-actions">
-                            <button className="modal-logout-btn" onClick={handleLogout}>Cerrar sesión</button>
-                            <button className="modal-cancel-btn" onClick={() => setShowLogoutModal(false)}>Cancelar</button>
+                            <button className="modal-logout-btn" onClick={handleLogout}>{t("profile.confirmLogout")}</button>
+                            <button className="modal-cancel-btn" onClick={() => setShowLogoutModal(false)}>{t("common.cancel")}</button>
                         </div>
                     </div>
                 </div>

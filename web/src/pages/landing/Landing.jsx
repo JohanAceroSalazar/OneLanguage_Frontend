@@ -2,8 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { FiArrowRight, FiShield, FiStar, FiUsers } from "react-icons/fi";
 import logo from "../../assets/Logo.png";
 import "./Landing.css";
+import { useTranslation } from "react-i18next";
 
 function Landing() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     return (
@@ -15,7 +17,7 @@ function Landing() {
                 <div className="landing-brand">
                     <img src={logo} alt="One Language" className="landing-logo" />
                     <div>
-                        <p className="landing-brand-kicker">Plataforma de inclusión</p>
+                        <p className="landing-brand-kicker">{t("landing.kicker")}</p>
                         <h1>One Language</h1>
                     </div>
                 </div>
@@ -32,9 +34,9 @@ function Landing() {
 
             <section className="landing-hero">
                 <div className="landing-copy">
-                    <p className="landing-badge">Traducción de lengua de señas colombiana</p>
-                    <p className="landing-value">De señas a texto/audio</p>
-                    <h2>Una app pensada para conectar personas sin barreras.</h2>
+                    <p className="landing-badge">{t("landing.badge")}</p>
+                    <p className="landing-value">{t("landing.value")}</p>
+                    <h2>{t("landing.title")}</h2>
                     <p className="landing-description">
                         Traduce, consulta tu historial y ajusta la accesibilidad desde una experiencia
                         moderna, clara y lista para acompañar a usuarios, familias y equipos de apoyo.
@@ -51,16 +53,16 @@ function Landing() {
 
                     <div className="landing-stats">
                         <article>
-                            <strong>Tiempo real</strong>
-                            <span>Interfaz lista para traducir con rapidez.</span>
+                            <strong>{t("landing.realtime")}</strong>
+                            <span>{t("landing.realtimeText")}</span>
                         </article>
                         <article>
-                            <strong>Historial</strong>
-                            <span>Guarda conversaciones y revisa resultados.</span>
+                            <strong>{t("landing.history")}</strong>
+                            <span>{t("landing.historyText")}</span>
                         </article>
                         <article>
-                            <strong>Accesible</strong>
-                            <span>Diseño contrastado y fácil de navegar.</span>
+                            <strong>{t("landing.accessible")}</strong>
+                            <span>{t("landing.accessibleText")}</span>
                         </article>
                     </div>
                 </div>
@@ -69,26 +71,26 @@ function Landing() {
                     <div className="landing-card landing-card-main">
                         <img src={logo} alt="Vista principal de One Language" />
                         <div className="landing-card-copy">
-                            <p>Diseño central</p>
-                            <strong>Una experiencia pensada para traducir sin perderse</strong>
+                            <p>{t("landing.clear")}</p>
+                            <strong>{t("landing.clearText")}</strong>
                         </div>
                     </div>
 
                     <div className="landing-mini-grid">
                         <article>
                             <FiStar />
-                            <h3>Interfaz clara</h3>
-                            <p>Diseñada para que el usuario no se pierda.</p>
+                            <h3>{t("landing.clear")}</h3>
+                            <p>{t("landing.clearText")}</p>
                         </article>
                         <article>
                             <FiUsers />
-                            <h3>Enfoque humano</h3>
-                            <p>Creada para acercar la comunicación.</p>
+                            <h3>{t("landing.human")}</h3>
+                            <p>{t("landing.humanText")}</p>
                         </article>
                         <article>
                             <FiShield />
-                            <h3>Validación segura</h3>
-                            <p>Mensajes en vivo y modales para guiar mejor.</p>
+                            <h3>{t("landing.safe")}</h3>
+                            <p>{t("landing.safeText")}</p>
                         </article>
                     </div>
                 </div>

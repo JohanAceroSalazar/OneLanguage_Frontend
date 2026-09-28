@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { BottomNav } from "../../components/bottom-nav";
 import { useTheme } from "../../src/theme/ThemeContext";
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -22,6 +23,7 @@ type PermissionItemProps = {
 
 function PermissionItem({ icon, title, description }: PermissionItemProps) {
     const { colors, fontScale } = useTheme();
+    const { t } = useTranslation();
 
     return (
     <View style={[styles.permissionItem, { borderColor: colors.border, backgroundColor: colors.surfaceAlt }]}> 
@@ -33,7 +35,7 @@ function PermissionItem({ icon, title, description }: PermissionItemProps) {
     </View>
 
     <TouchableOpacity activeOpacity={0.85} style={[styles.activateButton, { backgroundColor: colors.accent }]}> 
-        <Text style={[styles.activateText, { color: colors.textOnSurface, fontSize: 13 * fontScale }]}>Activar</Text>
+        <Text style={[styles.activateText, { color: colors.textOnSurface, fontSize: 13 * fontScale }]}>{t("common.activate")}</Text>
     </TouchableOpacity>
     </View>
     );
@@ -42,6 +44,7 @@ function PermissionItem({ icon, title, description }: PermissionItemProps) {
 export default function UserProfile() {
     const router = useRouter();
     const { colors, fontScale } = useTheme();
+    const { t } = useTranslation();
     const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
@@ -75,48 +78,48 @@ export default function UserProfile() {
         />
         </View>
 
-        <Text style={[styles.title, { color: colors.text, fontSize: 26 * fontScale }]}>Perfil de usuario</Text>
+        <Text style={[styles.title, { color: colors.text, fontSize: 26 * fontScale }]}>{t("profile.title")}</Text>
 
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
             <View style={styles.sectionHeader}>
             <Ionicons name="person-circle" size={34} color={colors.primary} />
 
             <View>
-                <Text style={[styles.sectionTitle, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>Información personal</Text>
+                <Text style={[styles.sectionTitle, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>{t("profile.personal")}</Text>
                 <Text style={[styles.sectionSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}> 
                 Visualiza tus datos personales
             </Text>
             </View>
         </View>
 
-        <Text style={[styles.label, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>Nombre completo</Text>
+        <Text style={[styles.label, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>{t("common.fullName")}</Text>
         <Text style={[styles.readonlyValue, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: colors.border }]}>
             {user?.fullName || "No disponible"}
         </Text>
 
-        <Text style={[styles.label, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>Correo electrónico</Text>
+        <Text style={[styles.label, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>{t("common.email")}</Text>
         <Text style={[styles.readonlyValue, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: colors.border }]}>
             {user?.email || "No disponible"}
         </Text>
 
-        <Text style={[styles.permissionsTitle, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>Permisos del dispositivo</Text>
+        <Text style={[styles.permissionsTitle, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>{t("profile.permissions")}</Text>
         <Text style={[styles.permissionsSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}> 
             Gestiona los permisos de acceso a{"\n"}funciones del dispositivo
         </Text>
 
         <PermissionItem
             icon="camera-outline"
-            title="Cámara"
+            title={t("common.camera")}
             description={"Necesaria para\nreconocimiento de señas"}
         />
         <PermissionItem
             icon="musical-notes"
-            title="Audio"
+            title={t("common.audio")}
             description={"Para funciones de\nconvertir y escuchar el\naudio"}
         />
         <PermissionItem
             icon="folder"
-            title="Archivos"
+            title={t("common.files")}
             description="Acceso para los archivos"
         />
         </View>
@@ -126,7 +129,7 @@ export default function UserProfile() {
             style={styles.logoutButton}
             onPress={() => router.push("/(auth)/login")}
         >
-            <Text style={[styles.logoutText, { color: "#FFFFFF", fontSize: 20 * fontScale }]}>Cerrar sesión</Text>
+            <Text style={[styles.logoutText, { color: "#FFFFFF", fontSize: 20 * fontScale }]}>{t("common.logout")}</Text>
         </TouchableOpacity>
     </ScrollView>
 

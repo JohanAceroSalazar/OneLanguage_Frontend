@@ -4,30 +4,13 @@ import BrandLogo from "../../components/BrandLogo/BrandLogo";
 import NavBar from "../../components/NavBar/NavBar";
 import { saveTranslation } from "../../services/translationService";
 import "./Translate.css";
+import { useTranslation } from "react-i18next";
 
 const FRAME_INTERVAL_MS = 40;
 const JPEG_QUALITY = 0.82;
 const CAMERA_CONSTRAINTS = {
     audio: false,
     video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
-};
-
-const statusMessages = {
-    inactive: "Activa la camara para interpretar senas.",
-    connecting: "Conectando el modelo de interpretacion...",
-    ready: "Modelo listo. Muestra una sena a la camara.",
-    analyzing: "Analizando el movimiento...",
-    waiting: "Aun no hay suficiente certeza para traducir.",
-    no_hands: "No se detecta una sena. Muestra tus manos dentro del encuadre.",
-    idle: "No se detecta una sena en este momento.",
-    saved: "Traduccion guardada en tu historial.",
-    save_error: "No se pudo guardar la traduccion. Intenta nuevamente.",
-    camera_insecure: "La camara requiere HTTPS o localhost.",
-    camera_denied: "El navegador no tiene permiso para usar la camara.",
-    camera_unavailable: "No se encontro una camara disponible.",
-    camera_busy: "La camara esta siendo usada por otra aplicacion.",
-    camera_error: "No se pudo iniciar la camara.",
-    model_error: "No fue posible conectar con el modelo de IA.",
 };
 
 function getAiSocketUrl() {
@@ -45,6 +28,7 @@ function getCameraErrorStatus(error) {
 }
 
 function Translate() {
+    const { t } = useTranslation();
     const [cameraActive, setCameraActive] = useState(false);
     const [flipped, setFlipped] = useState(false);
     const [modelStatus, setModelStatus] = useState("inactive");
@@ -260,42 +244,42 @@ function Translate() {
 
     const sessionText = sessionTranslations.join(" ");
     const displayedTranslation = reviewPending ? sessionText : translation;
-    const confidenceText = confidence === null ? null : `${Math.round(confidence * 100)}% de confianza`;
-    const statusText = statusMessages[modelStatus] || statusMessages.model_error;
+    const confidenceText = confidence === null ? null : t("translate.confidence", { value: Math.round(confidence * 100) });
+    const statusText = t(`translate.status.${modelStatus}`, { defaultValue: t("translate.status.model_error") });
 
     return (
         <div className="translate-container">
             <header className="translate-header">
                 <div className="translate-header-main">
                     <BrandLogo className="translate-logo" />
-                    <button className="icon-button" type="button" onClick={() => setFlipped((value) => !value)} aria-label="Intercambiar posicion de camara y traduccion" title="Intercambiar posicion"><FaExchangeAlt aria-hidden="true" /></button>
-                    <button className={`speech-toggle ${automaticSpeech ? "is-active" : ""}`} type="button" onClick={() => setAutomaticSpeech((value) => !value)} aria-label={automaticSpeech ? "Desactivar voz automatica" : "Activar voz automatica"} disabled={!speechSupported}><FaVolumeUp aria-hidden="true" /><span>{automaticSpeech ? "Voz activa" : "Voz apagada"}</span></button>
+                    <button className="icon-button" type="button" onClick={() => setFlipped((value) => !value)} aria-label={t("translate.swap")} title={t("translate.swapTitle")}><FaExchangeAlt aria-hidden="true" /></button>
+                    <button className={`speech-toggle ${automaticSpeech ? "is-active" : ""}`} type="button" onClick={() => setAutomaticSpeech((value) => !value)} aria-label={automaticSpeech ? t("translate.autoOff") : t("translate.autoOn")} disabled={!speechSupported}><FaVolumeUp aria-hidden="true" /><span>{automaticSpeech ? t("translate.voiceOn") : t("translate.voiceOff")}</span></button>
                 </div>
                 <NavBar />
             </header>
 
             <main className={`translate-content ${flipped ? "flipped" : ""}`}>
                 <section className="translate-text-box" aria-live="polite">
-                    <p className="translation-eyebrow">Traduccion en tiempo real</p>
-                    <h1>{displayedTranslation || "Aun no hay una sena reconocida"}</h1>
+                    <p className="translation-eyebrow">{t("translate.realtime")}</p>
+                    <h1>{displayedTranslation || t("translate.empty")}</h1>
                     <p className="translation-status">{statusText}</p>
                     {confidenceText && <p className="translation-confidence">{confidenceText}</p>}
-                    <button className="listen-translation" type="button" onClick={() => speakTranslation(displayedTranslation)} disabled={!displayedTranslation || !speechSupported}><FaVolumeUp aria-hidden="true" />Escuchar traduccion</button>
+                    <button className="listen-translation" type="button" onClick={() => speakTranslation(displayedTranslation)} disabled={!displayedTranslation || !speechSupported}><FaVolumeUp aria-hidden="true" />{t("translate.listen")}</button>
                 </section>
                 <section className="translate-camera-box">
-                    {cameraActive ? <video ref={attachVideo} autoPlay playsInline muted className="translate-video" /> : <div className="translate-camera-placeholder"><FaCamera size={48} aria-hidden="true" /><p>Activa la camara para interpretar senas</p></div>}
+                    {cameraActive ? <video ref={attachVideo} autoPlay playsInline muted className="translate-video" /> : <div className="translate-camera-placeholder"><FaCamera size={48} aria-hidden="true" /><p>{t("translate.cameraHint")}</p></div>}
                 </section>
             </main>
 
             {reviewPending ? (
                 <div className="translation-review-actions">
-                    <button className="review-save-btn" type="button" onClick={saveCompletedTranslation} disabled={saving}><FaSave aria-hidden="true" />{saving ? "Guardando..." : "Guardar en historial"}</button>
-                    <button className="review-discard-btn" type="button" onClick={discardTranslation} disabled={saving}><FaTrash aria-hidden="true" />Descartar</button>
+                    <button className="review-save-btn" type="button" onClick={saveCompletedTranslation} disabled={saving}><FaSave aria-hidden="true" />{saving ? t("translate.saving") : t("translate.save")}</button>
+                    <button className="review-discard-btn" type="button" onClick={discardTranslation} disabled={saving}><FaTrash aria-hidden="true" />{t("translate.discard")}</button>
                 </div>
             ) : (
                 <button className="translate-btn" type="button" onClick={cameraActive ? finishTranslation : startCamera}>
                     {cameraActive ? <FaStop aria-hidden="true" /> : <FaCamera aria-hidden="true" />}
-                    {cameraActive ? "Finalizar traduccion" : "Iniciar traduccion"}
+                    {cameraActive ? t("translate.finish") : t("translate.start")}
                 </button>
             )}
             <canvas ref={canvasRef} className="capture-canvas" aria-hidden="true" />

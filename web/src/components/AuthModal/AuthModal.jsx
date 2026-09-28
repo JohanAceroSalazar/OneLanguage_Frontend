@@ -1,7 +1,9 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import "./AuthModal.css";
 
-function AuthModal({ open, title, message, confirmText = "Entendido", onConfirm, tone = "success" }) {
+function AuthModal({ open, title, message, confirmText, onConfirm, tone = "success" }) {
+    const { t } = useTranslation();
     useEffect(() => {
         if (!open) {
             return;
@@ -31,7 +33,7 @@ function AuthModal({ open, title, message, confirmText = "Entendido", onConfirm,
                 aria-describedby="auth-modal-message"
                 onClick={(event) => event.stopPropagation()}
             >
-                <p className="auth-modal-badge">{tone === "error" ? "Revisar" : "Listo"}</p>
+                <p className="auth-modal-badge">{tone === "error" ? t("modal.review") : t("modal.ready")}</p>
                 <h3 id="auth-modal-title" className="auth-modal-title">
                     {title}
                 </h3>
@@ -39,7 +41,7 @@ function AuthModal({ open, title, message, confirmText = "Entendido", onConfirm,
                     {message}
                 </p>
                 <button type="button" className="auth-modal-button" onClick={() => onConfirm?.()}>
-                    {confirmText}
+                    {confirmText || t("modal.understood")}
                 </button>
             </div>
         </div>
