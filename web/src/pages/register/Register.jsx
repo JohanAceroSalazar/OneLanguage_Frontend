@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Input from "../../components/Input/Input";
@@ -34,44 +35,45 @@ const initialTouched = {
     acceptedTerms: false,
 };
 
-function validateField(field, value, form) {
+function validateField(field, value, form, t) {
     switch (field) {
         case "name":
-            if (!value.trim()) return "El nombre es obligatorio";
-            if (value.trim().length < 3) return "Ingresa al menos 3 caracteres";
+            if (!value.trim()) return t("auth.nameRequired");
+            if (value.trim().length < 3) return t("auth.minChars");
             return "";
         case "email":
-            if (!value.trim()) return "El correo es obligatorio";
-            if (!emailRegex.test(value)) return "Ingresa un correo válido";
+            if (!value.trim()) return t("auth.emailRequired");
+            if (!emailRegex.test(value)) return t("auth.emailInvalid");
             return "";
         case "password":
-            if (!value) return "La contraseña es obligatoria";
+            if (!value) return t("auth.passwordRequired");
             if (!passwordRegex.test(value)) {
-                return "Usa 8+ caracteres, una letra y un número";
+                return t("auth.passwordRules");
             }
             return "";
         case "confirmPassword":
-            if (!value) return "Confirma tu contraseña";
-            if (value !== form.password) return "Las contraseñas no coinciden";
+            if (!value) return t("auth.confirmRequired");
+            if (value !== form.password) return t("auth.passwordMismatch");
             return "";
         case "acceptedTerms":
-            return value ? "" : "Debes aceptar los términos y condiciones";
+            return value ? "" : t("auth.acceptTerms");
         default:
             return "";
     }
 }
 
-function validateForm(form) {
+function validateForm(form, t) {
     return {
-        name: validateField("name", form.name, form),
-        email: validateField("email", form.email, form),
-        password: validateField("password", form.password, form),
-        confirmPassword: validateField("confirmPassword", form.confirmPassword, form),
-        acceptedTerms: validateField("acceptedTerms", form.acceptedTerms, form),
+        name: validateField("name", form.name, form, t),
+        email: validateField("email", form.email, form, t),
+        password: validateField("password", form.password, form, t),
+        confirmPassword: validateField("confirmPassword", form.confirmPassword, form, t),
+        acceptedTerms: validateField("acceptedTerms", form.acceptedTerms, form, t),
     };
 }
 
 function Register() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [form, setForm] = useState(initialForm);
     const [errors, setErrors] = useState(initialErrors);
@@ -95,15 +97,15 @@ function Register() {
         }
 
         if (form.password.length < 8) {
-            return "Débil";
+            return t("auth.weak");
         }
 
         if (passwordRegex.test(form.password)) {
-            return "Fuerte";
+            return t("auth.strong");
         }
 
-        return "Media";
-    }, [form.password]);
+        return t("auth.medium");
+    }, [form.password, t]);
 
     const openModal = (nextModal) => {
         setModal({ open: true, ...nextModal });
@@ -119,7 +121,7 @@ function Register() {
 
         setForm((current) => {
             const nextForm = { ...current, [name]: nextValue };
-            const nextErrors = validateForm(nextForm);
+            const nextErrors = validateForm(nextForm, t);
             setErrors(nextErrors);
             return nextForm;
         });
@@ -136,10 +138,10 @@ function Register() {
 
         setErrors((current) => ({
             ...current,
-            [name]: validateField(name, form[name], form),
+            [name]: validateField(name, form[name], form, t),
             ...(name === "password" || name === "confirmPassword"
                 ? {
-                    confirmPassword: validateField("confirmPassword", form.confirmPassword, form),
+                    confirmPassword: validateField("confirmPassword", form.confirmPassword, form, t),
                     }
                 : {}),
         }));
@@ -148,7 +150,7 @@ function Register() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const nextErrors = validateForm(form);
+        const nextErrors = validateForm(form, t);
         const hasErrors = Object.values(nextErrors).some(Boolean);
 
         setErrors(nextErrors);
@@ -162,10 +164,10 @@ function Register() {
 
         if (hasErrors) {
             openModal({
-                title: "Revisa tu registro",
-                message: "Todavía hay campos por completar antes de crear la cuenta.",
+                title: t("auth.registerReview"),
+                message: t("auth.registerReviewMessage"),
                 tone: "error",
-                confirmText: "Corregir datos",
+                confirmText: t("auth.correct"),
                 onConfirm: closeModal,
             });
             return;
@@ -174,10 +176,10 @@ function Register() {
         try {
             await registerUser(form);
             openModal({
-                title: "Registro exitoso",
-                message: "Tu cuenta quedó lista. Ahora puedes iniciar sesión y empezar a usar la plataforma.",
+                title: t("auth.registerSuccess"),
+                message: t("auth.registerSuccessMessage"),
                 tone: "success",
-                confirmText: "Ir al inicio de sesión",
+                confirmText: t("auth.goLogin"),
                 onConfirm: () => {
                     closeModal();
                     navigate("/login");
@@ -185,10 +187,10 @@ function Register() {
             });
         } catch (error) {
             openModal({
-                title: "No pudimos registrar tu cuenta",
-                message: error?.message || "Ocurrió un problema al crear la cuenta. Inténtalo otra vez.",
+                title: t("auth.registerError"),
+                message: error?.message || t("auth.registerErrorMessage"),
                 tone: "error",
-                confirmText: "Entendido",
+                confirmText: t("modal.understood"),
                 onConfirm: closeModal,
             });
         }
@@ -207,24 +209,24 @@ function Register() {
 
             <div className="register-shell">
                 <div className="register-brand">
-                    <p className="register-brand-kicker">Bienvenido a</p>
+                    <p className="register-brand-kicker">{t("auth.welcome")}</p>
                     <h1>ONE LANGUAGE</h1>
                     <p className="register-brand-copy">
-                        Crea tu cuenta para acceder a traducción, historial y opciones de accesibilidad.
+                        {t("auth.brandCopy")}
                     </p>
                 </div>
 
                 <form className="form-card" onSubmit={handleSubmit}>
                     <div className="form-header">
-                        <span className="form-step">Paso 1 de 1</span>
-                        <h2>Regístrate en segundos</h2>
+                        <span className="form-step">{t("auth.step")}</span>
+                        <h2>{t("auth.register")}</h2>
                     </div>
 
-                    <label htmlFor="name">Nombre completo</label>
+                    <label htmlFor="name">{t("common.fullName")}</label>
                     <Input
                         name="name"
                         type="text"
-                        placeholder="Nombre completo"
+                        placeholder={t("common.fullName")}
                         value={form.name}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -233,7 +235,7 @@ function Register() {
                     />
                     {showFieldError("name") && errors.name && <p className="error-text">{errors.name}</p>}
 
-                    <label htmlFor="email">Correo electrónico</label>
+                    <label htmlFor="email">{t("common.email")}</label>
                     <Input
                         name="email"
                         type="email"
@@ -246,12 +248,12 @@ function Register() {
                     />
                     {showFieldError("email") && errors.email && <p className="error-text">{errors.email}</p>}
 
-                    <label htmlFor="password">Contraseña</label>
+                    <label htmlFor="password">{t("common.password")}</label>
                     <div className="password-field">
                         <Input
                             name="password"
                             type={showPassword ? "text" : "password"}
-                            placeholder="Mínimo 8 caracteres"
+                            placeholder={t("auth.passwordMin")}
                             value={form.password}
                             onChange={handleChange}
                             onBlur={handleBlur}
@@ -262,15 +264,15 @@ function Register() {
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
                     </div>
-                    {form.password && <p className="password-hint">Fortaleza de contraseña: {passwordStrength}</p>}
+                    {form.password && <p className="password-hint">{t("misc.passwordStrength")}: {passwordStrength}</p>}
                     {showFieldError("password") && errors.password && <p className="error-text">{errors.password}</p>}
 
-                    <label htmlFor="confirmPassword">Confirmar contraseña</label>
+                    <label htmlFor="confirmPassword">{t("common.confirmPassword")}</label>
                     <div className="password-field">
                         <Input
                             name="confirmPassword"
                             type={showConfirmPassword ? "text" : "password"}
-                            placeholder="Repite tu contraseña"
+                            placeholder={t("auth.repeatPassword")}
                             value={form.confirmPassword}
                             onChange={handleChange}
                             onBlur={handleBlur}
@@ -297,9 +299,9 @@ function Register() {
                             onBlur={handleBlur}
                         />
                         <span>
-                            Acepto los{" "}
+                            {t("auth.terms")}{" "}
                             <Link to="/terms" className="terms-link">
-                                términos y condiciones
+                                {t("terms.title")}
                             </Link>
                         </span>
                     </label>
@@ -307,12 +309,12 @@ function Register() {
                         <p className="error-text">{errors.acceptedTerms}</p>
                     )}
 
-                    <Button text="Crear cuenta" className="auth-submit-button" />
+                    <Button text={t("auth.createAccount")} className="auth-submit-button" />
                 </form>
 
                 <p className="login-text">
-                    ¿Ya tienes una cuenta?
-                    <Link to="/login"> Inicia sesión</Link>
+                    {t("auth.hasAccount")}
+                    <Link to="/login"> {t("auth.login")}</Link>
                 </p>
             </div>
         </div>

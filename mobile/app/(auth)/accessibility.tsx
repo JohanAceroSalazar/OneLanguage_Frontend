@@ -4,6 +4,8 @@ import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-nativ
 import { AppAlert } from "../../components/app-alert";
 import { BottomNav } from "../../components/bottom-nav";
 import { useTheme } from "../../src/theme/ThemeContext";
+import { useTranslation } from "react-i18next";
+import i18n, { languageOptions, setLanguage } from "../../src/i18n";
 
 type DropdownOption = {
     label: string;
@@ -56,21 +58,23 @@ export default function Accessibility() {
     const { colors, theme, fontScale, fontSizeMode, setThemeMode, setFontSizeMode } = useTheme();
     const [draftFontSize, setDraftFontSize] = useState(fontSizeMode);
     const [showSuccess, setShowSuccess] = useState(false);
-    const [openDropdown, setOpenDropdown] = useState<"font" | "theme" | null>(null);
+    const [openDropdown, setOpenDropdown] = useState<"font" | "theme" | "language" | null>(null);
+    const { t } = useTranslation();
+    const selectedLanguage = i18n.language;
 
     const fontOptions = useMemo<DropdownOption[]>(() => [
-        { label: "Pequeño", value: "small" },
-        { label: "Mediano", value: "medium" },
-        { label: "Grande", value: "large" },
-    ], []);
+        { label: t("accessibility.small"), value: "small" },
+        { label: t("accessibility.medium"), value: "medium" },
+        { label: t("accessibility.large"), value: "large" },
+    ], [t]);
 
     const themeOptions = useMemo<DropdownOption[]>(() => [
-        { label: "Claro", value: "light" },
-        { label: "Oscuro", value: "dark" },
-    ], []);
+        { label: t("accessibility.light"), value: "light" },
+        { label: t("accessibility.dark"), value: "dark" },
+    ], [t]);
 
-    const selectedFontLabel = fontOptions.find((option) => option.value === draftFontSize)?.label ?? "Mediano";
-    const selectedThemeLabel = themeOptions.find((option) => option.value === theme)?.label ?? "Claro";
+    const selectedFontLabel = fontOptions.find((option) => option.value === draftFontSize)?.label ?? t("accessibility.medium");
+    const selectedThemeLabel = themeOptions.find((option) => option.value === theme)?.label ?? t("accessibility.light");
 
     const handleSave = () => {
         setThemeMode(theme);
@@ -82,11 +86,11 @@ export default function Accessibility() {
         <Pressable style={[styles.container, { backgroundColor: colors.background }]} onPress={() => setOpenDropdown(null)}>
             <View style={styles.cameraDot} />
             <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
-            <Text style={[styles.title, { color: colors.text, fontSize: 30 * fontScale }]}>Accesibilidad</Text>
+            <Text style={[styles.title, { color: colors.text, fontSize: 30 * fontScale }]}>{t("accessibility.title")}</Text>
 
             <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
                 <Dropdown
-                    title="Tamaño de texto"
+                    title={t("misc.textSize")}
                     icon="text-outline"
                     options={fontOptions}
                     selectedValue={selectedFontLabel}
@@ -106,7 +110,7 @@ export default function Accessibility() {
                 />
 
                 <Dropdown
-                    title="Tema visual"
+                    title={t("accessibility.visual")}
                     icon="color-palette-outline"
                     options={themeOptions}
                     selectedValue={selectedThemeLabel}
@@ -129,16 +133,20 @@ export default function Accessibility() {
                 <View style={styles.optionRow}>
                     <Ionicons name="globe-outline" size={46} color={colors.accent} style={styles.optionIcon} />
                     <View style={styles.optionContent}>
-                        <Text style={[styles.optionText, { color: colors.textOnSurface }]}>Idioma</Text>
-                        <TouchableOpacity activeOpacity={0.9} style={[styles.dropdownButton, { backgroundColor: colors.accent }]}>
-                            <Text style={styles.dropdownButtonText}>Español</Text>
+                        <Text style={[styles.optionText, { color: colors.textOnSurface }]}>{t("accessibility.language")}</Text>
+                        <TouchableOpacity activeOpacity={0.9} style={[styles.dropdownButton, { backgroundColor: colors.accent }]} onPress={() => {
+                            const index = languageOptions.findIndex((option) => option.code === selectedLanguage);
+                            const next = languageOptions[(index + 1) % languageOptions.length].code;
+                            setLanguage(next);
+                        }}>
+                            <Text style={styles.dropdownButtonText}>{languageOptions.find((option) => option.code === selectedLanguage)?.label}</Text>
                             <Ionicons name="chevron-down" size={18} color="#111827" />
                         </TouchableOpacity>
                     </View>
                 </View>
 
                 <TouchableOpacity activeOpacity={0.85} style={[styles.saveButton, { backgroundColor: colors.accent }]} onPress={handleSave}>
-                    <Text style={styles.saveButtonText}>Guardar cambios</Text>
+                    <Text style={styles.saveButtonText}>{t("accessibility.save")}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -146,10 +154,10 @@ export default function Accessibility() {
 
             <AppAlert
                 visible={showSuccess}
-                label="LISTO"
-                title="Cambios guardados"
-                message="Tus ajustes de accesibilidad se guardaron correctamente."
-                actionText="Aceptar"
+                label={t("common.ok")}
+                title={t("common.save")}
+                message={t("accessibility.saved")}
+                actionText={t("common.ok")}
                 variant="success"
                 onAction={() => setShowSuccess(false)}
             />

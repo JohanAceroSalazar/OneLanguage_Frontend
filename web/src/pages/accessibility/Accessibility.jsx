@@ -1,26 +1,32 @@
 import { useEffect, useRef, useState } from "react";
 import { FaFont, FaCheck, FaGlobe, FaMoon, FaSun } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+import i18n, { languageOptions } from "../../i18n";
 import NavBar from "../../components/NavBar/NavBar";
 import BrandLogo from "../../components/BrandLogo/BrandLogo";
 import "./Accessibility.css";
 
 const fontSizeOptions = {
-    Pequeño: 0.92,
-    Mediano: 1,
-    Grande: 1.08,
+    small: 0.92,
+    medium: 1,
+    large: 1.08,
 };
 
 function Accessibility() {
-    const [fontSize, setFontSize] = useState(() => localStorage.getItem("fontSize") || "Mediano");
+    const [fontSize, setFontSize] = useState(() => localStorage.getItem("fontSize") || "medium");
     const [savedTheme, setSavedTheme] = useState(() => localStorage.getItem("theme") || "light");
     const [selectedTheme, setSelectedTheme] = useState(savedTheme);
-    const [savedLanguage, setSavedLanguage] = useState(() => localStorage.getItem("language") || "Español");
+    const [savedLanguage, setSavedLanguage] = useState(() => {
+        const stored = localStorage.getItem("language");
+        return languageOptions.some((option) => option.code === stored) ? stored : (i18n.language || "es");
+    });
     const [selectedLanguage, setSelectedLanguage] = useState(savedLanguage);
     const [showFontMenu, setShowFontMenu] = useState(false);
     const [showLangMenu, setShowLangMenu] = useState(false);
     const [showThemeMenu, setShowThemeMenu] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const controlsRef = useRef(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
         const zoom = fontSizeOptions[fontSize] || 1;
@@ -51,7 +57,14 @@ function Accessibility() {
         setSavedLanguage(selectedLanguage);
 
         localStorage.setItem("theme", selectedTheme);
-        localStorage.setItem("language", selectedLanguage);
+        const languageText = String(selectedLanguage).toLowerCase();
+        const languageCode = languageText.startsWith("ingl") ? "en"
+            : languageText.startsWith("port") ? "pt"
+            : languageText.startsWith("ital") ? "it"
+            : languageOptions.some((option) => option.code === selectedLanguage) ? selectedLanguage
+            : "es";
+        localStorage.setItem("language", languageCode);
+        i18n.changeLanguage(languageCode);
         localStorage.setItem("fontSize", fontSize);
 
         document.documentElement.dataset.theme = selectedTheme;
@@ -82,15 +95,15 @@ function Accessibility() {
                 <NavBar />
             </div>
 
-            <div className="access-card" ref={controlsRef}>
+            <div className="access-card" ref={controlsRef} data-supported-languages={languageOptions.map(({ code }) => code).join(",")}>
                 <div className="access-row">
                     <div className="access-label">
                         <FaFont size={20} />
-                        <span>Ajustar texto</span>
+                        <span>{t("accessibility.textSize")}</span>
                     </div>
                     <div className="access-control">
                         <button type="button" className="access-btn" onClick={() => openMenu(showFontMenu ? null : "font")}>
-                            Ajustar
+                            {t("accessibility.adjust")}
                         </button>
                         {showFontMenu && (
                             <div className="access-dropdown">
@@ -101,7 +114,7 @@ function Accessibility() {
                                         className={fontSize === size ? "selected" : ""}
                                         onClick={() => setFontSize(size)}
                                     >
-                                        <span>{size}</span>
+                                        <span>{t("accessibility." + size)}</span>
                                         {fontSize === size && <FaCheck size={12} />}
                                     </button>
                                 ))}
@@ -115,7 +128,7 @@ function Accessibility() {
                 <div className="access-row">
                     <div className="access-label">
                         <FaMoon size={20} />
-                        <span>Cambiar colores</span>
+                        <span>{t("accessibility.colors")}</span>
                     </div>
                     <div className="access-control">
                         <button type="button" className="access-btn" onClick={() => openMenu(showThemeMenu ? null : "theme")}>
@@ -123,21 +136,21 @@ function Accessibility() {
                         </button>
                         {showThemeMenu && (
                             <div className="access-theme-picker">
-                                <p className="color-title">Tema visual</p>
+                                <p className="color-title">{t("accessibility.visualTheme")}</p>
                                 <div className="theme-options">
                                     <button
                                         type="button"
                                         className={selectedTheme === "light" ? "theme-option selected" : "theme-option"}
                                         onClick={() => previewTheme("light")}
                                     >
-                                        <FaSun /> Claro
+                                        <FaSun /> {t("accessibility.light")}
                                     </button>
                                     <button
                                         type="button"
                                         className={selectedTheme === "dark" ? "theme-option selected" : "theme-option"}
                                         onClick={() => previewTheme("dark")}
                                     >
-                                        <FaMoon /> Oscuro
+                                        <FaMoon /> {t("accessibility.dark")}
                                     </button>
                                 </div>
                                 <p className="theme-hint">
@@ -153,23 +166,23 @@ function Accessibility() {
                 <div className="access-row">
                     <div className="access-label">
                         <FaGlobe size={20} />
-                        <span>Idioma</span>
+                        <span>{t("accessibility.language")}</span>
                     </div>
                     <div className="access-control">
                         <button type="button" className="access-btn" onClick={() => openMenu(showLangMenu ? null : "lang")}>
-                            Cambiar
+                            {t("accessibility.change")}
                         </button>
                         {showLangMenu && (
                             <div className="access-dropdown">
-                                {["Español", "Inglés", "Portugués", "Francés"].map((lang) => (
+                                {languageOptions.map(({ code, label }) => (
                                     <button
-                                        key={lang}
+                                        key={code}
                                         type="button"
-                                        className={selectedLanguage === lang ? "selected" : ""}
-                                        onClick={() => setSelectedLanguage(lang)}
+                                        className={selectedLanguage === code ? "selected" : ""}
+                                        onClick={() => setSelectedLanguage(code)}
                                     >
-                                        <span>{lang}</span>
-                                        {selectedLanguage === lang && <FaCheck size={12} />}
+                                        <span>{label}</span>
+                                        {selectedLanguage === code && <FaCheck size={12} />}
                                     </button>
                                 ))}
                             </div>
@@ -180,16 +193,16 @@ function Accessibility() {
                 <div className="access-divider" />
 
                 <button type="button" className="access-save-btn" onClick={handleSave}>
-                    Guardar cambios
+                    {t("common.save")}
                 </button>
             </div>
 
             {showSuccess && (
                 <div className="modal-overlay">
                     <div className="access-modal-box">
-                        <p className="access-modal-text">Cambios de accesibilidad<br />guardados correctamente</p>
+                        <p className="access-modal-text">{t("misc.accessibilitySaved")}</p>
                         <button type="button" className="access-modal-btn" onClick={() => setShowSuccess(false)}>
-                            Ok
+                            {t("common.ok")}
                         </button>
                     </div>
                 </div>

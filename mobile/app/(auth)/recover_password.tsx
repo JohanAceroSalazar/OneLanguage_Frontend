@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Image,
@@ -18,6 +19,7 @@ import { useTheme } from "../../src/theme/ThemeContext";
 const emailRegex = /\S+@\S+\.\S+/;
 
 export default function RecoverPassword() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { colors, fontScale } = useTheme();
   const [email, setEmail] = useState("");
@@ -36,21 +38,21 @@ export default function RecoverPassword() {
     setSuccess("");
 
     if (!email.trim()) {
-      setError("El correo es obligatorio");
+      setError(t("auth.emailRequired"));
       return;
     }
 
     if (!emailRegex.test(email)) {
-      setError("Ingresa un correo valido");
+      setError(t("auth.emailInvalid"));
       return;
     }
 
     setLoading(true);
     try {
       await forgotPassword(email.trim());
-      setSuccess("Enlace de recuperacion enviado a tu correo.");
+      setSuccess(t("auth.recoverSuccess"));
     } catch (err: any) {
-      setError(err?.message || "No se pudo enviar el enlace de recuperación, verifica tu correo.");
+      setError(err?.message || t("auth.recoverError"));
     } finally {
       setLoading(false);
     }
@@ -78,15 +80,15 @@ export default function RecoverPassword() {
           />
 
           <Text style={[styles.title, { color: colors.text, fontSize: 31 * fontScale }]}>
-            Restablecer contraseña
+            {t("auth.recoverTitle")}
           </Text>
 
           <Text style={[styles.subtitle, { color: colors.text }]}>
-            Escribe tu correo y te enviaremos el enlace para crear una nueva contraseña.
+            {t("auth.recoverHint")}
           </Text>
 
           <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}>
-            <Text style={styles.label}>Correo electronico</Text>
+            <Text style={styles.label}>{t("common.email")}</Text>
 
             <TextInput
               style={[
@@ -119,7 +121,7 @@ export default function RecoverPassword() {
                 <ActivityIndicator color="#000" />
               ) : (
                 <Text style={[styles.buttonText, { fontSize: 16 * fontScale }]}>
-                  Enviar enlace
+                  {t("auth.sendLink")}
                 </Text>
               )}
             </TouchableOpacity>
@@ -127,7 +129,7 @@ export default function RecoverPassword() {
 
           <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
             <Text style={[styles.loginLink, { color: colors.text, fontSize: 15 * fontScale }]}>
-              Volver al inicio de sesion
+              {t("auth.backLogin")}
             </Text>
           </TouchableOpacity>
         </View>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "./ForgotPassword.css";
 import logo from "../../assets/Logo.png";
@@ -6,6 +7,7 @@ import BrandLogo from "../../components/BrandLogo/BrandLogo";
 import { forgotPassword } from "../../services/authService";
 
 function RecoverPassword() {
+    const { t } = useTranslation();
     const [email, setEmail] = useState("");
     const [errors, setErrors] = useState({ email: false });
     const [sent, setSent] = useState(false);
@@ -35,7 +37,7 @@ function RecoverPassword() {
         } catch(error) {
             setErrorMessage(
                 error.message ||
-                "No se pudo enviar el enlace de recuperación."
+                t("auth.recoverError")
             );
         } finally {
             setLoading(false);
@@ -49,14 +51,14 @@ function RecoverPassword() {
             <BrandLogo className="recover-logo" />
 
             {/* TÍTULO */}
-            <h2 className="recover-title">Restablecer<br/>contraseña</h2>
+            <h2 className="recover-title">{t("auth.reset")}</h2>
 
             {/* IMAGEN */}
             <img src={logo} alt="logo" className="recover-img" />
 
             {/* TARJETA */}
             <div className="recover-card">
-                <label className="recover-label">Correo electrónico</label>
+                <label className="recover-label">{t("common.email")}</label>
                 <input
                     className={`recover-input ${errors.email ? "input-error" : ""}`}
                     type="email"
@@ -70,11 +72,11 @@ function RecoverPassword() {
                     }}
                 />
                 <p className="recover-error-text">
-                    {errors.email ? "Este campo es obligatorio" : ""}
+                    {errors.email ? t("common.required") : ""}
                 </p>
 
                 {sent && (
-                    <p className="recover-success">¡Enlace de recuperación enviado a tu correo!</p>
+                    <p className="recover-success">{t("auth.recoverSuccess")}</p>
                 )}
 
                 {errorMessage && (
@@ -88,14 +90,14 @@ function RecoverPassword() {
                     disabled={loading}
                 >
                     {loading
-                        ? "Enviando..."
-                        : "Enviar enlace de recuperación"}
+                        ? t("auth.sending")
+                        : t("auth.send")}
                 </button>
             </div>
 
             {/* VOLVER */}
             <p className="recover-back" onClick={() => navigate("/login")}>
-                ← Volver al inicio de sesión
+                ← {t("auth.backLogin")}
             </p>
 
         </div>

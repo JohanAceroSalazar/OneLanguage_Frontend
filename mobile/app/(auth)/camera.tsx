@@ -9,8 +9,10 @@ import {
     View,
 } from "react-native";
 import { useTheme } from "../../src/theme/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 export default function Camera() {
+    const { t } = useTranslation();
     const { colors, fontScale } = useTheme();
 
     return (
@@ -32,11 +34,11 @@ export default function Camera() {
     />
 
     <View style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-        <Text style={[styles.resultText, { color: colors.textOnSurface, fontSize: 27 * fontScale }]}>El texto traducido{"\n"}aparecerá aquí...</Text>
+        <Text style={[styles.resultText, { color: colors.textOnSurface, fontSize: 27 * fontScale }]}>{t("camera.result")}</Text>
     </View>
 
     <TouchableOpacity activeOpacity={0.85} style={[styles.finishButton, { backgroundColor: colors.accent }]}> 
-        <Text style={[styles.finishButtonText, { color: colors.textOnSurface, fontSize: 22 * fontScale }]}>Finalizar traducción</Text>
+        <Text style={[styles.finishButtonText, { color: colors.textOnSurface, fontSize: 22 * fontScale }]}>{t("camera.finish")}</Text>
     </TouchableOpacity>
 
     <BottomNav active="camera" />

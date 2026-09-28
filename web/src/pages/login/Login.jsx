@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Input from "../../components/Input/Input";
@@ -25,29 +26,30 @@ const initialTouched = {
     password: false,
 };
 
-function validateField(field, value) {
+function validateField(field, value, t) {
     switch (field) {
         case "email":
-            if (!value.trim()) return "El correo es obligatorio";
-            if (!emailRegex.test(value)) return "Ingresa un correo válido";
+            if (!value.trim()) return t("auth.emailRequired");
+            if (!emailRegex.test(value)) return t("auth.emailInvalid");
             return "";
         case "password":
-            if (!value) return "La contraseña es obligatoria";
-            if (value.length < 6) return "La contraseña debe tener al menos 6 caracteres";
+            if (!value) return t("auth.passwordRequired");
+            if (value.length < 6) return t("auth.passwordLength");
             return "";
         default:
             return "";
     }
 }
 
-function validateForm(form) {
+function validateForm(form, t) {
     return {
-        email: validateField("email", form.email),
-        password: validateField("password", form.password),
+        email: validateField("email", form.email, t),
+        password: validateField("password", form.password, t),
     };
 }
 
 function Login() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [form, setForm] = useState(initialForm);
     const [errors, setErrors] = useState(initialErrors);
@@ -75,7 +77,7 @@ function Login() {
 
         setForm((current) => {
             const nextForm = { ...current, [name]: value };
-            setErrors(validateForm(nextForm));
+            setErrors(validateForm(nextForm, t));
             return nextForm;
         });
 
@@ -87,14 +89,14 @@ function Login() {
         setTouched((current) => ({ ...current, [name]: true }));
         setErrors((current) => ({
             ...current,
-            [name]: validateField(name, form[name]),
+            [name]: validateField(name, form[name], t),
         }));
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const nextErrors = validateForm(form);
+        const nextErrors = validateForm(form, t);
         const hasErrors = Object.values(nextErrors).some(Boolean);
 
         setErrors(nextErrors);
@@ -105,10 +107,10 @@ function Login() {
 
         if (hasErrors) {
             openModal({
-                title: "Revisa tus datos",
-                message: "Todavía hay campos por corregir para poder entrar a la plataforma.",
+                title: t("auth.review"),
+                message: t("auth.reviewMessage"),
                 tone: "error",
-                confirmText: "Corregir datos",
+                confirmText: t("auth.correct"),
                 onConfirm: closeModal,
             });
             return;
@@ -125,10 +127,10 @@ function Login() {
         localStorage.setItem("user", JSON.stringify(response.user));
 
         openModal({
-            title: "Sesión Exitosa",
-            message: "Inicio de sesión exitoso. Vamos a llevarte al panel principal.",
+            title: t("auth.success"),
+            message: t("auth.successMessage"),
             tone: "success",
-            confirmText: "Entrar ahora",
+            confirmText: t("auth.enterNow"),
         onConfirm: () => {
             closeModal();
             navigate("/home");
@@ -138,10 +140,10 @@ function Login() {
         } catch {
 
         openModal({
-            title: "No se pudo iniciar sesión",
-            message: "Correo o contraseña incorrectos.",
+            title: t("auth.loginError"),
+            message: t("auth.credentialsError"),
             tone: "error",
-            confirmText: "Intentar nuevamente",
+            confirmText: t("common.ok"),
         onConfirm: closeModal,
         });
     }
@@ -163,19 +165,19 @@ function Login() {
             <div className="login-left">
                 <img src={logo} alt="One Language" className="logo-img" />
                 <h2 className="brand-name">ONE<br />LANGUAGE</h2>
-                <p className="login-brand-copy">
-                    Traduce, revisa tu historial y configura la experiencia de accesibilidad desde un solo lugar.
+                    <p className="login-brand-copy">
+                    {t("auth.loginCopy")}
                 </p>
             </div>
 
             <div className="login-right">
                 <form className="login-card" onSubmit={handleSubmit}>
                     <div className="form-header">
-                        <span className="form-step">Acceso seguro</span>
-                        <h1>Inicia sesión</h1>
+                        <span className="form-step">{t("auth.secure")}</span>
+                        <h1>{t("auth.login")}</h1>
                     </div>
 
-                    <label htmlFor="email">Correo electrónico</label>
+                    <label htmlFor="email">{t("common.email")}</label>
                     <Input
                         name="email"
                         type="email"
@@ -188,7 +190,7 @@ function Login() {
                     />
                     {showFieldError("email") && errors.email && <p className="error-text">{errors.email}</p>}
 
-                    <label htmlFor="password">Contraseña</label>
+                    <label htmlFor="password">{t("common.password")}</label>
                     <div className="password-field">
                         <Input
                             name="password"
@@ -206,14 +208,14 @@ function Login() {
                     </div>
                     {showFieldError("password") && errors.password && <p className="error-text">{errors.password}</p>}
 
-                    <Button text="Iniciar sesión" className="auth-submit-button" />
+                    <Button text={t("auth.login")} className="auth-submit-button" />
                 </form>
 
                 <p className="recover-text" onClick={() => navigate("/forgotPassword")}>
-                    Restablecer contraseña
+                    {t("auth.reset")}
                 </p>
                 <p className="register-text">
-                    ¿No tienes una cuenta? <Link to="/register">Regístrate</Link>
+                    {t("auth.noAccount")} <Link to="/register">{t("auth.register")}</Link>
                 </p>
             </div>
         </div>

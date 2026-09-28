@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import "./Terms.css";
 
 function Terms() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     return (
@@ -10,71 +12,49 @@ function Terms() {
             <button
                 className="back-button"
                 onClick={() => navigate(-1)}
-            >
-                ← Volver
-            </button>
+            >{t("common.back")}</button>
 
             <div className="terms-content">
 
-                <h1 className="title">Términos y condiciones</h1>
+                <h1 className="title">{t("terms.title")}</h1>
 
-                <p className="paragraph">Aplicación de Traducción de Señas a Texto</p>
-                <p className="paragraph">Última actualización: 2025</p>
-                <p className="paragraph">
-                    Bienvenido(a) a nuestra aplicación de traducción de señas a texto.
-                    Al utilizar la aplicación, usted acepta los presentes Términos y Condiciones.
-                </p>
+                <p className="paragraph">{t("terms.app")}</p>
+                <p className="paragraph">{t("terms.updated")}</p>
+                <p className="paragraph">{t("terms.welcome")}</p>
 
                 <div className="section">
-                    <p className="subtitle">1. Aceptación de los Términos</p>
-                    <p className="paragraph">
-                        Al acceder, instalar o utilizar la Aplicación, usted declara que ha leído,
-                        comprendido y aceptado estos términos.
-                    </p>
+                    <p className="subtitle">{t("terms.s1")}</p>
+                    <p className="paragraph">{t("terms.p1")}</p>
                 </div>
 
                 <div className="section">
-                    <p className="subtitle">2. Descripción del Servicio</p>
-                    <p className="paragraph">
-                        La aplicación permite capturar señas, interpretarlas mediante algoritmos
-                        y convertirlas en texto y audio.
-                    </p>
+                    <p className="subtitle">{t("terms.s2")}</p>
+                    <p className="paragraph">{t("terms.p2")}</p>
                 </div>
 
                 <div className="section">
-                    <p className="subtitle">3. Uso Permitido</p>
-                    <p className="paragraph">
-                        El usuario se compromete a usar la aplicación de forma responsable,
-                        sin fines ilegales ni maliciosos.
-                    </p>
+                    <p className="subtitle">{t("terms.s3")}</p>
+                    <p className="paragraph">{t("terms.p3")}</p>
                 </div>
 
                 <div className="section">
-                    <p className="subtitle">4. Registro y Seguridad</p>
-                    <p className="paragraph">
-                        El usuario debe proporcionar información verídica y proteger sus credenciales.
-                    </p>
+                    <p className="subtitle">{t("terms.s4")}</p>
+                    <p className="paragraph">{t("terms.p4")}</p>
                 </div>
 
                 <div className="section">
-                    <p className="subtitle">5. Privacidad</p>
-                    <p className="paragraph">
-                        Los datos recopilados se utilizan únicamente para mejorar la experiencia del usuario.
-                    </p>
+                    <p className="subtitle">{t("terms.s5")}</p>
+                    <p className="paragraph">{t("terms.p5")}</p>
                 </div>
 
                 <div className="section">
-                    <p className="subtitle">6. Propiedad Intelectual</p>
-                    <p className="paragraph">
-                        Todo el contenido de la aplicación pertenece a sus desarrolladores.
-                    </p>
+                    <p className="subtitle">{t("terms.s6")}</p>
+                    <p className="paragraph">{t("terms.p6")}</p>
                 </div>
 
                 <div className="section">
-                    <p className="subtitle">7. Limitación de Responsabilidad</p>
-                    <p className="paragraph">
-                        La aplicación puede tener errores y no garantiza precisión total.
-                    </p>
+                    <p className="subtitle">{t("terms.s7")}</p>
+                    <p className="paragraph">{t("terms.p7")}</p>
                 </div>
             </div>
         </div>

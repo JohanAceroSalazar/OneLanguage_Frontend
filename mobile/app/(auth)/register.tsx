@@ -12,6 +12,7 @@ import {
 import { AppAlert } from "../../components/app-alert";
 import { registerUser } from "../../src/services/authService";
 import { useTheme } from "../../src/theme/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 const emailRegex = /\S+@\S+\.\S+/;
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
@@ -26,6 +27,7 @@ type AlertState = {
 };
 
 export default function Register() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { colors } = useTheme();
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "", acceptedTerms: false });
@@ -46,16 +48,16 @@ export default function Register() {
 
   const passwordStrength = useMemo(() => {
     if (!form.password) return "";
-    if (form.password.length < 8) return "Débil";
-    return passwordRegex.test(form.password) ? "Fuerte" : "Media";
-  }, [form.password]);
+    if (form.password.length < 8) return t("auth.weak");
+    return passwordRegex.test(form.password) ? t("auth.strong") : t("auth.medium");
+  }, [form.password, t]);
 
   const validate = (nextForm = form) => ({
-    name: !nextForm.name.trim() ? "El nombre es obligatorio" : nextForm.name.trim().length < 3 ? "Ingresa al menos 3 caracteres" : "",
-    email: !nextForm.email.trim() ? "El correo es obligatorio" : !emailRegex.test(nextForm.email) ? "Ingresa un correo válido" : "",
-    password: !nextForm.password ? "La contraseña es obligatoria" : !passwordRegex.test(nextForm.password) ? "Usa 8+ caracteres, una letra y un número" : "",
-    confirmPassword: !nextForm.confirmPassword ? "Confirma tu contraseña" : nextForm.confirmPassword !== nextForm.password ? "Las contraseñas no coinciden" : "",
-    acceptedTerms: nextForm.acceptedTerms ? "" : "Debes aceptar los términos y condiciones",
+    name: !nextForm.name.trim() ? t("auth.nameRequired") : nextForm.name.trim().length < 3 ? t("auth.minChars") : "",
+    email: !nextForm.email.trim() ? t("auth.emailRequired") : !emailRegex.test(nextForm.email) ? t("auth.emailInvalid") : "",
+    password: !nextForm.password ? t("auth.passwordRequired") : !passwordRegex.test(nextForm.password) ? t("auth.passwordRules") : "",
+    confirmPassword: !nextForm.confirmPassword ? t("auth.confirmRequired") : nextForm.confirmPassword !== nextForm.password ? t("auth.passwordMismatch") : "",
+    acceptedTerms: nextForm.acceptedTerms ? "" : t("auth.acceptTerms"),
   });
 
   const handleChange = (field: keyof typeof form, value: string | boolean) => {
@@ -77,9 +79,9 @@ export default function Register() {
       await registerUser({ name: form.name, email: form.email, password: form.password });
       setAlert({
         visible: true,
-        title: "Registro exitoso",
-        message: "Tu cuenta quedó lista. Ahora puedes iniciar sesión.",
-        actionText: "Ir a iniciar sesión",
+        title: t("auth.registerSuccess"),
+        message: t("auth.registerSuccessMessage"),
+        actionText: t("auth.goLogin"),
         variant: "success",
         onAction: () => {
           closeAlert();
@@ -89,9 +91,9 @@ export default function Register() {
     } catch (error: any) {
       setAlert({
         visible: true,
-        title: "No pudimos registrar tu cuenta",
-        message: error?.message || "Ocurrió un problema al crear la cuenta.",
-        actionText: "Intentar de nuevo",
+        title: t("auth.registerError"),
+        message: error?.message || t("auth.registerError"),
+        actionText: t("common.ok"),
         variant: "error",
         onAction: closeAlert,
       });
@@ -106,20 +108,20 @@ export default function Register() {
         <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
       </View>
 
-      <Text style={[styles.title, { color: colors.text }]}>Crea tu cuenta</Text>
+      <Text style={[styles.title, { color: colors.text }]}>{t("auth.register")}</Text>
 
       <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}>
-        <Text style={styles.label}>Nombre completo</Text>
+        <Text style={styles.label}>{t("common.fullName")}</Text>
         <TextInput
           style={[styles.input, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.name ? "#ef4444" : "#d1d5db" }]}
-          placeholder="Nombre completo"
+          placeholder={t("common.fullName")}
           placeholderTextColor="#6b7280"
           value={form.name}
           onChangeText={(text) => handleChange("name", text)}
         />
         {errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
 
-        <Text style={styles.label}>Correo electrónico</Text>
+        <Text style={styles.label}>{t("common.email")}</Text>
         <TextInput
           style={[styles.input, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.email ? "#ef4444" : "#d1d5db" }]}
           placeholder="andres@gmail.com"
@@ -131,11 +133,11 @@ export default function Register() {
         />
         {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
-        <Text style={styles.label}>Contraseña</Text>
+        <Text style={styles.label}>{t("common.password")}</Text>
         <View style={styles.passwordField}>
           <TextInput
             style={[styles.inputPassword, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.password ? "#ef4444" : "#d1d5db" }]}
-            placeholder="Mínimo 8 caracteres"
+          placeholder={t("auth.passwordMin")}
             placeholderTextColor="#6b7280"
             secureTextEntry={!showPassword}
             value={form.password}
@@ -146,13 +148,13 @@ export default function Register() {
           </TouchableOpacity>
         </View>
         {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
-        {passwordStrength ? <Text style={styles.hint}>Seguridad: {passwordStrength}</Text> : null}
+        {passwordStrength ? <Text style={styles.hint}>{t("misc.passwordStrength")}: {passwordStrength}</Text> : null}
 
-        <Text style={styles.label}>Confirmar contraseña</Text>
+        <Text style={styles.label}>{t("common.confirmPassword")}</Text>
         <View style={styles.passwordField}>
           <TextInput
             style={[styles.inputPassword, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.confirmPassword ? "#ef4444" : "#d1d5db" }]}
-            placeholder="Repite tu contraseña"
+          placeholder={t("auth.repeat")}
             placeholderTextColor="#6b7280"
             secureTextEntry={!showConfirmPassword}
             value={form.confirmPassword}
@@ -166,17 +168,17 @@ export default function Register() {
 
         <TouchableOpacity style={styles.checkboxRow} onPress={() => handleChange("acceptedTerms", !form.acceptedTerms)}>
           <Ionicons name={form.acceptedTerms ? "checkbox" : "square-outline"} size={20} color={colors.primary} />
-          <Text style={styles.termsLink} onPress={() => router.push("/(auth)/terms")}>Acepto los términos y condiciones</Text>
+          <Text style={styles.termsLink} onPress={() => router.push("/(auth)/terms")}>{t("auth.terms")}</Text>
         </TouchableOpacity>
         {errors.acceptedTerms ? <Text style={styles.errorText}>{errors.acceptedTerms}</Text> : null}
 
         <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleRegister} disabled={loading}>
-          {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>Crear cuenta</Text>}
+          {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>{t("auth.create")}</Text>}
         </TouchableOpacity>
       </View>
 
       <Text style={styles.loginText}>
-        ¿Ya tienes una cuenta? <Text style={styles.loginLink} onPress={() => router.push("/(auth)/login")}>Inicia sesión</Text>
+        {t("auth.hasAccount")} <Text style={styles.loginLink} onPress={() => router.push("/(auth)/login")}>{t("auth.login")}</Text>
       </Text>
 
       <AppAlert
@@ -316,3 +318,5 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+
+
