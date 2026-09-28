@@ -6,6 +6,7 @@ import { BottomNav } from "../../components/bottom-nav";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
 import i18n, { languageOptions, setLanguage } from "../../src/i18n";
+import { updateAccessibilitySettings } from "../../src/services/authService";
 
 type DropdownOption = {
     label: string;
@@ -59,8 +60,8 @@ export default function Accessibility() {
     const [draftFontSize, setDraftFontSize] = useState(fontSizeMode);
     const [showSuccess, setShowSuccess] = useState(false);
     const [openDropdown, setOpenDropdown] = useState<"font" | "theme" | "language" | null>(null);
-    const { t } = useTranslation();
-    const selectedLanguage = i18n.language;
+    const { t, i18n: translationI18n } = useTranslation();
+    const selectedLanguage = (translationI18n.resolvedLanguage || translationI18n.language || "es").split("-")[0];
 
     const fontOptions = useMemo<DropdownOption[]>(() => [
         { label: t("accessibility.small"), value: "small" },
@@ -73,12 +74,28 @@ export default function Accessibility() {
         { label: t("accessibility.dark"), value: "dark" },
     ], [t]);
 
+    const languageDropdownOptions = useMemo<DropdownOption[]>(() => languageOptions.map((option) => ({
+        label: option.label,
+        value: option.code,
+    })), []);
+
     const selectedFontLabel = fontOptions.find((option) => option.value === draftFontSize)?.label ?? t("accessibility.medium");
     const selectedThemeLabel = themeOptions.find((option) => option.value === theme)?.label ?? t("accessibility.light");
+    const selectedLanguageLabel = languageDropdownOptions.find((option) => option.value === selectedLanguage)?.label
+        ?? languageDropdownOptions[0].label;
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setThemeMode(theme);
         setFontSizeMode(draftFontSize);
+        try {
+            await updateAccessibilitySettings({
+                language: i18n.language as "es" | "en" | "pt" | "it",
+                textSize: draftFontSize,
+                theme,
+            });
+        } catch {
+            // Se conserva el cambio local aunque el backend esté temporalmente fuera de servicio.
+        }
         setShowSuccess(true);
     };
 
@@ -130,20 +147,25 @@ export default function Accessibility() {
                     onToggle={() => setOpenDropdown((current) => current === "theme" ? null : "theme")}
                 />
 
-                <View style={styles.optionRow}>
-                    <Ionicons name="globe-outline" size={46} color={colors.accent} style={styles.optionIcon} />
-                    <View style={styles.optionContent}>
-                        <Text style={[styles.optionText, { color: colors.textOnSurface }]}>{t("accessibility.language")}</Text>
-                        <TouchableOpacity activeOpacity={0.9} style={[styles.dropdownButton, { backgroundColor: colors.accent }]} onPress={() => {
-                            const index = languageOptions.findIndex((option) => option.code === selectedLanguage);
-                            const next = languageOptions[(index + 1) % languageOptions.length].code;
-                            setLanguage(next);
-                        }}>
-                            <Text style={styles.dropdownButtonText}>{languageOptions.find((option) => option.code === selectedLanguage)?.label}</Text>
-                            <Ionicons name="chevron-down" size={18} color="#111827" />
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                <Dropdown
+                    title={t("accessibility.language")}
+                    icon="globe-outline"
+                    options={languageDropdownOptions}
+                    selectedValue={selectedLanguageLabel}
+                    onSelect={(value) => {
+                        void setLanguage(value);
+                        setOpenDropdown(null);
+                    }}
+                    accentColor={colors.accent}
+                    textColor={colors.textOnSurface}
+                    borderColor={colors.border}
+                    menuBackgroundColor={theme === "dark" ? "#111827" : "#ffffff"}
+                    menuTextColor={theme === "dark" ? "#f8fafc" : "#111827"}
+                    selectedBackgroundColor={theme === "dark" ? "#1f2937" : "#f3f4f6"}
+                    selectedTextColor={theme === "dark" ? "#f4dc2e" : "#111827"}
+                    open={openDropdown === "language"}
+                    onToggle={() => setOpenDropdown((current) => current === "language" ? null : "language")}
+                />
 
                 <TouchableOpacity activeOpacity={0.85} style={[styles.saveButton, { backgroundColor: colors.accent }]} onPress={handleSave}>
                     <Text style={styles.saveButtonText}>{t("accessibility.save")}</Text>
@@ -155,7 +177,7 @@ export default function Accessibility() {
             <AppAlert
                 visible={showSuccess}
                 label={t("common.ok")}
-                title={t("common.save")}
+                title={t("accessibility.changesSavedTitle")}
                 message={t("accessibility.saved")}
                 actionText={t("common.ok")}
                 variant="success"

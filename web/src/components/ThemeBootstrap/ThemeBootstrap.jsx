@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import { getValidToken } from "../../services/authSession";
+import { applyAccessibilitySettings, getAccessibilitySettings } from "../../services/accessibilityService";
 
 const fontSizeOptions = {
     small: 0.92,
@@ -13,6 +15,12 @@ function ThemeBootstrap() {
         document.documentElement.dataset.theme = savedTheme;
         document.documentElement.style.colorScheme = savedTheme;
         document.body.style.zoom = String(fontSizeOptions[savedFontSize] || 1);
+
+        if (getValidToken()) {
+            getAccessibilitySettings()
+                .then(applyAccessibilitySettings)
+                .catch(() => undefined);
+        }
     }, []);
 
     return null;

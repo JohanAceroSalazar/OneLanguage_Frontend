@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 type ThemeMode = "light" | "dark";
 type FontSizeMode = "small" | "medium" | "large";
@@ -64,6 +65,25 @@ const fontScaleMap: Record<FontSizeMode, number> = {
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<ThemeMode>("light");
   const [fontSizeMode, setFontSizeModeState] = useState<FontSizeMode>("medium");
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    Promise.all([AsyncStorage.getItem("theme"), AsyncStorage.getItem("fontSize")]).then(([storedTheme, storedFontSize]) => {
+      if (storedTheme === "light" || storedTheme === "dark") setTheme(storedTheme);
+      if (storedFontSize === "small" || storedFontSize === "medium" || storedFontSize === "large") {
+        setFontSizeModeState(storedFontSize);
+      }
+      setLoaded(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (loaded) AsyncStorage.setItem("theme", theme);
+  }, [loaded, theme]);
+
+  useEffect(() => {
+    if (loaded) AsyncStorage.setItem("fontSize", fontSizeMode);
+  }, [fontSizeMode, loaded]);
 
   const value = useMemo(() => ({
     theme,

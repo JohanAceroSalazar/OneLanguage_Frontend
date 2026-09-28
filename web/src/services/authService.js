@@ -1,4 +1,5 @@
 import api from "./api";
+import { applyAccessibilitySettings, getAccessibilitySettings } from "./accessibilityService";
 
 export const registerUser = async (data) => {
     try {
@@ -25,6 +26,16 @@ export const loginUser = async (data) => {
         return response.data;
     } catch (error) {
         throw error.response?.data || { message: "Error del servidor" };
+    }
+};
+
+export const syncAccessibilityAfterLogin = async () => {
+    try {
+        const settings = await getAccessibilitySettings();
+        applyAccessibilitySettings(settings);
+        return settings;
+    } catch {
+        return null;
     }
 };
 
