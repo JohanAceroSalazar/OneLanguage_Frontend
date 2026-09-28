@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import i18n, { languageOptions } from "../../i18n";
 import NavBar from "../../components/NavBar/NavBar";
 import BrandLogo from "../../components/BrandLogo/BrandLogo";
+import { updateAccessibilitySettings } from "../../services/accessibilityService";
 import "./Accessibility.css";
 
 const fontSizeOptions = {
@@ -52,7 +53,7 @@ function Accessibility() {
         return () => document.removeEventListener("pointerdown", closeMenusOnOutsideClick);
     }, []);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setSavedTheme(selectedTheme);
         setSavedLanguage(selectedLanguage);
 
@@ -66,6 +67,17 @@ function Accessibility() {
         localStorage.setItem("language", languageCode);
         i18n.changeLanguage(languageCode);
         localStorage.setItem("fontSize", fontSize);
+
+        try {
+            await updateAccessibilitySettings({
+                language: languageCode,
+                textSize: fontSize,
+                theme: selectedTheme,
+            });
+        } catch (error) {
+            // La interfaz y la persistencia local siguen funcionando aunque el backend no responda.
+            console.error("No se pudieron sincronizar las preferencias de accesibilidad", error);
+        }
 
         document.documentElement.dataset.theme = selectedTheme;
         document.documentElement.style.colorScheme = selectedTheme;

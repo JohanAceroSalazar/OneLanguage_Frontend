@@ -7,7 +7,7 @@ import Button from "../../components/Button/Button";
 import AuthModal from "../../components/AuthModal/AuthModal";
 import logo from "../../assets/Logo.png";
 import "./Login.css";
-import { loginUser } from "../../services/authService";
+import { loginUser, syncAccessibilityAfterLogin } from "../../services/authService";
 
 const emailRegex = /\S+@\S+\.\S+/;
 
@@ -125,6 +125,7 @@ function Login() {
 
         localStorage.setItem("token", response.token);
         localStorage.setItem("user", JSON.stringify(response.user));
+        await syncAccessibilityAfterLogin();
 
         openModal({
             title: t("auth.success"),

@@ -53,6 +53,20 @@ for (const [language, labels] of Object.entries({
   it: { "auth.weak": "Debole", "auth.strong": "Forte", "auth.medium": "Media", "auth.nameRequired": "Il nome è obbligatorio", "auth.minChars": "Inserisci almeno 3 caratteri", "auth.passwordRequired": "La password è obbligatoria", "auth.acceptTerms": "Devi accettare termini e condizioni", "auth.registerSuccess": "Registrazione riuscita", "auth.registerSuccessMessage": "Il tuo account è pronto. Ora puoi accedere.", "auth.goLogin": "Vai al login" }
 })) Object.assign((text as any)[language].translation, labels);
 
+const accessibilityLabels = {
+  es: { small: "Peque\u00f1o", medium: "Mediano", large: "Grande", changesSavedTitle: "Cambios guardados" },
+  en: { small: "Small", medium: "Medium", large: "Large", changesSavedTitle: "Changes saved" },
+  pt: { small: "Pequeno", medium: "M\u00e9dio", large: "Grande", changesSavedTitle: "Altera\u00e7\u00f5es salvas" },
+  it: { small: "Piccolo", medium: "Medio", large: "Grande", changesSavedTitle: "Modifiche salvate" },
+} as const;
+for (const [language, labels] of Object.entries(accessibilityLabels)) {
+  const translation = (text as any)[language].translation;
+  translation["accessibility.small"] = labels.small;
+  translation["accessibility.medium"] = labels.medium;
+  translation["accessibility.large"] = labels.large;
+  translation["accessibility.changesSavedTitle"] = labels.changesSavedTitle;
+}
+
 i18n.use(initReactI18next).init({ resources: text, lng: "es", fallbackLng: "es", interpolation: { escapeValue: false } });
 
 export async function loadLanguage() {

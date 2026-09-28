@@ -1,4 +1,5 @@
 import Constants from "expo-constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const API_PORT = "8084";
 const FALLBACK_API_HOST = "10.3.234.244";
@@ -14,6 +15,27 @@ const getApiUrl = () => {
 };
 
 const API_URL = getApiUrl();
+
+export type AccessibilitySettings = {
+    language: "es" | "en" | "pt" | "it";
+    textSize: "small" | "medium" | "large";
+    theme: "light" | "dark";
+};
+
+const defaultAccessibilitySettings: AccessibilitySettings = {
+    language: "es",
+    textSize: "medium",
+    theme: "light",
+};
+
+const normalizeAccessibilitySettings = (settings: Partial<AccessibilitySettings>): AccessibilitySettings => ({
+    language: ["es", "en", "pt", "it"].includes(settings.language || "")
+        ? settings.language as AccessibilitySettings["language"] : defaultAccessibilitySettings.language,
+    textSize: ["small", "medium", "large"].includes(settings.textSize || "")
+        ? settings.textSize as AccessibilitySettings["textSize"] : defaultAccessibilitySettings.textSize,
+    theme: ["light", "dark"].includes(settings.theme || "")
+        ? settings.theme as AccessibilitySettings["theme"] : defaultAccessibilitySettings.theme,
+});
 
 const readBody = async (response: Response) => {
     const text = await response.text();
@@ -75,6 +97,33 @@ export const loginUser = async (data: { email: string; password: string }) => {
     }
 
     return readBody(response);
+};
+
+const authenticatedRequest = async (path: string, options: RequestInit = {}) => {
+    const token = await AsyncStorage.getItem("token");
+    return fetch(`${API_URL}${path}`, {
+        ...options,
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(options.headers || {}),
+        },
+    });
+};
+
+export const getAccessibilitySettings = async (): Promise<AccessibilitySettings> => {
+    const response = await authenticatedRequest("/api/accessibility-settings");
+    if (!response.ok) await readError(response, "No se pudieron cargar los ajustes de accesibilidad.");
+    return normalizeAccessibilitySettings(await readBody(response));
+};
+
+export const updateAccessibilitySettings = async (settings: AccessibilitySettings) => {
+    const response = await authenticatedRequest("/api/accessibility-settings", {
+        method: "PUT",
+        body: JSON.stringify(settings),
+    });
+    if (!response.ok) await readError(response, "No se pudieron guardar los ajustes de accesibilidad.");
+    return normalizeAccessibilitySettings(await readBody(response));
 };
 
 export const forgotPassword = async (email: string) => {

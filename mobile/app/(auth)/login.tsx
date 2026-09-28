@@ -13,7 +13,8 @@ import {
   View,
 } from "react-native";
 import { AppAlert } from "../../components/app-alert";
-import { loginUser } from "../../src/services/authService";
+import { getAccessibilitySettings, loginUser } from "../../src/services/authService";
+import { setLanguage } from "../../src/i18n";
 import { useTheme } from "../../src/theme/ThemeContext";
 
 const emailRegex = /\S+@\S+\.\S+/;
@@ -30,7 +31,7 @@ type AlertState = {
 export default function Login() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { colors } = useTheme();
+  const { colors, setThemeMode, setFontSizeMode } = useTheme();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "" });
@@ -86,6 +87,15 @@ export default function Login() {
 
       if (response?.user) {
         await AsyncStorage.setItem("user", JSON.stringify(response.user));
+      }
+
+      try {
+        const settings = await getAccessibilitySettings();
+        await setLanguage(settings.language);
+        setThemeMode(settings.theme);
+        setFontSizeMode(settings.textSize);
+      } catch {
+        // El inicio de sesión no depende de que el backend de preferencias esté disponible.
       }
 
       setAlert({
