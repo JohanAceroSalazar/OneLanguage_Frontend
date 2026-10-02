@@ -1,6 +1,7 @@
 import { BottomNav } from "../../components/bottom-nav";
 import {
     Image,
+    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -15,9 +16,8 @@ export default function Home() {
     const { colors, fontScale } = useTheme();
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
-        <View style={styles.cameraDot} />
-
+        <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={[styles.logo, { color: colors.text, fontSize: 20 * fontScale }]}>ONE{"\n"}LANGUAGE</Text>
 
         <View style={styles.header}>
@@ -25,7 +25,7 @@ export default function Home() {
         <Image
             source={require("../../assets/images/Logo.png")}
             style={styles.avatar}
-            resizeMode="cover"
+            resizeMode="contain"
             />
         </View>
 
@@ -42,7 +42,7 @@ export default function Home() {
             <Text style={[styles.buttonText, { color: colors.textOnSurface, fontSize: 25 * fontScale }]}>{t("home.start")}</Text>
         </TouchableOpacity>
         </View>
-
+        </ScrollView>
         <BottomNav active="home" />
     </SafeAreaView>
     );
@@ -52,20 +52,12 @@ const styles = StyleSheet.create({
 container: {
     flex: 1,
     backgroundColor: "#2F78CC",
+    },
+content: {
+    flexGrow: 1,
     paddingHorizontal: 22,
     paddingTop: 28,
-    },
-cameraDot: {
-    position: "absolute",
-    top: 12,
-    alignSelf: "center",
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: "#05050B",
-    borderWidth: 3,
-    borderColor: "#111827",
-    zIndex: 5,
+    paddingBottom: 118,
     },
 logo: {
     fontSize: 20,
@@ -91,10 +83,6 @@ greeting: {
 avatar: {
     width: 76,
     height: 58,
-    borderRadius: 28,
-    borderColor: "#090909",
-    borderWidth: 1,
-    backgroundColor: "#FFEB3B",
     },
 card: {
     width: "100%",

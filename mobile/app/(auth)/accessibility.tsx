@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AppAlert } from "../../components/app-alert";
 import { BottomNav } from "../../components/bottom-nav";
 import { useTheme } from "../../src/theme/ThemeContext";
@@ -100,8 +101,9 @@ export default function Accessibility() {
     };
 
     return (
-        <Pressable style={[styles.container, { backgroundColor: colors.background }]} onPress={() => setOpenDropdown(null)}>
-            <View style={styles.cameraDot} />
+        <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}>
+        <Pressable style={styles.pressable} onPress={() => setOpenDropdown(null)}>
+            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
             <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
             <Text style={[styles.title, { color: colors.text, fontSize: 30 * fontScale }]}>{t("accessibility.title")}</Text>
 
@@ -171,6 +173,7 @@ export default function Accessibility() {
                     <Text style={styles.saveButtonText}>{t("accessibility.save")}</Text>
                 </TouchableOpacity>
             </View>
+            </ScrollView>
 
             <BottomNav active="accessibility" />
 
@@ -184,26 +187,22 @@ export default function Accessibility() {
                 onAction={() => setShowSuccess(false)}
             />
         </Pressable>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    pressable: {
+        flex: 1,
+    },
+    content: {
+        flexGrow: 1,
         paddingHorizontal: 20,
         paddingTop: 20,
-    },
-    cameraDot: {
-        position: "absolute",
-        top: 10,
-        alignSelf: "center",
-        width: 22,
-        height: 22,
-        borderRadius: 11,
-        backgroundColor: "#05050B",
-        borderWidth: 3,
-        borderColor: "#111827",
-        zIndex: 5,
+        paddingBottom: 118,
     },
     logo: {
         fontSize: 20,

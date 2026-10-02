@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { BottomNav } from "../../components/bottom-nav";
 import {
     Image,
+    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -16,9 +17,8 @@ export default function Camera() {
     const { colors, fontScale } = useTheme();
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
-        <View style={styles.cameraDot} />
-
+        <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
         <Text style={[styles.logo, { color: colors.text, fontSize: 20 * fontScale }]}>ONE{"\n"}LANGUAGE</Text>
 
@@ -40,7 +40,7 @@ export default function Camera() {
     <TouchableOpacity activeOpacity={0.85} style={[styles.finishButton, { backgroundColor: colors.accent }]}> 
         <Text style={[styles.finishButtonText, { color: colors.textOnSurface, fontSize: 22 * fontScale }]}>{t("camera.finish")}</Text>
     </TouchableOpacity>
-
+    </ScrollView>
     <BottomNav active="camera" />
     </SafeAreaView>
     );
@@ -50,21 +50,13 @@ const styles = StyleSheet.create({
 container: {
     flex: 1,
     backgroundColor: "#2F78CC",
-    paddingHorizontal: 14,
-    paddingTop: 30,
-    alignItems: "center",
     },
-cameraDot: {
-    position: "absolute",
-    top: 12,
-    alignSelf: "center",
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: "#05050B",
-    borderWidth: 3,
-    borderColor: "#111827",
-    zIndex: 5,
+content: {
+    flexGrow: 1,
+    paddingHorizontal: 14,
+    paddingTop: 20,
+    paddingBottom: 118,
+    alignItems: "center",
     },
 header: {
     width: "100%",

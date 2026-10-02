@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../src/theme/ThemeContext";
 
 type BottomNavTab = "home" | "camera" | "history" | "accessibility" | "profile";
@@ -30,12 +31,23 @@ const tabs: {
 
 export function BottomNav({ active }: BottomNavProps) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { colors, theme } = useTheme();
 
   const isDark = theme === "dark";
+  const safeBottom = Math.max(insets.bottom, 8);
 
   return (
-    <View style={[styles.tabBar, { backgroundColor: isDark ? "#0f172a" : "#1D1B3D" }]}> 
+    <View
+      style={[
+        styles.tabBar,
+        {
+          backgroundColor: isDark ? "#0f172a" : "#1D1B3D",
+          height: 70 + safeBottom,
+          paddingBottom: safeBottom,
+        },
+      ]}
+    >
       {tabs.map((tab) => {
         const icon = <Ionicons name={tab.icon} size={tab.size} color={isDark ? colors.accent : "#FFEB3B"} />;
 
@@ -51,6 +63,7 @@ export function BottomNav({ active }: BottomNavProps) {
           <TouchableOpacity
             key={tab.name}
             activeOpacity={0.8}
+            style={styles.tabButton}
             onPress={() => router.push(tab.route)}
           >
             {icon}
@@ -75,6 +88,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  tabButton: {
+    width: 48,
+    height: 48,
+    alignItems: "center",
+    justifyContent: "center",
   },
   activeTab: {
     width: 58,
