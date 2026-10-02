@@ -8,7 +8,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { BottomNav } from "../../components/bottom-nav";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
@@ -43,6 +43,7 @@ function PermissionItem({ icon, title, description }: PermissionItemProps) {
 
 export default function UserProfile() {
     const router = useRouter();
+    const insets = useSafeAreaInsets();
     const { colors, fontScale } = useTheme();
     const { t } = useTranslation();
     const [user, setUser] = useState<any>(null);
@@ -64,9 +65,9 @@ export default function UserProfile() {
 }, []);
 
     return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
         <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: 105 + Math.max(insets.bottom, 8) }]}
         showsVerticalScrollIndicator={false}
     >
         <View style={styles.header}>
@@ -74,7 +75,7 @@ export default function UserProfile() {
         <Image
             source={require("../../assets/images/Logo.png")}
             style={styles.avatar}
-            resizeMode="cover"
+            resizeMode="contain"
         />
         </View>
 
@@ -164,10 +165,6 @@ logo: {
 avatar: {
     width: 76,
     height: 58,
-    borderRadius: 28,
-    borderColor: "#090909",
-    borderWidth: 1,
-    backgroundColor: "#FFEB3B",
     },
 title: {
     color: "#FFFFFF",

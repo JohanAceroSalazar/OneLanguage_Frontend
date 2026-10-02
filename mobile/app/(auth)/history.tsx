@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BottomNav } from "../../components/bottom-nav";
 import { useTheme } from "../../src/theme/ThemeContext";
@@ -10,9 +10,8 @@ export default function History() {
     const { colors, fontScale } = useTheme();
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
-        <View style={styles.cameraDot} />
-
+        <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={[styles.logo, { color: colors.text, fontSize: 20 * fontScale }]}>ONE{"\n"}LANGUAGE</Text>
 
     <View style={styles.headerText}>
@@ -30,7 +29,7 @@ export default function History() {
             traducciones.
         </Text>
     </View>
-
+        </ScrollView>
         <BottomNav active="history" />
     </SafeAreaView>
     );
@@ -40,20 +39,12 @@ const styles = StyleSheet.create({
 container: {
     flex: 1,
     backgroundColor: "#2F78CC",
-    paddingHorizontal: 22,
-    paddingTop: 30,
     },
-cameraDot: {
-    position: "absolute",
-    top: 10,
-    alignSelf: "center",
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: "#05050B",
-    borderWidth: 3,
-    borderColor: "#111827",
-    zIndex: 5,
+content: {
+    flexGrow: 1,
+    paddingHorizontal: 22,
+    paddingTop: 20,
+    paddingBottom: 118,
     },
 logo: {
     color: "#FFFFFF",
