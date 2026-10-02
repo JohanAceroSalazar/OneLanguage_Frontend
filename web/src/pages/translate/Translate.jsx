@@ -92,11 +92,18 @@ function Translate() {
         window.speechSynthesis.speak(utterance);
     }, [speechSupported, translation]);
 
+    const clearLivePrediction = useCallback(() => {
+        setTranslation("");
+        setConfidence(null);
+        confidenceRef.current = null;
+    }, []);
+
     const handleModelMessage = useCallback((event) => {
         let message;
         try {
             message = JSON.parse(event.data);
         } catch {
+            clearLivePrediction();
             setModelStatus("model_error");
             return;
         }
@@ -105,6 +112,7 @@ function Translate() {
             return;
         }
         if (message.type === "error") {
+            clearLivePrediction();
             setModelStatus("model_error");
             return;
         }
@@ -112,9 +120,7 @@ function Translate() {
 
         setModelStatus(message.status || "analyzing");
         if (message.status === "no_hands" || message.status === "idle") {
-            setTranslation("");
-            setConfidence(null);
-            confidenceRef.current = null;
+            clearLivePrediction();
             return;
         }
 
@@ -132,7 +138,7 @@ function Translate() {
         const assembledText = nextSession.join(" ");
         setTranslation(assembledText);
         if (automaticSpeech && speechSupported) speakTranslation(message.text);
-    }, [automaticSpeech, speakTranslation, speechSupported]);
+    }, [automaticSpeech, clearLivePrediction, speakTranslation, speechSupported]);
 
     const startCapture = useCallback(() => {
         stopCapture();
@@ -161,7 +167,10 @@ function Translate() {
         socketRef.current = socket;
         socket.addEventListener("message", handleModelMessage);
         socket.addEventListener("open", startCapture);
-        socket.addEventListener("error", () => setModelStatus("model_error"));
+        socket.addEventListener("error", () => {
+            clearLivePrediction();
+            setModelStatus("model_error");
+        });
         socket.addEventListener("close", () => {
             if (socketRef.current !== socket) return;
             socketRef.current = null;
@@ -173,7 +182,7 @@ function Translate() {
                 connectModelRef.current?.();
             }, 1000);
         });
-    }, [handleModelMessage, startCapture, stopCapture]);
+    }, [clearLivePrediction, handleModelMessage, startCapture, stopCapture]);
 
     useEffect(() => {
         connectModelRef.current = connectModel;
