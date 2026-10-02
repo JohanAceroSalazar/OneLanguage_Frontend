@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { BottomNav } from "../../components/bottom-nav";
 import {
     Image,
-    SafeAreaView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
 
