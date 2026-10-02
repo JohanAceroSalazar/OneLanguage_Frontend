@@ -40,17 +40,20 @@ export const syncAccessibilityAfterLogin = async () => {
 };
 
 export const forgotPassword = async (email) => {
-
     try {
         const response = await api.post("/auth/forgot-password", {
-        email,
-    });
+            email,
+        });
 
-    return response.data;
-        } catch (error) {
-            throw error.response?.data || {
-        message: "No se pudo enviar el enlace de recuperación.",
-        };
+        return response.data;
+    } catch (error) {
+        const responseData = error.response?.data;
+        const message =
+            responseData?.message ||
+            responseData?.detail ||
+            "No se pudo enviar el enlace de recuperación.";
+
+        throw new Error(message);
     }
 };
 
