@@ -1,20 +1,5 @@
-import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const API_PORT = "8084";
-const FALLBACK_API_HOST = "10.3.234.244";
-
-const getApiUrl = () => {
-    const hostUri =
-        Constants.expoConfig?.hostUri ||
-        Constants.manifest2?.extra?.expoClient?.hostUri;
-
-    const host = hostUri?.split(":")[0] || FALLBACK_API_HOST;
-
-    return `http://${host}:${API_PORT}`;
-};
-
-const API_URL = getApiUrl();
+import { API_BASE_URL } from "../config/network";
 
 export type AccessibilitySettings = {
     language: "es" | "en" | "pt" | "it";
@@ -61,7 +46,7 @@ export const registerUser = async (data: {
     email: string;
     password: string;
 }) => {
-    const response = await fetch(`${API_URL}/api/users`, {
+    const response = await fetch(`${API_BASE_URL}/api/users`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -81,7 +66,7 @@ export const registerUser = async (data: {
 };
 
 export const loginUser = async (data: { email: string; password: string }) => {
-    const response = await fetch(`${API_URL}/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -101,7 +86,7 @@ export const loginUser = async (data: { email: string; password: string }) => {
 
 const authenticatedRequest = async (path: string, options: RequestInit = {}) => {
     const token = await AsyncStorage.getItem("token");
-    return fetch(`${API_URL}${path}`, {
+    return fetch(`${API_BASE_URL}${path}`, {
         ...options,
         headers: {
             "Content-Type": "application/json",
@@ -127,7 +112,7 @@ export const updateAccessibilitySettings = async (settings: AccessibilitySetting
 };
 
 export const forgotPassword = async (email: string) => {
-    const response = await fetch(`${API_URL}/auth/forgot-password`, {
+    const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -148,7 +133,7 @@ export const resetPassword = async (
     newPassword: string,
     confirmPassword: string
 ) => {
-    const response = await fetch(`${API_URL}/auth/reset-password`, {
+    const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

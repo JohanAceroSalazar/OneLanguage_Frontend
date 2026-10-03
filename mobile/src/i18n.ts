@@ -67,6 +67,88 @@ for (const [language, labels] of Object.entries(accessibilityLabels)) {
   translation["accessibility.changesSavedTitle"] = labels.changesSavedTitle;
 }
 
+const aiIntegrationLabels = {
+  es: {
+    "camera.realtime": "Traducción en tiempo real", "camera.empty": "Aún no hay una seña reconocida",
+    "camera.activateHint": "Activa la cámara para interpretar señas", "camera.start": "Iniciar traducción",
+    "camera.finish": "Finalizar traducción", "camera.listen": "Escuchar traducción", "camera.save": "Guardar en historial",
+    "camera.saving": "Guardando...", "camera.discard": "Descartar", "camera.switch": "Cambiar cámara",
+    "camera.enableVoice": "Activar voz automática", "camera.disableVoice": "Desactivar voz automática",
+    "camera.confidence": "{{value}}% de confianza", "camera.status.inactive": "La cámara está apagada.",
+    "camera.status.permission_required": "Debes permitir el acceso a la cámara.", "camera.status.connecting": "Conectando con el modelo de IA...",
+    "camera.status.ready": "Modelo listo. Muestra una seña a la cámara.", "camera.status.analyzing": "Analizando el movimiento...",
+    "camera.status.waiting": "La seña aún no es suficientemente clara.", "camera.status.translated": "Seña reconocida.",
+    "camera.status.no_hands": "No se detectan manos en la cámara.", "camera.status.idle": "No se está realizando una seña.",
+    "camera.status.model_error": "No fue posible conectar con el modelo de IA.", "camera.status.camera_error": "No fue posible capturar la cámara.",
+    "camera.status.saved": "Traducción guardada en el historial.", "camera.status.save_error": "No fue posible guardar la traducción.",
+    "history.emptyText": "Finaliza una traducción y guárdala para verla aquí.", "history.loadError": "No fue posible cargar el historial.",
+    "history.deleteError": "No fue posible eliminar la traducción.", "history.delete": "Eliminar traducción",
+    "history.deleteAll": "Eliminar todo", "history.deleteAllConfirm": "¿Quieres eliminar todo el historial?",
+    "history.cancel": "Cancelar", "history.dateUnavailable": "Fecha no disponible", "history.count_one": "{{count}} traducción",
+    "history.count_other": "{{count}} traducciones",
+  },
+  en: {
+    "camera.realtime": "Real-time translation", "camera.empty": "No sign has been recognized yet",
+    "camera.activateHint": "Turn on the camera to interpret signs", "camera.start": "Start translation",
+    "camera.finish": "Finish translation", "camera.listen": "Listen to translation", "camera.save": "Save to history",
+    "camera.saving": "Saving...", "camera.discard": "Discard", "camera.switch": "Switch camera",
+    "camera.enableVoice": "Enable automatic voice", "camera.disableVoice": "Disable automatic voice",
+    "camera.confidence": "{{value}}% confidence", "camera.status.inactive": "The camera is off.",
+    "camera.status.permission_required": "Camera permission is required.", "camera.status.connecting": "Connecting to the AI model...",
+    "camera.status.ready": "Model ready. Show a sign to the camera.", "camera.status.analyzing": "Analyzing movement...",
+    "camera.status.waiting": "The sign is not clear enough yet.", "camera.status.translated": "Sign recognized.",
+    "camera.status.no_hands": "No hands detected by the camera.", "camera.status.idle": "No sign is being performed.",
+    "camera.status.model_error": "Could not connect to the AI model.", "camera.status.camera_error": "Could not capture the camera.",
+    "camera.status.saved": "Translation saved to history.", "camera.status.save_error": "Could not save the translation.",
+    "history.emptyText": "Finish and save a translation to see it here.", "history.loadError": "Could not load history.",
+    "history.deleteError": "Could not delete the translation.", "history.delete": "Delete translation",
+    "history.deleteAll": "Delete all", "history.deleteAllConfirm": "Do you want to delete all history?",
+    "history.cancel": "Cancel", "history.dateUnavailable": "Date unavailable", "history.count_one": "{{count}} translation",
+    "history.count_other": "{{count}} translations",
+  },
+  pt: {
+    "camera.realtime": "Tradução em tempo real", "camera.empty": "Ainda não há sinal reconhecido",
+    "camera.activateHint": "Ative a câmera para interpretar sinais", "camera.start": "Iniciar tradução",
+    "camera.finish": "Finalizar tradução", "camera.listen": "Ouvir tradução", "camera.save": "Salvar no histórico",
+    "camera.saving": "Salvando...", "camera.discard": "Descartar", "camera.switch": "Trocar câmera",
+    "camera.enableVoice": "Ativar voz automática", "camera.disableVoice": "Desativar voz automática",
+    "camera.confidence": "{{value}}% de confiança", "camera.status.inactive": "A câmera está desligada.",
+    "camera.status.permission_required": "É necessário permitir o acesso à câmera.", "camera.status.connecting": "Conectando ao modelo de IA...",
+    "camera.status.ready": "Modelo pronto. Mostre um sinal à câmera.", "camera.status.analyzing": "Analisando o movimento...",
+    "camera.status.waiting": "O sinal ainda não está claro.", "camera.status.translated": "Sinal reconhecido.",
+    "camera.status.no_hands": "Nenhuma mão detectada pela câmera.", "camera.status.idle": "Nenhum sinal está sendo feito.",
+    "camera.status.model_error": "Não foi possível conectar ao modelo de IA.", "camera.status.camera_error": "Não foi possível capturar a câmera.",
+    "camera.status.saved": "Tradução salva no histórico.", "camera.status.save_error": "Não foi possível salvar a tradução.",
+    "history.emptyText": "Finalize e salve uma tradução para vê-la aqui.", "history.loadError": "Não foi possível carregar o histórico.",
+    "history.deleteError": "Não foi possível excluir a tradução.", "history.delete": "Excluir tradução",
+    "history.deleteAll": "Excluir tudo", "history.deleteAllConfirm": "Deseja excluir todo o histórico?",
+    "history.cancel": "Cancelar", "history.dateUnavailable": "Data indisponível", "history.count_one": "{{count}} tradução",
+    "history.count_other": "{{count}} traduções",
+  },
+  it: {
+    "camera.realtime": "Traduzione in tempo reale", "camera.empty": "Nessun segno riconosciuto",
+    "camera.activateHint": "Attiva la fotocamera per interpretare i segni", "camera.start": "Avvia traduzione",
+    "camera.finish": "Termina traduzione", "camera.listen": "Ascolta traduzione", "camera.save": "Salva nella cronologia",
+    "camera.saving": "Salvataggio...", "camera.discard": "Scarta", "camera.switch": "Cambia fotocamera",
+    "camera.enableVoice": "Attiva voce automatica", "camera.disableVoice": "Disattiva voce automatica",
+    "camera.confidence": "{{value}}% di affidabilità", "camera.status.inactive": "La fotocamera è spenta.",
+    "camera.status.permission_required": "È necessario consentire l'accesso alla fotocamera.", "camera.status.connecting": "Connessione al modello IA...",
+    "camera.status.ready": "Modello pronto. Mostra un segno alla fotocamera.", "camera.status.analyzing": "Analisi del movimento...",
+    "camera.status.waiting": "Il segno non è ancora abbastanza chiaro.", "camera.status.translated": "Segno riconosciuto.",
+    "camera.status.no_hands": "Nessuna mano rilevata.", "camera.status.idle": "Non viene eseguito alcun segno.",
+    "camera.status.model_error": "Impossibile connettersi al modello IA.", "camera.status.camera_error": "Impossibile acquisire la fotocamera.",
+    "camera.status.saved": "Traduzione salvata nella cronologia.", "camera.status.save_error": "Impossibile salvare la traduzione.",
+    "history.emptyText": "Termina e salva una traduzione per vederla qui.", "history.loadError": "Impossibile caricare la cronologia.",
+    "history.deleteError": "Impossibile eliminare la traduzione.", "history.delete": "Elimina traduzione",
+    "history.deleteAll": "Elimina tutto", "history.deleteAllConfirm": "Vuoi eliminare tutta la cronologia?",
+    "history.cancel": "Annulla", "history.dateUnavailable": "Data non disponibile", "history.count_one": "{{count}} traduzione",
+    "history.count_other": "{{count}} traduzioni",
+  },
+};
+for (const [language, labels] of Object.entries(aiIntegrationLabels)) {
+  Object.assign((text as any)[language].translation, labels);
+}
+
 i18n.use(initReactI18next).init({ resources: text, lng: "es", fallbackLng: "es", interpolation: { escapeValue: false } });
 
 export async function loadLanguage() {

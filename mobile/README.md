@@ -2,18 +2,37 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
+## Integración con IA y backend
+
+La pantalla de cámara envía fotogramas al WebSocket del modelo de IA, recibe predicciones en tiempo real y permite guardar la traducción terminada en el backend.
+
+Antes de abrir la cámara deben estar activos:
+
+- Backend en el puerto `8084`.
+- Servicio WebSocket de IA en el puerto `8000` y ruta `/ws/recognize`.
+- El computador y el celular deben estar en la misma red durante las pruebas con Expo Go.
+
+Expo obtiene normalmente la IP del computador desde Metro. Si los servicios están en otra máquina, crea `.env.local` a partir de `.env.example` y configura:
+
+```env
+EXPO_PUBLIC_API_URL=http://192.168.1.100:8084
+EXPO_PUBLIC_AI_WS_URL=ws://192.168.1.100:8000/ws/recognize
+```
+
+Para una aplicación distribuida usa endpoints seguros `https://` y `wss://`.
+
 ## Get started
 
 1. Install dependencies
 
    ```bash
-   npm install
+   npm ci
    ```
 
 2. Start the app
 
    ```bash
-   npx expo start
+   npx expo start --clear
    ```
 
 In the output, you'll find options to open the app in a
