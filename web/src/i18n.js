@@ -62,6 +62,15 @@ const additionalUi = {
   }
 };
 for (const language of Object.keys(additionalUi)) Object.assign(resources[language].translation, additionalUi[language]);
+const frameProcessingLabels = {
+  es: "No se pudo procesar una imagen de la camara. Intentando de nuevo...",
+  en: "A camera image could not be processed. Retrying...",
+  pt: "Nao foi possivel processar uma imagem da camera. Tentando novamente...",
+  it: "Impossibile elaborare un'immagine della fotocamera. Nuovo tentativo...",
+};
+for (const [language, message] of Object.entries(frameProcessingLabels)) {
+  resources[language].translation["translate.status.processing_error"] = message;
+}
 const resetUi = {
   es: { "auth.invalidLink": "El enlace de recuperación no es válido o está incompleto.", "auth.resetError": "No se pudo restablecer la contraseña.", "auth.resetSuccess": "Contraseña restablecida correctamente. Te llevaremos al inicio de sesión." },
   en: { "auth.invalidLink": "The recovery link is invalid or incomplete.", "auth.resetError": "Could not reset the password.", "auth.resetSuccess": "Password reset successfully. We'll take you to login." },
@@ -69,6 +78,14 @@ const resetUi = {
   it: { "auth.invalidLink": "Il link di recupero non è valido o incompleto.", "auth.resetError": "Impossibile reimpostare la password.", "auth.resetSuccess": "Password reimpostata correttamente. Ti porteremo al login." }
 };
 for (const language of Object.keys(resetUi)) Object.assign(resources[language].translation, resetUi[language]);
+
+const cameraPermissionUi = {
+  es: { "cameraPermission.title": "Activar permiso de la cámara", "cameraPermission.message": "Para realizar la traducción de lengua de señas a texto en tiempo real, necesitamos acceder a la cámara de tu dispositivo.", "cameraPermission.privacy": "La cámara se utilizará únicamente para detectar movimientos y gestos de las manos, sin almacenar ni compartir imágenes o videos.", "cameraPermission.reject": "Rechazar", "cameraPermission.requesting": "Solicitando...", "cameraPermission.error": "No fue posible acceder a la cámara. Revisa el permiso del navegador e inténtalo de nuevo." },
+  en: { "cameraPermission.title": "Enable camera permission", "cameraPermission.message": "To translate sign language into text in real time, we need access to your device camera.", "cameraPermission.privacy": "The camera is used only to detect hand movements and gestures. Images and videos are not stored or shared.", "cameraPermission.reject": "Reject", "cameraPermission.requesting": "Requesting...", "cameraPermission.error": "We could not access the camera. Check the browser permission and try again." },
+  pt: { "cameraPermission.title": "Ativar permissão da câmera", "cameraPermission.message": "Para traduzir a língua de sinais em texto em tempo real, precisamos acessar a câmera do dispositivo.", "cameraPermission.privacy": "A câmera será usada apenas para detectar movimentos e gestos das mãos, sem armazenar ou compartilhar imagens ou vídeos.", "cameraPermission.reject": "Recusar", "cameraPermission.requesting": "Solicitando...", "cameraPermission.error": "Não foi possível acessar a câmera. Verifique a permissão do navegador e tente novamente." },
+  it: { "cameraPermission.title": "Attiva il permesso della fotocamera", "cameraPermission.message": "Per tradurre la lingua dei segni in testo in tempo reale, dobbiamo accedere alla fotocamera del dispositivo.", "cameraPermission.privacy": "La fotocamera viene usata solo per rilevare movimenti e gesti delle mani, senza salvare o condividere immagini o video.", "cameraPermission.reject": "Rifiuta", "cameraPermission.requesting": "Richiesta...", "cameraPermission.error": "Impossibile accedere alla fotocamera. Controlla il permesso del browser e riprova." }
+};
+for (const language of Object.keys(cameraPermissionUi)) Object.assign(resources[language].translation, cameraPermissionUi[language]);
 
 const saved = localStorage.getItem("language");
 const initial = languageOptions.some((option) => option.code === saved) ? saved : "es";

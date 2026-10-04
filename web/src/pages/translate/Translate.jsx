@@ -6,8 +6,10 @@ import { saveTranslation } from "../../services/translationService";
 import "./Translate.css";
 import { useTranslation } from "react-i18next";
 
-const FRAME_INTERVAL_MS = 40;
-const JPEG_QUALITY = 0.82;
+const FRAME_INTERVAL_MS = 100;
+const FRAME_TIMEOUT_MS = 10000;
+const FRAME_MAX_WIDTH = 1280;
+const JPEG_QUALITY = 0.68;
 const CAMERA_CONSTRAINTS = {
     audio: false,
     video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
@@ -44,6 +46,9 @@ function Translate() {
     const streamRef = useRef(null);
     const socketRef = useRef(null);
     const captureTimerRef = useRef(null);
+    const framePendingRef = useRef(false);
+    const encodingRef = useRef(false);
+    const frameSentAtRef = useRef(0);
     const reconnectTimerRef = useRef(null);
     const connectModelRef = useRef(null);
     const sessionTranslationsRef = useRef([]);
@@ -63,6 +68,8 @@ function Translate() {
             window.clearInterval(captureTimerRef.current);
             captureTimerRef.current = null;
         }
+        framePendingRef.current = false;
+        encodingRef.current = false;
     }, []);
 
     const stopCamera = useCallback((nextStatus = "inactive") => {
@@ -112,11 +119,13 @@ function Translate() {
             return;
         }
         if (message.type === "error") {
-            clearLivePrediction();
-            setModelStatus("model_error");
+            framePendingRef.current = false;
+            setModelStatus("processing_error");
             return;
         }
         if (message.type !== "prediction") return;
+
+        framePendingRef.current = false;
 
         setModelStatus(message.status || "analyzing");
         if (message.status === "no_hands" || message.status === "idle") {
@@ -148,14 +157,32 @@ function Translate() {
             const socket = socketRef.current;
             if (!video || !canvas || !socket || socket.readyState !== WebSocket.OPEN || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
             if (!video.videoWidth || !video.videoHeight) return;
+            if (framePendingRef.current) {
+                if (Date.now() - frameSentAtRef.current > FRAME_TIMEOUT_MS) socket.close();
+                return;
+            }
+            if (encodingRef.current) return;
 
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            const width = Math.min(video.videoWidth, FRAME_MAX_WIDTH);
+            const height = Math.round(width * video.videoHeight / video.videoWidth);
+            if (canvas.width !== width) canvas.width = width;
+            if (canvas.height !== height) canvas.height = height;
             const context = canvas.getContext("2d");
             if (!context) return;
-            context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+            encodingRef.current = true;
+            context.drawImage(video, 0, 0, width, height);
             canvas.toBlob((blob) => {
-                if (blob && socket.readyState === WebSocket.OPEN) socket.send(blob);
+                encodingRef.current = false;
+                if (blob && socketRef.current === socket && socket.readyState === WebSocket.OPEN && !framePendingRef.current) {
+                    framePendingRef.current = true;
+                    frameSentAtRef.current = Date.now();
+                    try {
+                        socket.send(blob);
+                    } catch {
+                        framePendingRef.current = false;
+                        socket.close();
+                    }
+                }
             }, "image/jpeg", JPEG_QUALITY);
         }, FRAME_INTERVAL_MS);
     }, [stopCapture]);

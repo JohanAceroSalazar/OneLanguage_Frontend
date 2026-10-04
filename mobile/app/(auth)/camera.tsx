@@ -19,12 +19,13 @@ import { saveTranslation } from "../../src/services/translationService";
 
 // Expo Go obtains frames by taking pictures. A modest cadence prevents Android's
 // shutter animation and gives MediaPipe a sharp, correctly oriented frame.
-const FRAME_INTERVAL_MS = 220;
-const FRAME_JPEG_QUALITY = 0.5;
+const FRAME_INTERVAL_MS = 100;
+const FRAME_JPEG_QUALITY = 0.65;
+const FRAME_TIMEOUT_MS = 10000;
 
 type ModelStatus = "inactive" | "permission_required" | "connecting" | "ready" |
     "analyzing" | "waiting" | "translated" | "no_hands" | "idle" |
-    "model_error" | "camera_error" | "saved" | "save_error";
+    "model_error" | "processing_error" | "camera_error" | "saved" | "save_error";
 
 type PredictionMessage = {
     type: "ready" | "prediction" | "error";
@@ -48,6 +49,7 @@ export default function Camera() {
     const [facing, setFacing] = useState<CameraType>("front");
     const [cameraActive, setCameraActive] = useState(false);
     const [cameraReady, setCameraReady] = useState(false);
+    const [pictureSize, setPictureSize] = useState<string>();
     const [automaticSpeech, setAutomaticSpeech] = useState(true);
     const [modelStatus, setModelStatus] = useState<ModelStatus>("inactive");
     const [translation, setTranslation] = useState("");
@@ -63,6 +65,8 @@ export default function Camera() {
     const activeRef = useRef(false);
     const readyRef = useRef(false);
     const captureBusyRef = useRef(false);
+    const framePendingRef = useRef(false);
+    const frameSentAtRef = useRef(0);
     const sessionRef = useRef<string[]>([]);
     const confidenceRef = useRef<number | null>(null);
     const speechRef = useRef(true);
@@ -72,6 +76,7 @@ export default function Camera() {
         if (captureTimerRef.current) clearTimeout(captureTimerRef.current);
         captureTimerRef.current = null;
         captureBusyRef.current = false;
+        framePendingRef.current = false;
     }, []);
 
     const clearLivePrediction = useCallback(() => {
@@ -90,6 +95,11 @@ export default function Camera() {
                 return;
             }
             if (captureBusyRef.current) return;
+            if (framePendingRef.current) {
+                if (Date.now() - frameSentAtRef.current > FRAME_TIMEOUT_MS) socket.close();
+                if (activeRef.current) captureTimerRef.current = setTimeout(capture, FRAME_INTERVAL_MS);
+                return;
+            }
             captureBusyRef.current = true;
             try {
                 const picture = await cameraRef.current.takePictureAsync({
@@ -101,9 +111,12 @@ export default function Camera() {
                     shutterSound: false,
                 });
                 if (picture?.base64 && socket.readyState === WebSocket.OPEN) {
+                    framePendingRef.current = true;
+                    frameSentAtRef.current = Date.now();
                     socket.send(decodeBase64(picture.base64));
                 }
             } catch {
+                framePendingRef.current = false;
                 if (activeRef.current) setModelStatus("camera_error");
             } finally {
                 captureBusyRef.current = false;
@@ -127,11 +140,13 @@ export default function Camera() {
             return;
         }
         if (message.type === "error") {
-            clearLivePrediction();
-            setModelStatus("model_error");
+            framePendingRef.current = false;
+            setModelStatus("processing_error");
             return;
         }
         if (message.type !== "prediction") return;
+
+        framePendingRef.current = false;
 
         const status = message.status || "analyzing";
         setModelStatus(status);
@@ -270,6 +285,7 @@ export default function Camera() {
             <TouchableOpacity activeOpacity={0.8} disabled={!cameraActive} style={[styles.iconButton, !cameraActive && styles.disabled]} onPress={() => {
                 readyRef.current = false;
                 setCameraReady(false);
+                setPictureSize(undefined);
                 setFacing((current) => current === "front" ? "back" : "front");
             }}>
                 <Ionicons name="camera-reverse-outline" size={28} color={colors.accent} />
@@ -278,7 +294,21 @@ export default function Camera() {
     </View>
 
     <View style={[styles.cameraFrame, { borderColor: colors.border }]}>
-        {cameraActive ? <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing={facing} animateShutter={false} onCameraReady={() => {
+        {cameraActive ? <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing={facing} pictureSize={pictureSize} animateShutter={false} onCameraReady={async () => {
+            if (!pictureSize) {
+                try {
+                    const sizes = await cameraRef.current?.getAvailablePictureSizesAsync();
+                    const supported = sizes?.map((size) => {
+                        const [width, height] = size.split("x").map(Number);
+                        return { size, width, height };
+                    }).filter(({ width, height }) =>
+                        Math.min(width, height) >= 720 && Math.abs(Math.max(width, height) / Math.min(width, height) - 4 / 3) < 0.1
+                    ).sort((a, b) => a.width * a.height - b.width * b.height);
+                    if (supported?.length && activeRef.current) setPictureSize(supported[0].size);
+                } catch {
+                    // Devices without a compatible camera size use the default resolution.
+                }
+            }
             readyRef.current = true;
             setCameraReady(true);
         }} onMountError={() => stopCamera("camera_error")} /> : <View style={styles.cameraPlaceholder}>
@@ -349,7 +379,7 @@ const styles = StyleSheet.create({
     cameraFrame: {
         // Phone cameras produce a portrait preview. Matching that geometry
         // removes the black side bars instead of stretching the image.
-        width: "72%",
+        width: "94%",
         aspectRatio: 3 / 4,
         alignSelf: "center",
         marginTop: 18,
