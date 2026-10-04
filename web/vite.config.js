@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
             proxy: {
                 "/api": { target: "http://127.0.0.1:8084", changeOrigin: true },
                 "/auth": { target: "http://127.0.0.1:8084", changeOrigin: true },
-                "/ws/recognize": { target: "ws://127.0.0.1:8000", changeOrigin: true, ws: true },
+                "/ws/recognize": { target: "ws://127.0.0.1:8001", changeOrigin: true, ws: true },
             },
         },
     };

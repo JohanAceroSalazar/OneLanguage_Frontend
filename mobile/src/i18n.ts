@@ -148,6 +148,25 @@ const aiIntegrationLabels = {
 for (const [language, labels] of Object.entries(aiIntegrationLabels)) {
   Object.assign((text as any)[language].translation, labels);
 }
+const frameProcessingLabels = {
+  es: "No se pudo procesar una imagen de la camara. Intentando de nuevo...",
+  en: "A camera image could not be processed. Retrying...",
+  pt: "Nao foi possivel processar uma imagem da camera. Tentando novamente...",
+  it: "Impossibile elaborare un'immagine della fotocamera. Nuovo tentativo...",
+};
+for (const [language, message] of Object.entries(frameProcessingLabels)) {
+  (text as any)[language].translation["camera.status.processing_error"] = message;
+}
+
+const cameraPermissionUi = {
+  es: { "cameraPermission.title": "Activar permiso de la cámara", "cameraPermission.message": "Para realizar la traducción de lengua de señas a texto en tiempo real, necesitamos acceder a la cámara de tu dispositivo.", "cameraPermission.privacy": "La cámara se utilizará únicamente para detectar movimientos y gestos de las manos, sin almacenar ni compartir imágenes o videos.", "cameraPermission.reject": "Rechazar", "cameraPermission.requesting": "Solicitando...", "cameraPermission.error": "No fue posible acceder a la cámara. Revisa el permiso del dispositivo e inténtalo de nuevo." },
+  en: { "cameraPermission.title": "Enable camera permission", "cameraPermission.message": "To translate sign language into text in real time, we need access to your device camera.", "cameraPermission.privacy": "The camera is used only to detect hand movements and gestures. Images and videos are not stored or shared.", "cameraPermission.reject": "Reject", "cameraPermission.requesting": "Requesting...", "cameraPermission.error": "We could not access the camera. Check the device permission and try again." },
+  pt: { "cameraPermission.title": "Ativar permissão da câmera", "cameraPermission.message": "Para traduzir a língua de sinais em texto em tempo real, precisamos acessar a câmera do dispositivo.", "cameraPermission.privacy": "A câmera será usada apenas para detectar movimentos e gestos das mãos, sem armazenar ou compartilhar imagens ou vídeos.", "cameraPermission.reject": "Recusar", "cameraPermission.requesting": "Solicitando...", "cameraPermission.error": "Não foi possível acessar a câmera. Verifique a permissão do dispositivo e tente novamente." },
+  it: { "cameraPermission.title": "Attiva il permesso della fotocamera", "cameraPermission.message": "Per tradurre la lingua dei segni in testo in tempo reale, dobbiamo accedere alla fotocamera del dispositivo.", "cameraPermission.privacy": "La fotocamera viene usata solo per rilevare movimenti e gesti delle mani, senza salvare o condividere immagini o video.", "cameraPermission.reject": "Rifiuta", "cameraPermission.requesting": "Richiesta...", "cameraPermission.error": "Impossibile accedere alla fotocamera. Controlla il permesso del dispositivo e riprova." }
+};
+for (const [language, labels] of Object.entries(cameraPermissionUi)) {
+  Object.assign((text as any)[language].translation, labels);
+}
 
 i18n.use(initReactI18next).init({ resources: text, lng: "es", fallbackLng: "es", interpolation: { escapeValue: false } });
 

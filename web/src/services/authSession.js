@@ -6,7 +6,12 @@ function getTokenExpiration(token) {
         const payload = token.split(".")[1];
         if (!payload) return null;
 
-        const decodedPayload = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+        const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
+        const paddedPayload = normalizedPayload.padEnd(
+            Math.ceil(normalizedPayload.length / 4) * 4,
+            "="
+        );
+        const decodedPayload = atob(paddedPayload);
         return JSON.parse(decodedPayload).exp;
     } catch {
         return null;
