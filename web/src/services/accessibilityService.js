@@ -1,21 +1,14 @@
 import api from "./api";
-import i18n, { languageOptions } from "../i18n";
-
-export const DEFAULT_ACCESSIBILITY_SETTINGS = {
-    language: "es",
-    textSize: "medium",
-    theme: "light",
-};
+import i18n from "../i18n";
+import {
+    DEFAULT_ACCESSIBILITY_SETTINGS,
+    normalizeStoredAccessibility,
+    persistStoredAccessibility,
+    readStoredAccessibility,
+} from "./accessibilityStorage";
 
 export function normalizeAccessibilitySettings(settings = {}) {
-    return {
-        language: languageOptions.some(({ code }) => code === settings.language)
-            ? settings.language : DEFAULT_ACCESSIBILITY_SETTINGS.language,
-        textSize: ["small", "medium", "large"].includes(settings.textSize)
-            ? settings.textSize : DEFAULT_ACCESSIBILITY_SETTINGS.textSize,
-        theme: ["light", "dark"].includes(settings.theme)
-            ? settings.theme : DEFAULT_ACCESSIBILITY_SETTINGS.theme,
-    };
+    return normalizeStoredAccessibility(settings);
 }
 
 export async function getAccessibilitySettings() {
@@ -30,9 +23,7 @@ export async function updateAccessibilitySettings(settings) {
 
 export function applyAccessibilitySettings(settings) {
     const normalized = normalizeAccessibilitySettings(settings);
-    localStorage.setItem("language", normalized.language);
-    localStorage.setItem("fontSize", normalized.textSize);
-    localStorage.setItem("theme", normalized.theme);
+    persistStoredAccessibility(normalized);
     i18n.changeLanguage(normalized.language);
     document.documentElement.dataset.theme = normalized.theme;
     document.documentElement.style.colorScheme = normalized.theme;
@@ -40,3 +31,5 @@ export function applyAccessibilitySettings(settings) {
     document.documentElement.dataset.textSize = normalized.textSize;
     return normalized;
 }
+
+export { DEFAULT_ACCESSIBILITY_SETTINGS, readStoredAccessibility };

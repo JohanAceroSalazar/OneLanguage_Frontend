@@ -7,7 +7,7 @@ import { BottomNav } from "../../components/bottom-nav";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
 import i18n, { languageOptions, setLanguage } from "../../src/i18n";
-import { updateAccessibilitySettings } from "../../src/services/authService";
+import { persistLocalAccessibilitySettings, updateAccessibilitySettings } from "../../src/services/authService";
 
 type DropdownOption = {
     label: string;
@@ -60,6 +60,7 @@ export default function Accessibility() {
     const { colors, theme, fontScale, fontSizeMode, setThemeMode, setFontSizeMode } = useTheme();
     const [draftFontSize, setDraftFontSize] = useState(fontSizeMode);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [showError, setShowError] = useState(false);
     const [openDropdown, setOpenDropdown] = useState<"font" | "theme" | "language" | null>(null);
     const { t, i18n: translationI18n } = useTranslation();
     const selectedLanguage = (translationI18n.resolvedLanguage || translationI18n.language || "es").split("-")[0];
@@ -88,6 +89,8 @@ export default function Accessibility() {
     const handleSave = async () => {
         setThemeMode(theme);
         setFontSizeMode(draftFontSize);
+        setShowSuccess(false);
+        setShowError(false);
         try {
             await updateAccessibilitySettings({
                 language: i18n.language as "es" | "en" | "pt" | "it",
@@ -95,8 +98,19 @@ export default function Accessibility() {
                 theme,
             });
         } catch {
-            // Se conserva el cambio local aunque el backend esté temporalmente fuera de servicio.
+            await persistLocalAccessibilitySettings({
+                language: translationI18n.language as "es" | "en" | "pt" | "it",
+                textSize: draftFontSize,
+                theme,
+            });
+            setShowError(true);
+            return;
         }
+        await persistLocalAccessibilitySettings({
+            language: translationI18n.language as "es" | "en" | "pt" | "it",
+            textSize: draftFontSize,
+            theme,
+        });
         setShowSuccess(true);
     };
 
@@ -114,7 +128,9 @@ export default function Accessibility() {
                     options={fontOptions}
                     selectedValue={selectedFontLabel}
                     onSelect={(value) => {
-                        setDraftFontSize(value as typeof draftFontSize);
+                        const nextFontSize = value as typeof draftFontSize;
+                        setDraftFontSize(nextFontSize);
+                        setFontSizeMode(nextFontSize);
                         setOpenDropdown(null);
                     }}
                     accentColor={colors.accent}
@@ -156,6 +172,7 @@ export default function Accessibility() {
                     selectedValue={selectedLanguageLabel}
                     onSelect={(value) => {
                         void setLanguage(value);
+                        void persistLocalAccessibilitySettings({ language: value as "es" | "en" | "pt" | "it" });
                         setOpenDropdown(null);
                     }}
                     accentColor={colors.accent}
@@ -185,6 +202,15 @@ export default function Accessibility() {
                 actionText={t("common.ok")}
                 variant="success"
                 onAction={() => setShowSuccess(false)}
+            />
+            <AppAlert
+                visible={showError}
+                label={t("common.ok")}
+                title={t("accessibility.changesSavedTitle")}
+                message={t("accessibility.saveError")}
+                actionText={t("common.ok")}
+                variant="error"
+                onAction={() => setShowError(false)}
             />
         </Pressable>
         </SafeAreaView>

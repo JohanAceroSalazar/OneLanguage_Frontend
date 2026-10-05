@@ -26,6 +26,7 @@ function Accessibility() {
     const [showLangMenu, setShowLangMenu] = useState(false);
     const [showThemeMenu, setShowThemeMenu] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [saveError, setSaveError] = useState(false);
     const controlsRef = useRef(null);
     const { t } = useTranslation();
 
@@ -54,6 +55,8 @@ function Accessibility() {
     }, []);
 
     const handleSave = async () => {
+        setShowSuccess(false);
+        setSaveError(false);
         setSavedTheme(selectedTheme);
         setSavedLanguage(selectedLanguage);
 
@@ -75,8 +78,9 @@ function Accessibility() {
                 theme: selectedTheme,
             });
         } catch (error) {
-            // La interfaz y la persistencia local siguen funcionando aunque el backend no responda.
             console.error("No se pudieron sincronizar las preferencias de accesibilidad", error);
+            setSaveError(true);
+            return;
         }
 
         document.documentElement.dataset.theme = selectedTheme;
@@ -144,7 +148,7 @@ function Accessibility() {
                     </div>
                     <div className="access-control">
                         <button type="button" className="access-btn" onClick={() => openMenu(showThemeMenu ? null : "theme")}>
-                            Ajustar
+                            {t("accessibility.adjust")}
                         </button>
                         {showThemeMenu && (
                             <div className="access-theme-picker">
@@ -166,7 +170,9 @@ function Accessibility() {
                                     </button>
                                 </div>
                                 <p className="theme-hint">
-                                    Vista previa en {selectedTheme === "dark" ? "oscuro" : "claro"}. Guarda los cambios para conservarla.
+                            {t("accessibility.preview", {
+                                theme: t(selectedTheme === "dark" ? "accessibility.dark" : "accessibility.light").toLowerCase(),
+                            })}
                                 </p>
                             </div>
                         )}
@@ -191,7 +197,10 @@ function Accessibility() {
                                         key={code}
                                         type="button"
                                         className={selectedLanguage === code ? "selected" : ""}
-                                        onClick={() => setSelectedLanguage(code)}
+                                        onClick={() => {
+                                            setSelectedLanguage(code);
+                                            i18n.changeLanguage(code);
+                                        }}
                                     >
                                         <span>{label}</span>
                                         {selectedLanguage === code && <FaCheck size={12} />}
@@ -214,6 +223,17 @@ function Accessibility() {
                     <div className="access-modal-box">
                         <p className="access-modal-text">{t("misc.accessibilitySaved")}</p>
                         <button type="button" className="access-modal-btn" onClick={() => setShowSuccess(false)}>
+                            {t("common.ok")}
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {saveError && (
+                <div className="modal-overlay">
+                    <div className="access-modal-box">
+                        <p className="access-modal-text">{t("misc.accessibilitySaveError")}</p>
+                        <button type="button" className="access-modal-btn" onClick={() => setSaveError(false)}>
                             {t("common.ok")}
                         </button>
                     </div>

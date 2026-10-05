@@ -1,5 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { getLocalAccessibilitySettings, persistLocalAccessibilitySettings } from "../services/authService";
 
 type ThemeMode = "light" | "dark";
 type FontSizeMode = "small" | "medium" | "large";
@@ -68,21 +68,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    Promise.all([AsyncStorage.getItem("theme"), AsyncStorage.getItem("fontSize")]).then(([storedTheme, storedFontSize]) => {
-      if (storedTheme === "light" || storedTheme === "dark") setTheme(storedTheme);
-      if (storedFontSize === "small" || storedFontSize === "medium" || storedFontSize === "large") {
-        setFontSizeModeState(storedFontSize);
-      }
+    getLocalAccessibilitySettings().then((settings) => {
+      setTheme(settings.theme);
+      setFontSizeModeState(settings.textSize);
       setLoaded(true);
     });
   }, []);
 
   useEffect(() => {
-    if (loaded) AsyncStorage.setItem("theme", theme);
+    if (loaded) void persistLocalAccessibilitySettings({ theme });
   }, [loaded, theme]);
 
   useEffect(() => {
-    if (loaded) AsyncStorage.setItem("fontSize", fontSizeMode);
+    if (loaded) void persistLocalAccessibilitySettings({ textSize: fontSizeMode });
   }, [fontSizeMode, loaded]);
 
   const value = useMemo(() => ({

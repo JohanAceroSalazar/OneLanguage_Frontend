@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 import { AppAlert } from "../../components/app-alert";
-import { getAccessibilitySettings, loginUser } from "../../src/services/authService";
+import { getAccessibilitySettings, getLocalAccessibilitySettings, loginUser } from "../../src/services/authService";
 import { setLanguage } from "../../src/i18n";
 import { useTheme } from "../../src/theme/ThemeContext";
 
@@ -95,6 +95,10 @@ export default function Login() {
         setThemeMode(settings.theme);
         setFontSizeMode(settings.textSize);
       } catch {
+        const localSettings = await getLocalAccessibilitySettings();
+        await setLanguage(localSettings.language);
+        setThemeMode(localSettings.theme);
+        setFontSizeMode(localSettings.textSize);
         // El inicio de sesión no depende de que el backend de preferencias esté disponible.
       }
 

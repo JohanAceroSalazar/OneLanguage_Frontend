@@ -44,13 +44,9 @@ function Home() {
             {/* TARJETA */}
             <div className="home-card">
                 <h1>{t("home.title")}</h1>
-                <p>
-                    One Language es una aplicación diseñada para traducir el lenguaje
-                    de señas colombiano a texto y audio en tiempo real, promoviendo
-                    la inclusión y la comunicación sin barreras en Colombia.
-                </p>
+                <p>{t("home.description")}</p>
                 <button className="home-btn" onClick={() => setPermissionDialogOpen(true)}>
-                    Comenzar a traducir
+                    {t("home.start")}
                 </button>
             </div>
 

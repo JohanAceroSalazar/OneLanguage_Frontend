@@ -1,3 +1,5 @@
+import { resetActiveViewToAnonymous } from "./accessibilityStorage";
+
 const TOKEN_KEY = "token";
 const USER_KEY = "user";
 
@@ -21,6 +23,7 @@ function getTokenExpiration(token) {
 export function clearAuthSession() {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    resetActiveViewToAnonymous();
 }
 
 export function getValidToken() {
