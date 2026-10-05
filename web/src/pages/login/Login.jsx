@@ -138,11 +138,11 @@ function Login() {
         },
     });
 
-        } catch {
+        } catch (error) {
 
         openModal({
             title: t("auth.loginError"),
-            message: t("auth.credentialsError"),
+            message: error?.message || t("auth.credentialsError"),
             tone: "error",
             confirmText: t("common.ok"),
         onConfirm: closeModal,
@@ -212,7 +212,7 @@ function Login() {
                     <Button text={t("auth.login")} className="auth-submit-button" />
                 </form>
 
-                <p className="recover-text" onClick={() => navigate("/forgotPassword")}>
+                <p className="recover-text" onClick={() => navigate("/forgotpassword")}>
                     {t("auth.reset")}
                 </p>
                 <p className="register-text">

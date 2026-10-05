@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
@@ -6,6 +6,9 @@ import { FaCamera, FaMusic, FaFolder, FaUser } from "react-icons/fa";
 import BrandLogo from "../../components/BrandLogo/BrandLogo";
 import NavBar from "../../components/NavBar/NavBar";
 import { clearAuthSession } from "../../services/authSession";
+import { getCurrentUser } from "../../services/authService";
+import i18n from "../../i18n";
+import { readStoredAccessibility } from "../../services/accessibilityStorage";
 
 function Profile() {
     const { t } = useTranslation();
@@ -13,13 +16,35 @@ function Profile() {
 
     const [view, setView] = useState("profile"); // profile | password | camera | audio | files
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [user, setUser] = useState(null);
+    const [profileError, setProfileError] = useState("");
+
+    useEffect(() => {
+        let active = true;
+
+        getCurrentUser()
+            .then((currentUser) => {
+                if (!active) return;
+                setUser(currentUser);
+                localStorage.setItem("user", JSON.stringify(currentUser));
+            })
+            .catch(() => {
+                if (active) {
+                    setUser(null);
+                    setProfileError(t("profile.loadError", "No se pudo cargar el perfil."));
+                }
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [t]);
 
     const handleLogout = () => {
         clearAuthSession();
+        i18n.changeLanguage(readStoredAccessibility().language);
         navigate("/login", { replace: true });
     };
-
-    const storedUser = JSON.parse(localStorage.getItem("user") || "null");
 
     // VISTA CÁMARA
     if (view === "camera") {
@@ -85,6 +110,8 @@ function Profile() {
 
             <div className="profile-card">
 
+                {profileError && <p role="alert">{profileError}</p>}
+
                 {/* INFO PERSONAL */}
                 <div className="profile-section">
                     <div className="profile-avatar-col">
@@ -96,9 +123,9 @@ function Profile() {
                         <p className="section-title">{t("profile.personal")}</p>
                         <p className="section-subtitle">{t("profile.personalText")}</p>
                         <label className="field-label">{t("common.fullName")}</label>
-                        <p className="profile-value">{storedUser?.fullName || t("common.noAvailable")}</p>
+                         <p className="profile-value">{user?.fullName || t("common.noAvailable")}</p>
                         <label className="field-label">{t("common.email")}</label>
-                        <p className="profile-value">{storedUser?.email || t("common.noAvailable")}</p>
+                         <p className="profile-value">{user?.email || t("common.noAvailable")}</p>
                     </div>
                 </div>
 

@@ -1,5 +1,6 @@
 import api from "./api";
 import { applyAccessibilitySettings, getAccessibilitySettings } from "./accessibilityService";
+import { readStoredAccessibility } from "./accessibilityStorage";
 
 export const registerUser = async (data) => {
     try {
@@ -29,12 +30,18 @@ export const loginUser = async (data) => {
     }
 };
 
+export const getCurrentUser = async () => {
+    const response = await api.get("/api/users/me");
+    return response.data;
+};
+
 export const syncAccessibilityAfterLogin = async () => {
     try {
         const settings = await getAccessibilitySettings();
         applyAccessibilitySettings(settings);
         return settings;
     } catch {
+        applyAccessibilitySettings(readStoredAccessibility());
         return null;
     }
 };

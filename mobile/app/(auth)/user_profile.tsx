@@ -13,7 +13,8 @@ import { BottomNav } from "../../components/bottom-nav";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { clearAuthSession, getCurrentUser, getLocalAccessibilitySettings } from "../../src/services/authService";
+import { setLanguage } from "../../src/i18n";
 
 type PermissionItemProps = {
     icon: keyof typeof Ionicons.glyphMap;
@@ -44,25 +45,34 @@ function PermissionItem({ icon, title, description }: PermissionItemProps) {
 export default function UserProfile() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const { colors, fontScale } = useTheme();
+    const { colors, fontScale, setThemeMode, setFontSizeMode } = useTheme();
     const { t } = useTranslation();
     const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
     const loadUser = async () => {
         try {
-            const storedUser = await AsyncStorage.getItem("user");
-
-            if (storedUser) {
-                setUser(JSON.parse(storedUser));
+            setUser(await getCurrentUser());
+        } catch (error: any) {
+            setUser(null);
+            if (error?.status === 401) {
+                router.replace("/(auth)/login");
             }
-        } catch (error) {
             console.error("Error al cargar los datos del usuario:", error);
         }
     };
 
     loadUser();
-}, []);
+}, [router]);
+
+    const handleLogout = async () => {
+        await clearAuthSession();
+        const anonymousSettings = await getLocalAccessibilitySettings();
+        await setLanguage(anonymousSettings.language);
+        setThemeMode(anonymousSettings.theme);
+        setFontSizeMode(anonymousSettings.textSize);
+        router.replace("/(auth)/login");
+    };
 
     return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
@@ -88,47 +98,47 @@ export default function UserProfile() {
             <View>
                 <Text style={[styles.sectionTitle, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>{t("profile.personal")}</Text>
                 <Text style={[styles.sectionSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}> 
-                Visualiza tus datos personales
+                {t("profile.personalText")}
             </Text>
             </View>
         </View>
 
         <Text style={[styles.label, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>{t("common.fullName")}</Text>
         <Text style={[styles.readonlyValue, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: colors.border }]}>
-            {user?.fullName || "No disponible"}
+            {user?.fullName || t("common.noAvailable")}
         </Text>
 
         <Text style={[styles.label, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>{t("common.email")}</Text>
         <Text style={[styles.readonlyValue, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: colors.border }]}>
-            {user?.email || "No disponible"}
+            {user?.email || t("common.noAvailable")}
         </Text>
 
         <Text style={[styles.permissionsTitle, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>{t("profile.permissions")}</Text>
         <Text style={[styles.permissionsSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}> 
-            Gestiona los permisos de acceso a{"\n"}funciones del dispositivo
+            {t("profile.permissionsText")}
         </Text>
 
         <PermissionItem
             icon="camera-outline"
             title={t("common.camera")}
-            description={"Necesaria para\nreconocimiento de señas"}
+            description={t("profile.cameraText")}
         />
         <PermissionItem
             icon="musical-notes"
             title={t("common.audio")}
-            description={"Para funciones de\nconvertir y escuchar el\naudio"}
+            description={t("profile.audioText")}
         />
         <PermissionItem
             icon="folder"
             title={t("common.files")}
-            description="Acceso para los archivos"
+            description={t("profile.filesText")}
         />
         </View>
 
         <TouchableOpacity
             activeOpacity={0.85}
             style={styles.logoutButton}
-            onPress={() => router.push("/(auth)/login")}
+            onPress={handleLogout}
         >
             <Text style={[styles.logoutText, { color: "#FFFFFF", fontSize: 20 * fontScale }]}>{t("common.logout")}</Text>
         </TouchableOpacity>

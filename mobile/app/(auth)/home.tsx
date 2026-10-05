@@ -57,9 +57,7 @@ export default function Home() {
             <Text style={[styles.cardTitle, { color: colors.textOnSurface, fontSize: 30 * fontScale }]}>{t("home.title")}</Text>
 
         <Text style={[styles.description, { color: colors.textOnSurface, fontSize: 19 * fontScale }]}> 
-            One Language es una aplicación diseñada para traducir el lenguaje de
-            señas colombiano a texto y audio en tiempo real, promoviendo la
-            inclusión y la comunicación sin barreras en Colombia.
+            {t("home.description")}
         </Text>
 
         <TouchableOpacity activeOpacity={0.85} onPress={() => setPermissionDialogVisible(true)} style={[styles.button, { backgroundColor: colors.accent }]}>
