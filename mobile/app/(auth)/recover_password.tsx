@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { forgotPassword } from "../../src/services/authService";
+import { BrandWordmark } from "../../components/brand-wordmark";
 import { useTheme } from "../../src/theme/ThemeContext";
 
 const emailRegex = /\S+@\S+\.\S+/;
@@ -52,7 +53,12 @@ export default function RecoverPassword() {
       await forgotPassword(email.trim());
       setSuccess(t("auth.recoverSuccess"));
     } catch (err: any) {
-      setError(err?.message || t("auth.recoverError"));
+      const message = String(err?.message || "");
+      setError(
+        /no existe un usuario|no account|not found/i.test(message)
+          ? t("auth.recoverNotFound")
+          : t("auth.recoverError")
+      );
     } finally {
       setLoading(false);
     }
@@ -69,19 +75,19 @@ export default function RecoverPassword() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topBar}>
-          <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
+          <BrandWordmark color={colors.text} style={styles.logo} />
         </View>
 
         <View style={styles.content}>
+          <Text style={[styles.title, { color: colors.text, fontSize: 31 * fontScale }]}>
+            {t("auth.recoverTitle")}
+          </Text>
+
           <Image
             source={require("../../assets/images/Logo.png")}
             style={styles.logoImg}
             resizeMode="contain"
           />
-
-          <Text style={[styles.title, { color: colors.text, fontSize: 31 * fontScale }]}>
-            {t("auth.recoverTitle")}
-          </Text>
 
           <Text style={[styles.subtitle, { color: colors.text }]}>
             {t("auth.recoverHint")}
@@ -158,9 +164,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   logo: {
-    fontWeight: "bold",
-    fontSize: 20,
-    lineHeight: 22,
   },
   content: {
     width: "100%",

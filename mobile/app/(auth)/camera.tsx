@@ -3,12 +3,17 @@ import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import * as Speech from "expo-speech";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BottomNav } from "../../components/bottom-nav";
+import { BrandWordmark } from "../../components/brand-wordmark";
+import { useMainPager } from "../../components/main-pager-context";
+import { SwipeNavigation } from "../../components/swipe-navigation";
 import {
     ActivityIndicator,
+    Alert,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
+    useWindowDimensions,
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,11 +21,12 @@ import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
 import { AI_WEBSOCKET_URL } from "../../src/config/network";
 import { saveTranslation } from "../../src/services/translationService";
+import { getFeaturePermissions, setFeaturePermission } from "../../src/services/featurePermissionService";
 
 // Expo Go obtains frames by taking pictures. A modest cadence prevents Android's
 // shutter animation and gives MediaPipe a sharp, correctly oriented frame.
-const FRAME_INTERVAL_MS = 100;
-const FRAME_JPEG_QUALITY = 0.65;
+const FRAME_INTERVAL_MS = 50;
+const FRAME_JPEG_QUALITY = 0.45;
 const FRAME_TIMEOUT_MS = 10000;
 
 type ModelStatus = "inactive" | "permission_required" | "connecting" | "ready" |
@@ -45,12 +51,14 @@ const decodeBase64 = (value: string) => {
 export default function Camera() {
     const { t } = useTranslation();
     const { colors, fontScale } = useTheme();
+    const mainPager = useMainPager();
+    const { height } = useWindowDimensions();
     const [permission, requestPermission] = useCameraPermissions();
     const [facing, setFacing] = useState<CameraType>("front");
     const [cameraActive, setCameraActive] = useState(false);
     const [cameraReady, setCameraReady] = useState(false);
     const [pictureSize, setPictureSize] = useState<string>();
-    const [automaticSpeech, setAutomaticSpeech] = useState(true);
+    const [automaticSpeech, setAutomaticSpeech] = useState(false);
     const [modelStatus, setModelStatus] = useState<ModelStatus>("inactive");
     const [translation, setTranslation] = useState("");
     const [sessionTranslations, setSessionTranslations] = useState<string[]>([]);
@@ -159,12 +167,10 @@ export default function Camera() {
         confidenceRef.current = nextConfidence;
         if (status !== "translated" || !message.text || !message.is_new_translation) return;
 
-        const nextSession = sessionRef.current.at(-1) === message.text
-            ? sessionRef.current
-            : [...sessionRef.current, message.text];
+        const nextSession = [message.text];
         sessionRef.current = nextSession;
         setSessionTranslations(nextSession);
-        setTranslation(nextSession.join(" "));
+        setTranslation(message.text);
         if (speechRef.current) {
             Speech.stop();
             Speech.speak(message.text, { language: "es-CO" });
@@ -198,6 +204,13 @@ export default function Camera() {
 
     useEffect(() => { connectRef.current = connectModel; }, [connectModel]);
 
+    useEffect(() => {
+        getFeaturePermissions().then((permissions) => {
+            speechRef.current = permissions.audio;
+            setAutomaticSpeech(permissions.audio);
+        }).catch(() => undefined);
+    }, []);
+
     const resetSession = useCallback(() => {
         sessionRef.current = [];
         confidenceRef.current = null;
@@ -221,7 +234,20 @@ export default function Camera() {
         setModelStatus(status);
     }, [clearCapture]);
 
+    useEffect(() => {
+        if (mainPager && mainPager.activeTab !== "camera" && cameraActive) {
+            stopCamera();
+        }
+    }, [cameraActive, mainPager?.activeTab, stopCamera]);
+
     const startCamera = useCallback(async () => {
+        const featurePermissions = await getFeaturePermissions();
+        if (!featurePermissions.camera) {
+            setModelStatus("permission_required");
+            return;
+        }
+        speechRef.current = featurePermissions.audio;
+        setAutomaticSpeech(featurePermissions.audio);
         let granted = permission?.granted;
         if (!granted) granted = (await requestPermission()).granted;
         if (!granted) {
@@ -234,9 +260,41 @@ export default function Camera() {
         connectModel();
     }, [connectModel, permission?.granted, requestPermission, resetSession]);
 
-    const finishTranslation = () => {
+    const toggleAutomaticSpeech = async () => {
+        if (automaticSpeech) {
+            speechRef.current = false;
+            setAutomaticSpeech(false);
+            Speech.stop();
+            return;
+        }
+
+        if ((await getFeaturePermissions()).audio) {
+            speechRef.current = true;
+            setAutomaticSpeech(true);
+            return;
+        }
+
+        Alert.alert(
+            t("profile.audioPermissionTitle"),
+            t("profile.audioPermissionMessage"),
+            [
+                { text: t("cameraPermission.reject"), style: "cancel" },
+                {
+                    text: t("common.activate"),
+                    onPress: () => {
+                        void setFeaturePermission("audio", true);
+                        speechRef.current = true;
+                        setAutomaticSpeech(true);
+                    },
+                },
+            ],
+        );
+    };
+
+    const finishTranslation = async () => {
+        const hasTranslation = sessionRef.current.length > 0;
         stopCamera();
-        setReviewPending(sessionRef.current.length > 0);
+        setReviewPending(hasTranslation);
     };
 
     const saveCompletedTranslation = async () => {
@@ -244,7 +302,10 @@ export default function Camera() {
         if (!translatedText || saving) return;
         setSaving(true);
         try {
-            await saveTranslation({ translatedText, confidence: confidenceRef.current });
+            await saveTranslation({
+                translatedText,
+                confidence: confidenceRef.current,
+            });
             resetSession();
             setModelStatus("saved");
         } catch {
@@ -254,32 +315,30 @@ export default function Camera() {
         }
     };
 
-    const speakTranslation = () => {
-        const text = reviewPending ? sessionTranslations.join(" ") : translation;
-        if (!text) return;
-        Speech.stop();
-        Speech.speak(text, { language: "es-CO" });
-    };
-
     useEffect(() => () => {
         stopCamera();
         Speech.stop();
     }, [stopCamera]);
 
     const displayedTranslation = reviewPending ? sessionTranslations.join(" ") : translation;
+    const availableHeight = height - 112;
+    const compactLayout = availableHeight < 780 || fontScale > 1;
+    const cameraHeight = compactLayout
+        ? Math.max(250, Math.min(340, availableHeight * 0.4))
+        : Math.max(360, Math.min(620, availableHeight - 440));
 
     return (
+        <SwipeNavigation active="camera">
         <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView
+            contentContainerStyle={[styles.content, compactLayout && styles.compactContent]}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={compactLayout || availableHeight < 860 || reviewPending}
+        >
         <View style={styles.header}>
-        <Text style={[styles.logo, { color: colors.text, fontSize: 20 * fontScale }]}>ONE{"\n"}LANGUAGE</Text>
+        <BrandWordmark color={colors.text} style={styles.logo} />
         <View style={styles.headerActions}>
-            <TouchableOpacity activeOpacity={0.8} style={[styles.iconButton, automaticSpeech && styles.iconButtonActive]} onPress={() => {
-                const next = !automaticSpeech;
-                speechRef.current = next;
-                setAutomaticSpeech(next);
-                if (!next) Speech.stop();
-            }}>
+            <TouchableOpacity activeOpacity={0.8} style={[styles.iconButton, automaticSpeech && styles.iconButtonActive]} onPress={() => void toggleAutomaticSpeech()}>
                 <Ionicons name={automaticSpeech ? "volume-high" : "volume-mute"} size={25} color={colors.accent} />
             </TouchableOpacity>
             <TouchableOpacity activeOpacity={0.8} disabled={!cameraActive} style={[styles.iconButton, !cameraActive && styles.disabled]} onPress={() => {
@@ -293,8 +352,16 @@ export default function Camera() {
         </View>
     </View>
 
-    <View style={[styles.cameraFrame, { borderColor: colors.border }]}>
-        {cameraActive ? <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing={facing} pictureSize={pictureSize} animateShutter={false} onCameraReady={async () => {
+    <TouchableOpacity
+        activeOpacity={0.88}
+        disabled={cameraActive || reviewPending}
+        onPress={startCamera}
+        accessibilityRole={!cameraActive && !reviewPending ? "button" : undefined}
+        accessibilityLabel={t("camera.start")}
+        style={styles.cameraFrameTrigger}
+    >
+    <View style={[styles.cameraFrame, compactLayout && styles.compactCameraFrame, { borderColor: colors.border, height: cameraHeight }]}>
+        {cameraActive ? <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing={facing} pictureSize={pictureSize} animateShutter={false} mute onCameraReady={async () => {
             if (!pictureSize) {
                 try {
                     const sizes = await cameraRef.current?.getAvailablePictureSizesAsync();
@@ -302,9 +369,12 @@ export default function Camera() {
                         const [width, height] = size.split("x").map(Number);
                         return { size, width, height };
                     }).filter(({ width, height }) =>
-                        Math.min(width, height) >= 720 && Math.abs(Math.max(width, height) / Math.min(width, height) - 4 / 3) < 0.1
+                        Math.min(width, height) >= 480 && Math.abs(Math.max(width, height) / Math.min(width, height) - 4 / 3) < 0.1
                     ).sort((a, b) => a.width * a.height - b.width * b.height);
-                    if (supported?.length && activeRef.current) setPictureSize(supported[0].size);
+                    if (supported?.length && activeRef.current) {
+                        setPictureSize(supported[0].size);
+                        return;
+                    }
                 } catch {
                     // Devices without a compatible camera size use the default resolution.
                 }
@@ -317,16 +387,13 @@ export default function Camera() {
         </View>}
         {cameraActive && !cameraReady ? <View style={styles.cameraLoading}><ActivityIndicator color="#ffffff" size="large" /></View> : null}
     </View>
+    </TouchableOpacity>
 
-    <View style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
+    <View style={[styles.resultCard, compactLayout && styles.compactResultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         <Text style={[styles.eyebrow, { color: colors.primary }]}>{t("camera.realtime")}</Text>
         <Text style={[styles.resultText, { color: colors.textOnSurface, fontSize: 27 * fontScale }]}>{displayedTranslation || t("camera.empty")}</Text>
         <Text style={[styles.statusText, { color: colors.textOnSurface }]}>{t(`camera.status.${modelStatus}`)}</Text>
         {confidence !== null && displayedTranslation ? <Text style={[styles.confidenceText, { color: colors.textOnSurface }]}>{t("camera.confidence", { value: Math.round(confidence * 100) })}</Text> : null}
-        <TouchableOpacity activeOpacity={0.85} disabled={!displayedTranslation} onPress={speakTranslation} style={[styles.listenButton, { backgroundColor: colors.accent }, !displayedTranslation && styles.disabled]}>
-            <Ionicons name="volume-high" size={20} color="#111827" />
-            <Text style={styles.listenButtonText}>{t("camera.listen")}</Text>
-        </TouchableOpacity>
     </View>
 
     {reviewPending ? <View style={styles.reviewActions}>
@@ -345,6 +412,7 @@ export default function Camera() {
     </ScrollView>
     <BottomNav active="camera" />
     </SafeAreaView>
+    </SwipeNavigation>
     );
 }
 
@@ -352,19 +420,23 @@ const styles = StyleSheet.create({
     container: { flex: 1 },
     content: {
         flexGrow: 1,
-        paddingHorizontal: 14,
-        paddingTop: 16,
-        paddingBottom: 120,
+        paddingHorizontal: 20,
+        paddingTop: 20,
+        paddingBottom: 96,
         alignItems: "center",
+    },
+    compactContent: {
+        paddingTop: 20,
+        paddingBottom: 92,
     },
     header: {
         width: "100%",
-        paddingHorizontal: 8,
+        paddingHorizontal: 2,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
     },
-    logo: { fontWeight: "bold", lineHeight: 22, marginLeft: 8 },
+    logo: { marginLeft: 8 },
     headerActions: { flexDirection: "row", gap: 8 },
     iconButton: {
         width: 48,
@@ -379,15 +451,16 @@ const styles = StyleSheet.create({
     cameraFrame: {
         // Phone cameras produce a portrait preview. Matching that geometry
         // removes the black side bars instead of stretching the image.
-        width: "94%",
-        aspectRatio: 3 / 4,
+        width: "100%",
         alignSelf: "center",
-        marginTop: 18,
+        marginTop: 12,
         borderRadius: 8,
         borderWidth: 1,
         overflow: "hidden",
         backgroundColor: "#245f9f",
     },
+    compactCameraFrame: { marginTop: 10 },
+    cameraFrameTrigger: { width: "100%", alignItems: "center" },
     cameraPlaceholder: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
     placeholderText: { color: "#ffffff", fontSize: 16, marginTop: 10, textAlign: "center" },
     cameraLoading: {
@@ -398,33 +471,27 @@ const styles = StyleSheet.create({
     },
     resultCard: {
         width: "100%",
-        minHeight: 230,
-        marginTop: 18,
+        minHeight: 190,
+        marginTop: 12,
         borderRadius: 8,
         borderWidth: 1,
         justifyContent: "center",
         paddingHorizontal: 24,
-        paddingVertical: 22,
+        paddingVertical: 18,
+    },
+    compactResultCard: {
+        minHeight: 168,
+        marginTop: 10,
+        paddingVertical: 14,
     },
     eyebrow: { fontSize: 14, marginBottom: 10 },
     resultText: { lineHeight: 34, fontWeight: "500" },
     statusText: { fontSize: 15, marginTop: 12, opacity: 0.72 },
     confidenceText: { fontSize: 14, marginTop: 6, opacity: 0.72 },
-    listenButton: {
-        minHeight: 46,
-        alignSelf: "flex-start",
-        marginTop: 16,
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-    },
-    listenButtonText: { color: "#111827", fontSize: 15, fontWeight: "700" },
     primaryButton: {
         width: "78%",
         minHeight: 52,
-        marginTop: 18,
+        marginTop: 14,
         borderRadius: 10,
         alignItems: "center",
         justifyContent: "center",

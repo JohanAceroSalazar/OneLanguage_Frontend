@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaTimes } from "react-icons/fa";
 import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import AuthModal from "../../components/AuthModal/AuthModal";
@@ -80,6 +80,7 @@ function Register() {
     const [touched, setTouched] = useState(initialTouched);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showTerms, setShowTerms] = useState(false);
     const [modal, setModal] = useState({
         open: false,
         title: "",
@@ -209,13 +210,14 @@ function Register() {
 
             <div className="register-shell">
                 <div className="register-brand">
-                    <p className="register-brand-kicker">{t("auth.welcome")}</p>
-                    <h1>ONE LANGUAGE</h1>
+                    <h1>ONE<br />LANGUAGE</h1>
                     <p className="register-brand-copy">
                         {t("auth.brandCopy")}
                     </p>
                 </div>
 
+                <div className="register-form-column">
+                <h2 className="register-form-title">{t("auth.createAccount")}</h2>
                 <form className="form-card" onSubmit={handleSubmit}>
                     <div className="form-header">
                         <span className="form-step">{t("auth.step")}</span>
@@ -300,23 +302,50 @@ function Register() {
                         />
                         <span>
                             {t("auth.terms")}{" "}
-                            <Link to="/terms" className="terms-link">
+                            <button
+                                type="button"
+                                className="terms-link"
+                                onClick={() => setShowTerms(true)}
+                                aria-haspopup="dialog"
+                            >
                                 {t("terms.title")}
-                            </Link>
+                            </button>
                         </span>
                     </label>
                     {showFieldError("acceptedTerms") && errors.acceptedTerms && (
-                        <p className="error-text">{errors.acceptedTerms}</p>
+                        <p className="terms-alert" role="alert">{errors.acceptedTerms}</p>
                     )}
 
                     <Button text={t("auth.createAccount")} className="auth-submit-button" />
                 </form>
-
                 <p className="login-text">
                     {t("auth.hasAccount")}
                     <Link to="/login"> {t("auth.login")}</Link>
                 </p>
+                </div>
             </div>
+
+            {showTerms ? <div className="register-terms-backdrop" role="presentation">
+                <section className="register-terms-dialog" role="dialog" aria-modal="true" aria-labelledby="register-terms-title">
+                    <header className="register-terms-header">
+                        <h2 id="register-terms-title">{t("terms.title")}</h2>
+                        <button type="button" onClick={() => setShowTerms(false)} aria-label={t("common.back")}>
+                            <FaTimes aria-hidden="true" />
+                        </button>
+                    </header>
+                    <div className="register-terms-body">
+                        <p>{t("terms.app")}</p>
+                        <p>{t("terms.updated")}</p>
+                        <p>{t("terms.welcome")}</p>
+                        {[1, 2, 3, 4, 5, 6, 7].map((section) => (
+                            <div key={section}>
+                                <strong>{t(`terms.s${section}`)}</strong>
+                                <p>{t(`terms.p${section}`)}</p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            </div> : null}
         </div>
     );
 }

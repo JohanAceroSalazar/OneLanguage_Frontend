@@ -8,13 +8,20 @@
     cursor: pointer;
     text-align: left;
     font: inherit;
-    line-height: 1.15;
+    width: 128px;
+    height: 44px;
+    line-height: 22px;
 }
 
 .brand-logo span {
-    display: inline-block;
+    display: block;
+    width: 128px;
+    height: 44px;
+    font-size: 20px;
+    line-height: 22px;
     font-weight: 800;
-    letter-spacing: 0.03em;
+    letter-spacing: 0;
+    white-space: nowrap;
 }
 
 .brand-logo:focus-visible {

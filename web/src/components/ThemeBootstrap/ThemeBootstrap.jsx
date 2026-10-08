@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { getValidToken } from "../../services/authSession";
 import { applyAccessibilitySettings, getAccessibilitySettings, readStoredAccessibility } from "../../services/accessibilityService";
+import { hasValidSession } from "../../services/authSession";
 
 const fontSizeOptions = {
     small: 0.92,
@@ -18,11 +18,8 @@ function ThemeBootstrap() {
         document.body.style.zoom = String(fontSizeOptions[savedFontSize] || 1);
         document.documentElement.dataset.textSize = savedFontSize;
 
-        if (getValidToken()) {
-            getAccessibilitySettings()
-                .then(applyAccessibilitySettings)
-                .catch(() => applyAccessibilitySettings(readStoredAccessibility()));
-        }
+        if (!hasValidSession()) return;
+        getAccessibilitySettings().then(applyAccessibilitySettings).catch(() => undefined);
     }, []);
 
     return null;

@@ -6,10 +6,10 @@ import { saveTranslation } from "../../services/translationService";
 import "./Translate.css";
 import { useTranslation } from "react-i18next";
 
-const FRAME_INTERVAL_MS = 100;
+const FRAME_INTERVAL_MS = 66;
 const FRAME_TIMEOUT_MS = 10000;
-const FRAME_MAX_WIDTH = 1280;
-const JPEG_QUALITY = 0.68;
+const FRAME_MAX_WIDTH = 960;
+const JPEG_QUALITY = 0.55;
 const CAMERA_CONSTRAINTS = {
     audio: false,
     video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
@@ -53,6 +53,10 @@ function Translate() {
     const connectModelRef = useRef(null);
     const sessionTranslationsRef = useRef([]);
     const confidenceRef = useRef(null);
+    const recorderRef = useRef(null);
+    const recorderChunksRef = useRef([]);
+    const recordingBlobRef = useRef(null);
+    const recordingStopResolverRef = useRef(null);
     const speechSupported = "speechSynthesis" in window;
 
     const attachVideo = useCallback((node) => {
@@ -105,6 +109,39 @@ function Translate() {
         confidenceRef.current = null;
     }, []);
 
+    const startRecording = useCallback((stream) => {
+        recordingBlobRef.current = null;
+        recorderChunksRef.current = [];
+        if (typeof MediaRecorder === "undefined") return;
+
+        const mimeType = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"]
+            .find((candidate) => MediaRecorder.isTypeSupported(candidate));
+        const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+        recorderRef.current = recorder;
+        recorder.addEventListener("dataavailable", (event) => {
+            if (event.data.size > 0) recorderChunksRef.current.push(event.data);
+        });
+        recorder.addEventListener("stop", () => {
+            const chunks = recorderChunksRef.current;
+            const recording = chunks.length ? new Blob(chunks, { type: recorder.mimeType || "video/webm" }) : null;
+            recordingBlobRef.current = recording;
+            recorderChunksRef.current = [];
+            recorderRef.current = null;
+            recordingStopResolverRef.current?.(recording);
+            recordingStopResolverRef.current = null;
+        });
+        recorder.start(1000);
+    }, []);
+
+    const finishRecording = useCallback(() => {
+        const recorder = recorderRef.current;
+        if (!recorder || recorder.state === "inactive") return Promise.resolve(recordingBlobRef.current);
+        return new Promise((resolve) => {
+            recordingStopResolverRef.current = resolve;
+            recorder.stop();
+        });
+    }, []);
+
     const handleModelMessage = useCallback((event) => {
         let message;
         try {
@@ -138,14 +175,10 @@ function Translate() {
         confidenceRef.current = nextConfidence;
         if (message.status !== "translated" || !message.text || !message.is_new_translation) return;
 
-        const currentSession = sessionTranslationsRef.current;
-        const nextSession = currentSession.at(-1) === message.text
-            ? currentSession
-            : [...currentSession, message.text];
+        const nextSession = [message.text];
         sessionTranslationsRef.current = nextSession;
         setSessionTranslations(nextSession);
-        const assembledText = nextSession.join(" ");
-        setTranslation(assembledText);
+        setTranslation(message.text);
         if (automaticSpeech && speechSupported) speakTranslation(message.text);
     }, [automaticSpeech, clearLivePrediction, speakTranslation, speechSupported]);
 
@@ -239,18 +272,20 @@ function Translate() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia(CAMERA_CONSTRAINTS);
             streamRef.current = stream;
+            startRecording(stream);
             setCameraActive(true);
             setModelStatus("connecting");
             connectModel();
         } catch (error) {
             stopCamera(getCameraErrorStatus(error));
         }
-    }, [connectModel, resetSession, reviewPending, stopCamera]);
+    }, [connectModel, resetSession, reviewPending, startRecording, stopCamera]);
 
-    const finishTranslation = useCallback(() => {
+    const finishTranslation = useCallback(async () => {
+        await finishRecording();
         stopCamera();
         setReviewPending(sessionTranslationsRef.current.length > 0);
-    }, [stopCamera]);
+    }, [finishRecording, stopCamera]);
 
     const discardTranslation = useCallback(() => {
         resetSession();
@@ -263,8 +298,13 @@ function Translate() {
 
         setSaving(true);
         try {
-            await saveTranslation({ translatedText, confidence: confidenceRef.current });
+            await saveTranslation({
+                translatedText,
+                confidence: confidenceRef.current,
+                recording: recordingBlobRef.current,
+            });
             resetSession();
+            recordingBlobRef.current = null;
             setModelStatus("saved");
         } catch {
             setModelStatus("save_error");
@@ -274,14 +314,16 @@ function Translate() {
     }, [resetSession, saving]);
 
     useEffect(() => () => {
+        void finishRecording();
         stopCamera();
         if (speechSupported) window.speechSynthesis.cancel();
-    }, [speechSupported, stopCamera]);
+    }, [finishRecording, speechSupported, stopCamera]);
 
     const sessionText = sessionTranslations.join(" ");
     const displayedTranslation = reviewPending ? sessionText : translation;
     const confidenceText = confidence === null ? null : t("translate.confidence", { value: Math.round(confidence * 100) });
     const statusText = t(`translate.status.${modelStatus}`, { defaultValue: t("translate.status.model_error") });
+    const canStartFromPreview = !cameraActive && !reviewPending;
 
     return (
         <div className="translate-container">
@@ -300,9 +342,20 @@ function Translate() {
                     <h1>{displayedTranslation || t("translate.empty")}</h1>
                     <p className="translation-status">{statusText}</p>
                     {confidenceText && <p className="translation-confidence">{confidenceText}</p>}
-                    <button className="listen-translation" type="button" onClick={() => speakTranslation(displayedTranslation)} disabled={!displayedTranslation || !speechSupported}><FaVolumeUp aria-hidden="true" />{t("translate.listen")}</button>
                 </section>
-                <section className="translate-camera-box">
+                <section
+                    className={`translate-camera-box ${canStartFromPreview ? "is-camera-trigger" : ""}`}
+                    role={canStartFromPreview ? "button" : undefined}
+                    tabIndex={canStartFromPreview ? 0 : undefined}
+                    onClick={canStartFromPreview ? startCamera : undefined}
+                    onKeyDown={canStartFromPreview ? (event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            void startCamera();
+                        }
+                    } : undefined}
+                    aria-label={canStartFromPreview ? t("translate.start") : undefined}
+                >
                     {cameraActive ? <video ref={attachVideo} autoPlay playsInline muted className="translate-video" /> : <div className="translate-camera-placeholder"><FaCamera size={48} aria-hidden="true" /><p>{t("translate.cameraHint")}</p></div>}
                 </section>
             </main>

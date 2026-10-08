@@ -3,24 +3,18 @@
 }
 
 .landing-page {
-    min-height: 100vh;
+    min-height: 100dvh;
     position: relative;
-    overflow: hidden;
-    background:
-        radial-gradient(circle at top left, color-mix(in srgb, var(--color-accent) 24%, transparent), transparent 28%),
-        radial-gradient(circle at top right, color-mix(in srgb, var(--color-surface) 12%, transparent), transparent 24%),
-        linear-gradient(135deg, var(--color-page-bg-alt) 0%, var(--color-page-bg) 48%, color-mix(in srgb, var(--color-page-bg) 60%, #000) 100%);
+    overflow-x: hidden;
+    overflow-y: visible;
+    background: var(--color-page-bg);
     color: var(--color-text-on-page);
     padding: 28px clamp(18px, 4vw, 48px) 36px;
     font-family: Arial, sans-serif;
 }
 
 .landing-glow {
-    position: absolute;
-    border-radius: 999px;
-    filter: blur(20px);
-    opacity: 0.7;
-    pointer-events: none;
+    display: none;
 }
 
 .landing-glow-1 {
@@ -96,18 +90,18 @@
 }
 
 .landing-link-button {
-    background: var(--color-surface-alt);
-    color: var(--color-text-on-page);
+    background: var(--color-surface);
+    color: var(--color-page-bg);
 }
 
 .landing-secondary-button {
-    background: color-mix(in srgb, var(--color-surface) 8%, transparent);
-    color: var(--color-text-on-page);
+    background: var(--color-surface);
+    color: var(--color-page-bg);
 }
 
 .landing-primary-button {
-    background: linear-gradient(135deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 86%, white) 100%);
-    color: var(--color-accent-text);
+    background: var(--color-accent);
+    color: #ffffff;
     box-shadow: 0 16px 30px color-mix(in srgb, var(--color-accent) 28%, transparent);
 }
 
@@ -131,16 +125,15 @@
 .landing-badge {
     display: inline-flex;
     align-items: center;
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    backdrop-filter: blur(8px);
+    padding: 0;
+    border: 0;
+    background: none;
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
     margin: 0 0 18px;
+    color: var(--color-accent);
 }
 
 .landing-copy h2 {
@@ -188,12 +181,12 @@
 
 .landing-stats article,
 .landing-mini-grid article {
-    background: var(--color-surface-alt);
-    border: 1px solid color-mix(in srgb, var(--color-surface) 14%, transparent);
-    backdrop-filter: blur(12px);
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface);
     border-radius: 22px;
     padding: 18px;
     box-shadow: var(--color-shadow);
+    color: var(--color-text);
 }
 
 .landing-stats strong {
@@ -204,7 +197,7 @@
 
 .landing-stats span,
 .landing-mini-grid p {
-    color: color-mix(in srgb, var(--color-text-on-page) 82%, transparent);
+    color: var(--color-text-muted);
     line-height: 1.55;
     font-size: 14px;
 }
@@ -215,12 +208,13 @@
 }
 
 .landing-card-main {
-    background: var(--color-surface-alt);
-    border: 1px solid color-mix(in srgb, var(--color-surface) 16%, transparent);
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface);
     border-radius: 28px;
     padding: 18px;
     backdrop-filter: blur(12px);
     box-shadow: var(--color-shadow);
+    color: var(--color-text);
 }
 
 .landing-card-main img {
@@ -228,7 +222,7 @@
     display: block;
     margin: 0 auto;
     border-radius: 20px;
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--color-page-bg);
 }
 
 .landing-card-copy {
@@ -240,7 +234,7 @@
     font-size: 13px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--color-text-on-page) 72%, transparent);
+    color: var(--color-text-muted);
 }
 
 .landing-card-copy strong {
@@ -260,13 +254,14 @@
 
 .landing-mini-grid svg {
     font-size: 24px;
-    color: var(--color-accent);
+    color: var(--color-page-bg);
     margin-bottom: 12px;
 }
 
 .landing-mini-grid h3 {
     margin: 0 0 10px;
     font-size: 16px;
+    color: var(--color-text);
 }
 
 @media (max-width: 1080px) {

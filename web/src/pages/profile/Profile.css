@@ -22,7 +22,6 @@
 }
 
 .profile-logo {
-    font-size: 22px;
     color: var(--color-text-on-page);
 }
 
@@ -197,6 +196,17 @@
     color: var(--color-accent-text);
 }
 
+.activate-btn.is-active {
+    background: var(--color-control-bg);
+    border-color: var(--color-control-bg);
+    color: var(--color-control-text);
+}
+
+.activate-btn:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
 .logout-btn {
     width: 100%;
     padding: 12px;
@@ -206,6 +216,14 @@
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
+    color: #111827;
+}
+
+:root[data-theme="dark"] .logout-btn {
+    color: #ffffff;
+}
+
+:root[data-theme="dark"] .modal-logout-btn {
     color: #ffffff;
 }
 

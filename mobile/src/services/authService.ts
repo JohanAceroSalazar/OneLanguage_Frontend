@@ -60,6 +60,11 @@ export const getLocalAccessibilitySettings = async (): Promise<AccessibilitySett
     return { ...defaultAccessibilitySettings };
 };
 
+export const hasLocalAccessibilitySettings = async () => {
+    const user = await getStoredUser();
+    return Boolean(await AsyncStorage.getItem(getAccessibilityKey(user)));
+};
+
 export const persistLocalAccessibilitySettings = async (settings: Partial<AccessibilitySettings>) => {
     const current = await getLocalAccessibilitySettings();
     const normalized = normalizeAccessibilitySettings({ ...current, ...settings });

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiArrowRight, FiShield, FiStar, FiUsers } from "react-icons/fi";
 import logo from "../../assets/Logo.png";
@@ -7,6 +8,15 @@ import { useTranslation } from "react-i18next";
 function Landing() {
     const { t } = useTranslation();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        document.documentElement.classList.add("landing-scroll");
+        document.body.classList.add("landing-scroll");
+        return () => {
+            document.documentElement.classList.remove("landing-scroll");
+            document.body.classList.remove("landing-scroll");
+        };
+    }, []);
 
     return (
         <main className="landing-page">
@@ -24,10 +34,10 @@ function Landing() {
 
                 <nav className="landing-actions">
                     <button type="button" className="landing-link-button" onClick={() => navigate("/login")}>
-                        Iniciar sesión
+                        {t("landing.login")}
                     </button>
                     <button type="button" className="landing-primary-button" onClick={() => navigate("/register")}>
-                        Crear cuenta
+                        {t("landing.create")}
                     </button>
                 </nav>
             </header>
@@ -38,16 +48,15 @@ function Landing() {
                     <p className="landing-value">{t("landing.value")}</p>
                     <h2>{t("landing.title")}</h2>
                     <p className="landing-description">
-                        Traduce, consulta tu historial y ajusta la accesibilidad desde una experiencia
-                        moderna, clara y lista para acompañar a usuarios, familias y equipos de apoyo.
+                        {t("landing.description")}
                     </p>
 
                     <div className="landing-cta-row">
                         <button type="button" className="landing-primary-button landing-cta-main" onClick={() => navigate("/register")}>
-                            Empezar ahora <FiArrowRight />
+                            {t("landing.start")} <FiArrowRight />
                         </button>
                         <button type="button" className="landing-secondary-button" onClick={() => navigate("/login")}>
-                            Ya tengo cuenta
+                            {t("landing.hasAccount")}
                         </button>
                     </div>
 

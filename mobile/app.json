@@ -7,6 +7,11 @@
     "icon": "./assets/images/icon.png",
     "scheme": "mobile",
     "userInterfaceStyle": "automatic",
+    "androidNavigationBar": {
+      "visible": "visible",
+      "barStyle": "light-content",
+      "backgroundColor": "#3A78C2"
+    },
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -50,7 +55,8 @@
           "cameraPermission": "Permite que One Language use la cámara para reconocer señas.",
           "recordAudioAndroid": false
         }
-      ]
+      ],
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true,

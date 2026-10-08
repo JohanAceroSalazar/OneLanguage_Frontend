@@ -3,14 +3,21 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Terms() {
     const { t } = useTranslation();
 
     const router = useRouter();
     const { colors, fontScale } = useTheme();
+    const insets = useSafeAreaInsets();
     return (
-        <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={styles.content}>
+        <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.container, { backgroundColor: colors.background }]}>
+        <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={[styles.content, { paddingBottom: Math.max(insets.bottom, 24) + 24 }]}
+            showsVerticalScrollIndicator={false}
+        >
         <View style={styles.headerRow}>
             <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.surface }]} onPress={() => router.back()}>
                 <Ionicons name="arrow-back" size={22} color={colors.textOnSurface} />
@@ -44,7 +51,8 @@ export default function Terms() {
 
         <Text style={[styles.subtitle, { color: colors.text, fontSize: 16 * fontScale }]}>{t("terms.s7")}</Text>
         <Text style={[styles.paragraph, { color: colors.text, fontSize: 14 * fontScale }]}>{t("terms.p7")}</Text>
-    </ScrollView>
+        </ScrollView>
+        </SafeAreaView>
     );
 }
 
@@ -52,6 +60,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
+    },
+    scrollView: {
+        flex: 1,
     },
     content: {
         padding: 20,

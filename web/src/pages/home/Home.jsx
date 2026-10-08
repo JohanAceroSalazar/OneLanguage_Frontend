@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BrandLogo from "../../components/BrandLogo/BrandLogo";
 import NavBar from "../../components/NavBar/NavBar";
+import { getFeaturePermissions, setFeaturePermission } from "../../services/featurePermissionService";
 import "./Home.css";
 import { useTranslation } from "react-i18next";
 
@@ -20,6 +21,7 @@ function Home() {
             if (!navigator.mediaDevices?.getUserMedia) throw new Error("camera_unavailable");
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
             stream.getTracks().forEach((track) => track.stop());
+            await setFeaturePermission("camera", true);
             setPermissionDialogOpen(false);
             navigate("/translate");
         } catch {
@@ -27,6 +29,19 @@ function Home() {
         } finally {
             setRequestingPermission(false);
         }
+    };
+
+    const openTranslator = async () => {
+        try {
+            if ((await getFeaturePermissions()).camera) {
+                navigate("/translate");
+                return;
+            }
+        } catch {
+            // Ask for camera access again when the persisted setting cannot be loaded.
+        }
+        setPermissionError("");
+        setPermissionDialogOpen(true);
     };
 
     return (
@@ -45,7 +60,7 @@ function Home() {
             <div className="home-card">
                 <h1>{t("home.title")}</h1>
                 <p>{t("home.description")}</p>
-                <button className="home-btn" onClick={() => setPermissionDialogOpen(true)}>
+                <button className="home-btn" onClick={() => void openTranslator()}>
                     {t("home.start")}
                 </button>
             </div>

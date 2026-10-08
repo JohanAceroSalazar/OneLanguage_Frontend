@@ -56,6 +56,8 @@ function RecoverPassword() {
             {/* IMAGEN */}
             <img src={logo} alt="logo" className="recover-img" />
 
+            <p className="recover-description">{t("auth.recoverHint")}</p>
+
             {/* TARJETA */}
             <div className="recover-card">
                 <label className="recover-label">{t("common.email")}</label>
@@ -97,7 +99,7 @@ function RecoverPassword() {
 
             {/* VOLVER */}
             <p className="recover-back" onClick={() => navigate("/login")}>
-                ← {t("auth.backLogin")}
+                {t("auth.backLogin")}
             </p>
 
         </div>

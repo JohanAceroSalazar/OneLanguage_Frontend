@@ -4,10 +4,16 @@ import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppAlert } from "../../components/app-alert";
 import { BottomNav } from "../../components/bottom-nav";
+import { BrandWordmark } from "../../components/brand-wordmark";
+import { SwipeNavigation } from "../../components/swipe-navigation";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
-import i18n, { languageOptions, setLanguage } from "../../src/i18n";
-import { persistLocalAccessibilitySettings, updateAccessibilitySettings } from "../../src/services/authService";
+import { languageOptions, setLanguage } from "../../src/i18n";
+import {
+    AccessibilitySettings,
+    persistLocalAccessibilitySettings,
+    updateAccessibilitySettings,
+} from "../../src/services/authService";
 
 type DropdownOption = {
     label: string;
@@ -86,39 +92,41 @@ export default function Accessibility() {
     const selectedLanguageLabel = languageDropdownOptions.find((option) => option.value === selectedLanguage)?.label
         ?? languageDropdownOptions[0].label;
 
-    const handleSave = async () => {
-        setThemeMode(theme);
-        setFontSizeMode(draftFontSize);
+    const syncAccessibilitySettings = async (
+        changes: Partial<AccessibilitySettings>,
+        showConfirmation = false,
+    ) => {
+        const nextSettings: AccessibilitySettings = {
+            language: selectedLanguage as AccessibilitySettings["language"],
+            textSize: draftFontSize,
+            theme,
+            ...changes,
+        };
         setShowSuccess(false);
         setShowError(false);
         try {
-            await updateAccessibilitySettings({
-                language: i18n.language as "es" | "en" | "pt" | "it",
-                textSize: draftFontSize,
-                theme,
-            });
+            const savedSettings = await updateAccessibilitySettings(nextSettings);
+            await persistLocalAccessibilitySettings(savedSettings);
         } catch {
-            await persistLocalAccessibilitySettings({
-                language: translationI18n.language as "es" | "en" | "pt" | "it",
-                textSize: draftFontSize,
-                theme,
-            });
+            await persistLocalAccessibilitySettings(nextSettings);
             setShowError(true);
             return;
         }
-        await persistLocalAccessibilitySettings({
-            language: translationI18n.language as "es" | "en" | "pt" | "it",
-            textSize: draftFontSize,
-            theme,
-        });
-        setShowSuccess(true);
+        if (showConfirmation) setShowSuccess(true);
+    };
+
+    const handleSave = async () => {
+        setThemeMode(theme);
+        setFontSizeMode(draftFontSize);
+        await syncAccessibilitySettings({}, true);
     };
 
     return (
+        <SwipeNavigation active="accessibility">
         <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}>
         <Pressable style={styles.pressable} onPress={() => setOpenDropdown(null)}>
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-            <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
+            <BrandWordmark color={colors.text} style={styles.logo} />
             <Text style={[styles.title, { color: colors.text, fontSize: 30 * fontScale }]}>{t("accessibility.title")}</Text>
 
             <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
@@ -131,6 +139,7 @@ export default function Accessibility() {
                         const nextFontSize = value as typeof draftFontSize;
                         setDraftFontSize(nextFontSize);
                         setFontSizeMode(nextFontSize);
+                        void syncAccessibilitySettings({ textSize: nextFontSize });
                         setOpenDropdown(null);
                     }}
                     accentColor={colors.accent}
@@ -152,6 +161,7 @@ export default function Accessibility() {
                     onSelect={(value) => {
                         const nextTheme = value as typeof theme;
                         setThemeMode(nextTheme);
+                        void syncAccessibilitySettings({ theme: nextTheme });
                         setOpenDropdown(null);
                     }}
                     accentColor={colors.accent}
@@ -172,7 +182,7 @@ export default function Accessibility() {
                     selectedValue={selectedLanguageLabel}
                     onSelect={(value) => {
                         void setLanguage(value);
-                        void persistLocalAccessibilitySettings({ language: value as "es" | "en" | "pt" | "it" });
+                        void syncAccessibilitySettings({ language: value as AccessibilitySettings["language"] });
                         setOpenDropdown(null);
                     }}
                     accentColor={colors.accent}
@@ -214,6 +224,7 @@ export default function Accessibility() {
             />
         </Pressable>
         </SafeAreaView>
+        </SwipeNavigation>
     );
 }
 
@@ -226,14 +237,11 @@ const styles = StyleSheet.create({
     },
     content: {
         flexGrow: 1,
-        paddingHorizontal: 20,
+        paddingHorizontal: 22,
         paddingTop: 20,
         paddingBottom: 118,
     },
     logo: {
-        fontSize: 20,
-        fontWeight: "bold",
-        lineHeight: 20,
         marginLeft: 8,
     },
     title: {

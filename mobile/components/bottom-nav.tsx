@@ -3,16 +3,20 @@ import { useRouter } from "expo-router";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../src/theme/ThemeContext";
+import { useMainPager } from "./main-pager-context";
 
-type BottomNavTab = "home" | "camera" | "history" | "accessibility" | "profile";
+export type BottomNavTab = "home" | "camera" | "history" | "accessibility" | "profile";
 
 type BottomNavProps = {
   active: BottomNavTab;
+  onNavigate?: (tab: BottomNavTab) => void;
+  renderInPager?: boolean;
 };
 
 const tabs: {
   name: BottomNavTab;
   icon: keyof typeof Ionicons.glyphMap;
+  activeIcon: keyof typeof Ionicons.glyphMap;
   route:
     | "/(auth)/home"
     | "/(auth)/camera"
@@ -22,20 +26,23 @@ const tabs: {
     | "/(auth)/login";
   size: number;
 }[] = [
-  { name: "home", icon: "home-outline", route: "/(auth)/home", size: 32 },
-  { name: "camera", icon: "camera-outline", route: "/(auth)/camera", size: 32 },
-  { name: "history", icon: "receipt-outline", route: "/(auth)/history", size: 32 },
-  { name: "accessibility", icon: "accessibility-outline", route: "/(auth)/accessibility", size: 34 },
-  { name: "profile", icon: "person-circle-outline", route: "/(auth)/user_profile", size: 34 },
+  { name: "home", icon: "home-outline", activeIcon: "home", route: "/(auth)/home", size: 32 },
+  { name: "camera", icon: "camera-outline", activeIcon: "camera", route: "/(auth)/camera", size: 32 },
+  { name: "history", icon: "document-text-outline", activeIcon: "document-text", route: "/(auth)/history", size: 32 },
+  { name: "accessibility", icon: "accessibility-outline", activeIcon: "accessibility", route: "/(auth)/accessibility", size: 34 },
+  { name: "profile", icon: "person-circle-outline", activeIcon: "person-circle", route: "/(auth)/user_profile", size: 34 },
 ];
 
-export function BottomNav({ active }: BottomNavProps) {
+export function BottomNav({ active, onNavigate, renderInPager = false }: BottomNavProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors, theme } = useTheme();
+  const mainPager = useMainPager();
 
   const isDark = theme === "dark";
   const safeBottom = Math.max(insets.bottom, 8);
+
+  if (mainPager && !renderInPager) return null;
 
   return (
     <View
@@ -49,13 +56,25 @@ export function BottomNav({ active }: BottomNavProps) {
       ]}
     >
       {tabs.map((tab) => {
-        const icon = <Ionicons name={tab.icon} size={tab.size} color={isDark ? colors.accent : "#FFEB3B"} />;
+        const isActive = tab.name === active;
+        const iconColor = isDark ? colors.accent : "#FFEB3B";
+        const icon = tab.name === "history" ? (
+          <Ionicons name={isActive ? "document-text" : "document-text-outline"} size={34} color={iconColor} />
+        ) : !isActive && tab.name === "profile" ? (
+          <View style={[styles.profileOutline, { borderColor: iconColor }]}>
+            <Ionicons name="person-outline" size={22} color={iconColor} />
+          </View>
+        ) : (
+          <Ionicons
+            name={isActive ? tab.activeIcon : tab.icon}
+            size={tab.size}
+            color={iconColor}
+          />
+        );
 
-        if (tab.name === active) {
+        if (isActive) {
           return (
-            <View key={tab.name} style={[styles.activeTab, { borderColor: isDark ? colors.accent : "#FFEB3B", backgroundColor: isDark ? "#0f172a" : "#1D1B3D" }]}> 
-              {icon}
-            </View>
+            <View key={tab.name} style={styles.tabButton}>{icon}</View>
           );
         }
 
@@ -64,7 +83,7 @@ export function BottomNav({ active }: BottomNavProps) {
             key={tab.name}
             activeOpacity={0.8}
             style={styles.tabButton}
-            onPress={() => router.push(tab.route)}
+            onPress={() => onNavigate ? onNavigate(tab.name) : router.push(tab.route)}
           >
             {icon}
           </TouchableOpacity>
@@ -95,15 +114,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  activeTab: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    borderWidth: 4,
-    borderColor: "#FFEB3B",
-    backgroundColor: "#1D1B3D",
+  profileOutline: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    borderWidth: 2,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: -24,
   },
 });
