@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
@@ -9,9 +9,14 @@ export default function Landing() {
   const { t } = useTranslation();
   const router = useRouter();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
+    <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.container, { backgroundColor: colors.background }]}>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingBottom: Math.max(insets.bottom, 32) + 88 }]}
+        showsVerticalScrollIndicator={false}
+      >
       <View style={styles.headerRow}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
           <Image source={require("../../assets/images/Logo.png")} style={styles.logoImage} />
@@ -52,6 +57,7 @@ export default function Landing() {
           <Text style={styles.infoText}>{t("landing.accessibleText")}</Text>
         </View>
       </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -59,43 +65,46 @@ export default function Landing() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  content: {
+    flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 28,
-    paddingBottom: 24,
+    paddingTop: 16,
   },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 12,
   },
   logoImage: {
     width: 45,
     height: 45,
-    marginTop: 15,
+    marginTop: 0,
     borderRadius: 25,
   },
   brand: {
     fontSize: 25,
     fontWeight: "700",
-    marginTop: 15,
+    marginTop: 0,
   },
   heroCard: {
-    padding: 24,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
     borderRadius: 24,
-    marginBottom: 18,
+    marginBottom: 12,
   },
   badge: {
     fontSize: 13,
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 1.2,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   title: {
     fontSize: 32,
     fontWeight: "800",
-    marginBottom: 10,
+    marginBottom: 6,
     lineHeight: 38,
   },
   valuePromise: {
@@ -103,22 +112,22 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: 1.1,
     textTransform: "uppercase",
-    marginBottom: 8,
+    marginBottom: 6,
   },
   description: {
     fontSize: 16,
     lineHeight: 24,
-    marginBottom: 20,
+    marginBottom: 16,
     color : "#fff",
   },
   actions: {
-    gap: 12,
+    gap: 10,
   },
   primaryButton: {
-    paddingVertical: 14,
+    paddingVertical: 12,
     borderRadius: 14,
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 0,
     shadowColor: "#06142B",
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.18,
@@ -131,7 +140,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   secondaryButton: {
-    paddingVertical: 14,
+    paddingVertical: 12,
     borderRadius: 14,
     alignItems: "center",
     shadowColor: "#06142B",
@@ -147,14 +156,14 @@ const styles = StyleSheet.create({
   infoCard: {
     borderRadius: 20,
     borderWidth: 1,
-    padding: 16,
+    padding: 14,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 16,
     elevation: 3,
   },
   infoItem: {
-    paddingVertical: 8,
+    paddingVertical: 6,
     gap: 4,
   },
   infoTitle: {

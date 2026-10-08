@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import i18n, { languageOptions } from "../../i18n";
 import NavBar from "../../components/NavBar/NavBar";
 import BrandLogo from "../../components/BrandLogo/BrandLogo";
-import { updateAccessibilitySettings } from "../../services/accessibilityService";
+import { applyAccessibilitySettings, getAccessibilitySettings, readStoredAccessibility, updateAccessibilitySettings } from "../../services/accessibilityService";
 import "./Accessibility.css";
 
 const fontSizeOptions = {
@@ -14,11 +14,11 @@ const fontSizeOptions = {
 };
 
 function Accessibility() {
-    const [fontSize, setFontSize] = useState(() => localStorage.getItem("fontSize") || "medium");
-    const [savedTheme, setSavedTheme] = useState(() => localStorage.getItem("theme") || "light");
+    const [fontSize, setFontSize] = useState(() => readStoredAccessibility().textSize);
+    const [savedTheme, setSavedTheme] = useState(() => readStoredAccessibility().theme);
     const [selectedTheme, setSelectedTheme] = useState(savedTheme);
     const [savedLanguage, setSavedLanguage] = useState(() => {
-        const stored = localStorage.getItem("language");
+        const stored = readStoredAccessibility().language;
         return languageOptions.some((option) => option.code === stored) ? stored : (i18n.language || "es");
     });
     const [selectedLanguage, setSelectedLanguage] = useState(savedLanguage);
@@ -35,6 +35,22 @@ function Accessibility() {
         document.body.style.zoom = String(zoom);
         document.documentElement.dataset.textSize = fontSize;
     }, [fontSize]);
+
+    useEffect(() => {
+        let active = true;
+        getAccessibilitySettings().then((settings) => {
+            if (!active) return;
+            const saved = applyAccessibilitySettings(settings);
+            setFontSize(saved.textSize);
+            setSavedTheme(saved.theme);
+            setSelectedTheme(saved.theme);
+            setSavedLanguage(saved.language);
+            setSelectedLanguage(saved.language);
+        }).catch(() => undefined);
+        return () => {
+            active = false;
+        };
+    }, []);
 
     useEffect(() => {
         document.documentElement.dataset.theme = savedTheme;
@@ -54,37 +70,37 @@ function Accessibility() {
         return () => document.removeEventListener("pointerdown", closeMenusOnOutsideClick);
     }, []);
 
-    const handleSave = async () => {
+    const syncAccessibilitySettings = async (changes = {}, showConfirmation = false) => {
         setShowSuccess(false);
         setSaveError(false);
-        setSavedTheme(selectedTheme);
-        setSavedLanguage(selectedLanguage);
-
-        localStorage.setItem("theme", selectedTheme);
-        const languageText = String(selectedLanguage).toLowerCase();
-        const languageCode = languageText.startsWith("ingl") ? "en"
-            : languageText.startsWith("port") ? "pt"
-            : languageText.startsWith("ital") ? "it"
-            : languageOptions.some((option) => option.code === selectedLanguage) ? selectedLanguage
-            : "es";
-        localStorage.setItem("language", languageCode);
-        i18n.changeLanguage(languageCode);
-        localStorage.setItem("fontSize", fontSize);
-
+        const nextSettings = {
+            language: languageOptions.some((option) => option.code === selectedLanguage) ? selectedLanguage : "es",
+            textSize: fontSize,
+            theme: selectedTheme,
+            ...changes,
+        };
         try {
-            await updateAccessibilitySettings({
-                language: languageCode,
-                textSize: fontSize,
-                theme: selectedTheme,
-            });
+            const savedSettings = await updateAccessibilitySettings(nextSettings);
+            applyAccessibilitySettings(savedSettings);
+            setSavedTheme(savedSettings.theme);
+            setSelectedTheme(savedSettings.theme);
+            setSavedLanguage(savedSettings.language);
+            setSelectedLanguage(savedSettings.language);
+            setFontSize(savedSettings.textSize);
         } catch (error) {
             console.error("No se pudieron sincronizar las preferencias de accesibilidad", error);
+            applyAccessibilitySettings(nextSettings);
+            setSavedTheme(nextSettings.theme);
+            setSavedLanguage(nextSettings.language);
             setSaveError(true);
             return;
         }
 
-        document.documentElement.dataset.theme = selectedTheme;
-        document.documentElement.style.colorScheme = selectedTheme;
+        if (showConfirmation) setShowSuccess(true);
+    };
+
+    const handleSave = async () => {
+        await syncAccessibilitySettings({}, true);
 
         setShowFontMenu(false);
         setShowLangMenu(false);
@@ -128,7 +144,11 @@ function Accessibility() {
                                         key={size}
                                         type="button"
                                         className={fontSize === size ? "selected" : ""}
-                                        onClick={() => setFontSize(size)}
+                                        onClick={() => {
+                                            setFontSize(size);
+                                            void syncAccessibilitySettings({ textSize: size });
+                                            setShowFontMenu(false);
+                                        }}
                                     >
                                         <span>{t("accessibility." + size)}</span>
                                         {fontSize === size && <FaCheck size={12} />}
@@ -157,14 +177,22 @@ function Accessibility() {
                                     <button
                                         type="button"
                                         className={selectedTheme === "light" ? "theme-option selected" : "theme-option"}
-                                        onClick={() => previewTheme("light")}
+                                        onClick={() => {
+                                            previewTheme("light");
+                                            void syncAccessibilitySettings({ theme: "light" });
+                                            setShowThemeMenu(false);
+                                        }}
                                     >
                                         <FaSun /> {t("accessibility.light")}
                                     </button>
                                     <button
                                         type="button"
                                         className={selectedTheme === "dark" ? "theme-option selected" : "theme-option"}
-                                        onClick={() => previewTheme("dark")}
+                                        onClick={() => {
+                                            previewTheme("dark");
+                                            void syncAccessibilitySettings({ theme: "dark" });
+                                            setShowThemeMenu(false);
+                                        }}
                                     >
                                         <FaMoon /> {t("accessibility.dark")}
                                     </button>
@@ -200,6 +228,8 @@ function Accessibility() {
                                         onClick={() => {
                                             setSelectedLanguage(code);
                                             i18n.changeLanguage(code);
+                                            void syncAccessibilitySettings({ language: code });
+                                            setShowLangMenu(false);
                                         }}
                                     >
                                         <span>{label}</span>

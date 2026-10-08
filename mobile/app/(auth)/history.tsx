@@ -1,25 +1,51 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useVideoPlayer, VideoView } from "expo-video";
+import * as FileSystem from "expo-file-system/legacy";
+import * as Speech from "expo-speech";
+import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BottomNav } from "../../components/bottom-nav";
+import { BrandWordmark } from "../../components/brand-wordmark";
+import { useMainPager } from "../../components/main-pager-context";
+import { SwipeNavigation } from "../../components/swipe-navigation";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
     deleteAllTranslations,
     deleteTranslation,
     getTranslations,
+    getTranslationRecordingUrl,
     Translation,
 } from "../../src/services/translationService";
+import { getFeaturePermissions, setFeaturePermission } from "../../src/services/featurePermissionService";
+
+function RecordingPlayer({ translationId, token }: { translationId: string; token: string | null }) {
+    const player = useVideoPlayer({
+        uri: getTranslationRecordingUrl(translationId),
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+
+    return <VideoView player={player} style={styles.recordingVideo} nativeControls contentFit="contain" />;
+}
 
 export default function History() {
     const { t } = useTranslation();
     const { colors, fontScale } = useTheme();
+    const mainPager = useMainPager();
     const [translations, setTranslations] = useState<Translation[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [openRecordingId, setOpenRecordingId] = useState<string | null>(null);
+    const [token, setToken] = useState<string | null>(null);
+    const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+    useEffect(() => {
+        AsyncStorage.getItem("token").then(setToken).catch(() => setToken(null));
+    }, []);
 
     const loadTranslations = useCallback(async () => {
         setLoading(true);
@@ -37,6 +63,10 @@ export default function History() {
         loadTranslations();
     }, [loadTranslations]));
 
+    useEffect(() => {
+        if (mainPager?.activeTab === "history") void loadTranslations();
+    }, [loadTranslations, mainPager?.activeTab]);
+
     const removeOne = (translation: Translation) => {
         Alert.alert(t("history.delete"), translation.translatedText, [
             { text: t("history.cancel"), style: "cancel" },
@@ -47,6 +77,7 @@ export default function History() {
                     setDeletingId(translation.id);
                     try {
                         await deleteTranslation(translation.id);
+                        if (openRecordingId === translation.id) setOpenRecordingId(null);
                         setTranslations((current) => current.filter((item) => item.id !== translation.id));
                     } catch {
                         setError(t("history.deleteError"));
@@ -68,6 +99,7 @@ export default function History() {
                     setDeletingId("all");
                     try {
                         await deleteAllTranslations();
+                        setOpenRecordingId(null);
                         setTranslations([]);
                     } catch {
                         setError(t("history.deleteError"));
@@ -85,10 +117,70 @@ export default function History() {
         return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(date);
     };
 
+    const speakTranslation = async (text: string) => {
+        if (!(await getFeaturePermissions()).audio) {
+            Alert.alert(
+                t("profile.audioPermissionTitle"),
+                t("profile.audioPermissionMessage"),
+                [
+                    { text: t("cameraPermission.reject"), style: "cancel" },
+                    {
+                        text: t("common.activate"),
+                        onPress: () => {
+                            void setFeaturePermission("audio", true);
+                            Speech.stop();
+                            Speech.speak(text, { language: "es-CO" });
+                        },
+                    },
+                ],
+            );
+            return;
+        }
+        Speech.stop();
+        Speech.speak(text, { language: "es-CO" });
+    };
+
+    const downloadRecording = async (translation: Translation) => {
+        if (!(await getFeaturePermissions()).files) {
+            Alert.alert(
+                t("profile.filesPermissionTitle"),
+                t("profile.filesPermissionMessage"),
+                [
+                    { text: t("cameraPermission.reject"), style: "cancel" },
+                    {
+                        text: t("common.activate"),
+                        onPress: () => {
+                            void setFeaturePermission("files", true).then(() => downloadRecording(translation));
+                        },
+                    },
+                ],
+            );
+            return;
+        }
+
+        const documentDirectory = FileSystem.documentDirectory;
+        if (!documentDirectory || downloadingId) return;
+        const target = `${documentDirectory}onelanguage-${translation.id}-${Date.now()}.mp4`;
+        setDownloadingId(translation.id);
+        try {
+            const download = await FileSystem.downloadAsync(
+                getTranslationRecordingUrl(translation.id),
+                target,
+                { headers: token ? { Authorization: `Bearer ${token}` } : undefined },
+            );
+            Alert.alert(t("profile.permissions"), t("history.downloaded"));
+        } catch {
+            Alert.alert(t("profile.permissions"), t("history.downloadError"));
+        } finally {
+            setDownloadingId(null);
+        }
+    };
+
     return (
+        <SwipeNavigation active="history">
         <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={[styles.logo, { color: colors.text, fontSize: 20 * fontScale }]}>ONE{"\n"}LANGUAGE</Text>
+        <BrandWordmark color={colors.text} style={styles.logo} />
 
     <View style={styles.headerText}>
         <Text style={[styles.title, { color: colors.text, fontSize: 23 * fontScale }]}>{t("history.title")}</Text>
@@ -115,14 +207,21 @@ export default function History() {
                 <Text style={[styles.itemText, { color: colors.textOnSurface }]}>{translation.translatedText}</Text>
                 <Text style={[styles.itemDate, { color: colors.textOnSurface }]}>{formatDate(translation.createdAt)}</Text>
             </View>
-            <TouchableOpacity disabled={deletingId !== null} onPress={() => removeOne(translation)} style={styles.deleteButton}>
-                {deletingId === translation.id ? <ActivityIndicator color="#b91c1c" /> : <Ionicons name="trash-outline" size={22} color="#b91c1c" />}
-            </TouchableOpacity>
+            <View style={styles.itemActions}>
+                <TouchableOpacity onPress={() => void speakTranslation(translation.translatedText)} style={styles.itemActionButton}><Ionicons name="volume-high-outline" size={20} color={colors.textOnSurface} /></TouchableOpacity>
+                {translation.hasRecording ? <TouchableOpacity onPress={() => setOpenRecordingId((current) => current === translation.id ? null : translation.id)} style={styles.itemActionButton}><Ionicons name={openRecordingId === translation.id ? "close" : "play-outline"} size={20} color={colors.textOnSurface} /></TouchableOpacity> : null}
+                {translation.hasRecording ? <TouchableOpacity disabled={downloadingId !== null} onPress={() => void downloadRecording(translation)} style={styles.itemActionButton}>{downloadingId === translation.id ? <ActivityIndicator size="small" color={colors.textOnSurface} /> : <Ionicons name="download-outline" size={20} color={colors.textOnSurface} />}</TouchableOpacity> : null}
+                <TouchableOpacity disabled={deletingId !== null} onPress={() => removeOne(translation)} style={styles.deleteButton}>
+                    {deletingId === translation.id ? <ActivityIndicator color="#b91c1c" /> : <Ionicons name="trash-outline" size={20} color="#b91c1c" />}
+                </TouchableOpacity>
+            </View>
+            {openRecordingId === translation.id ? <RecordingPlayer translationId={translation.id} token={token} /> : null}
         </View>)}
     </View> : null}
         </ScrollView>
         <BottomNav active="history" />
     </SafeAreaView>
+    </SwipeNavigation>
     );
 }
 
@@ -138,10 +237,6 @@ content: {
     paddingBottom: 118,
     },
 logo: {
-    color: "#FFFFFF",
-    fontSize: 20,
-    fontWeight: "bold",
-    lineHeight: 22,
     marginLeft: 8,
     },
 headerText: {
@@ -200,7 +295,7 @@ errorText: {
     },
 historyList: {
     width: "100%",
-    marginTop: 28,
+    marginTop: 18,
     gap: 10,
     },
 listHeader: {
@@ -219,12 +314,13 @@ deleteAllButton: {
     backgroundColor: "rgba(255,255,255,0.12)",
     },
 historyItem: {
-    minHeight: 86,
+    minHeight: 72,
     borderWidth: 1,
     borderRadius: 8,
     padding: 12,
     flexDirection: "row",
     alignItems: "center",
+    flexWrap: "wrap",
     },
 itemIcon: {
     width: 44,
@@ -234,15 +330,18 @@ itemIcon: {
     alignItems: "center",
     justifyContent: "center",
     },
-itemContent: { flex: 1, paddingHorizontal: 12 },
-itemText: { fontSize: 17, fontWeight: "700" },
-itemDate: { fontSize: 12, opacity: 0.65, marginTop: 5 },
+itemContent: { flex: 1, paddingHorizontal: 10 },
+itemText: { fontSize: 16, fontWeight: "700" },
+itemDate: { fontSize: 12, opacity: 0.65, marginTop: 3 },
+itemActions: { flexDirection: "row", alignItems: "center", gap: 2 },
+itemActionButton: { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
 deleteButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#fee2e2",
     },
+recordingVideo: { width: "100%", maxWidth: 360, alignSelf: "center", height: 210, marginTop: 10, borderRadius: 6, overflow: "hidden", backgroundColor: "#111827" },
 });

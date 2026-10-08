@@ -3,6 +3,8 @@ import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -10,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { AppAlert } from "../../components/app-alert";
+import { BrandWordmark } from "../../components/brand-wordmark";
 import { registerUser } from "../../src/services/authService";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
@@ -34,6 +37,7 @@ export default function Register() {
   const [errors, setErrors] = useState({ name: "", email: "", password: "", confirmPassword: "", acceptedTerms: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState<AlertState>({
     visible: false,
@@ -105,7 +109,7 @@ export default function Register() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.topBar}>
-        <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
+        <BrandWordmark color={colors.text} style={styles.logo} />
       </View>
 
       <Text style={[styles.title, { color: colors.text }]}>{t("auth.register")}</Text>
@@ -166,11 +170,23 @@ export default function Register() {
         </View>
         {errors.confirmPassword ? <Text style={styles.errorText}>{errors.confirmPassword}</Text> : null}
 
-        <TouchableOpacity style={styles.checkboxRow} onPress={() => handleChange("acceptedTerms", !form.acceptedTerms)}>
-          <Ionicons name={form.acceptedTerms ? "checkbox" : "square-outline"} size={20} color={colors.primary} />
-          <Text style={styles.termsLink} onPress={() => router.push("/(auth)/terms")}>{t("auth.terms")}</Text>
-        </TouchableOpacity>
-        {errors.acceptedTerms ? <Text style={styles.errorText}>{errors.acceptedTerms}</Text> : null}
+        <View style={styles.checkboxRow}>
+          <TouchableOpacity onPress={() => handleChange("acceptedTerms", !form.acceptedTerms)} accessibilityRole="checkbox" accessibilityState={{ checked: form.acceptedTerms }}>
+            <Ionicons name={form.acceptedTerms ? "checkbox" : "square-outline"} size={20} color={colors.primary} />
+          </TouchableOpacity>
+          <View style={styles.termsLabel}>
+            <Text style={styles.termsPrefix}>{t("auth.acceptPrefix")}</Text>
+            <TouchableOpacity onPress={() => setShowTerms(true)} accessibilityRole="button" accessibilityState={{ expanded: showTerms }}>
+              <Text style={styles.termsLink}>{t("terms.title")}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        {errors.acceptedTerms ? (
+          <View style={styles.termsAlert} accessibilityRole="alert">
+            <Ionicons name="alert-circle-outline" size={18} color="#111827" />
+            <Text style={styles.termsAlertText}>{errors.acceptedTerms}</Text>
+          </View>
+        ) : null}
 
         <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleRegister} disabled={loading}>
           {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>{t("auth.create")}</Text>}
@@ -180,6 +196,30 @@ export default function Register() {
       <Text style={styles.loginText}>
         {t("auth.hasAccount")} <Text style={styles.loginLink} onPress={() => router.push("/(auth)/login")}>{t("auth.login")}</Text>
       </Text>
+
+      <Modal visible={showTerms} transparent animationType="fade" onRequestClose={() => setShowTerms(false)}>
+        <View style={styles.termsModalBackdrop}>
+          <View style={styles.termsModalDialog} accessibilityRole="alert">
+            <View style={styles.termsContentHeader}>
+              <Text style={styles.termsContentTitle}>{t("terms.title")}</Text>
+              <TouchableOpacity style={styles.termsModalClose} onPress={() => setShowTerms(false)} accessibilityLabel={t("common.back")}>
+                <Ionicons name="close" size={20} color="#ffffff" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.termsContentBody} nestedScrollEnabled showsVerticalScrollIndicator>
+              <Text style={styles.termsContentText}>{t("terms.app")}</Text>
+              <Text style={styles.termsContentText}>{t("terms.updated")}</Text>
+              <Text style={styles.termsContentText}>{t("terms.welcome")}</Text>
+              {[1, 2, 3, 4, 5, 6, 7].map((section) => (
+                <View key={section} style={styles.termsSection}>
+                  <Text style={styles.termsContentSubtitle}>{t(`terms.s${section}`)}</Text>
+                  <Text style={styles.termsContentText}>{t(`terms.p${section}`)}</Text>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
       <AppAlert
         visible={alert.visible}
@@ -210,12 +250,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   logo: {
-    fontWeight: "bold",
-    fontSize: 20,
-    lineHeight: 22,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     textAlign: "center",
     marginTop: 30,
     fontWeight: "700",
@@ -276,11 +313,92 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 12,
   },
+  termsLabel: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  termsPrefix: {
+    color: "#111827",
+    fontSize: 13,
+    fontWeight: "700",
+  },
   termsLink: {
     fontSize: 13,
     color: "#6b7280",
     fontWeight: "700",
     textDecorationLine: "underline",
+  },
+  termsModalBackdrop: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+    backgroundColor: "rgba(6,20,43,0.58)",
+  },
+  termsModalDialog: {
+    width: "100%",
+    maxWidth: 420,
+    maxHeight: "82%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 8,
+    padding: 20,
+  },
+  termsContentHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  termsContentTitle: {
+    color: "#111827",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  termsContentBody: {
+    maxHeight: 480,
+    marginTop: 8,
+  },
+  termsContentText: {
+    color: "#111827",
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 8,
+  },
+  termsContentSubtitle: {
+    color: "#111827",
+    fontSize: 13,
+    fontWeight: "700",
+    marginBottom: 3,
+  },
+  termsSection: {
+    marginTop: 4,
+  },
+  termsModalClose: {
+    alignItems: "center",
+    backgroundColor: "#111827",
+    borderRadius: 6,
+    height: 30,
+    justifyContent: "center",
+    width: 30,
+  },
+  termsAlert: {
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderColor: "#111827",
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
+  },
+  termsAlertText: {
+    color: "#111827",
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "700",
+    lineHeight: 18,
   },
   button: {
     width: "100%",

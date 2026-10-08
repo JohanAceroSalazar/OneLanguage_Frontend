@@ -2,6 +2,9 @@ import { Camera } from "expo-camera";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { BottomNav } from "../../components/bottom-nav";
+import { BrandWordmark } from "../../components/brand-wordmark";
+import { useMainPager } from "../../components/main-pager-context";
+import { SwipeNavigation } from "../../components/swipe-navigation";
 import {
     Image,
     Modal,
@@ -14,11 +17,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
+import { getFeaturePermissions, setFeaturePermission } from "../../src/services/featurePermissionService";
 
 export default function Home() {
     const { t } = useTranslation();
     const { colors, fontScale } = useTheme();
     const router = useRouter();
+    const mainPager = useMainPager();
     const [permissionDialogVisible, setPermissionDialogVisible] = useState(false);
     const [permissionError, setPermissionError] = useState(false);
     const [requestingPermission, setRequestingPermission] = useState(false);
@@ -32,17 +37,29 @@ export default function Home() {
                 setPermissionError(true);
                 return;
             }
+            await setFeaturePermission("camera", true);
             setPermissionDialogVisible(false);
-            router.push("/(auth)/camera");
+            if (mainPager) mainPager.navigate("camera");
+            else router.push("/(auth)/camera");
         } finally {
             setRequestingPermission(false);
         }
     };
 
+    const openTranslator = async () => {
+        if ((await getFeaturePermissions()).camera) {
+            if (mainPager) mainPager.navigate("camera");
+            else router.push("/(auth)/camera");
+            return;
+        }
+        setPermissionDialogVisible(true);
+    };
+
     return (
+        <SwipeNavigation active="home">
         <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={[styles.logo, { color: colors.text, fontSize: 20 * fontScale }]}>ONE{"\n"}LANGUAGE</Text>
+        <BrandWordmark color={colors.text} style={styles.logo} />
 
         <View style={styles.header}>
         <Text style={[styles.greeting, { color: colors.text, fontSize: 24 * fontScale }]}>{t("home.greeting")}</Text>
@@ -60,7 +77,7 @@ export default function Home() {
             {t("home.description")}
         </Text>
 
-        <TouchableOpacity activeOpacity={0.85} onPress={() => setPermissionDialogVisible(true)} style={[styles.button, { backgroundColor: colors.accent }]}>
+        <TouchableOpacity activeOpacity={0.85} onPress={() => void openTranslator()} style={[styles.button, { backgroundColor: colors.accent }]}>
             <Text style={[styles.buttonText, { color: colors.textOnSurface, fontSize: 25 * fontScale }]}>{t("home.start")}</Text>
         </TouchableOpacity>
         </View>
@@ -85,6 +102,7 @@ export default function Home() {
             </View>
         </Modal>
     </SafeAreaView>
+    </SwipeNavigation>
     );
 }
 
@@ -96,14 +114,10 @@ container: {
 content: {
     flexGrow: 1,
     paddingHorizontal: 22,
-    paddingTop: 28,
+    paddingTop: 20,
     paddingBottom: 118,
     },
 logo: {
-    fontSize: 20,
-    fontWeight: "bold",
-    lineHeight: 22,
-    color: "#FFFFFF",
     marginLeft: 8,
     },
 header: {

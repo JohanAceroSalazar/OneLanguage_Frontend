@@ -14,6 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { resetPassword } from "../../src/services/authService";
+import { BrandWordmark } from "../../components/brand-wordmark";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
 
@@ -107,7 +108,7 @@ export default function ResetPassword() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topBar}>
-          <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
+          <BrandWordmark color={colors.text} style={styles.logo} />
         </View>
 
         <Text style={[styles.title, { color: colors.text, fontSize: 32 * fontScale }]}>{t("auth.resetTitle")}</Text>
@@ -193,7 +194,7 @@ export default function ResetPassword() {
 
         <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
           <Text style={[styles.loginLink, { color: colors.text, fontSize: 15 * fontScale }]}>
-            Volver al inicio de sesion
+            {t("auth.resetBack")}
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -221,9 +222,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   logo: {
-    fontWeight: "bold",
-    fontSize: 20,
-    lineHeight: 22,
   },
   title: {
     textAlign: "center",

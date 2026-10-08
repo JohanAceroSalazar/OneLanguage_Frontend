@@ -68,6 +68,42 @@ body {
     background: var(--color-page-bg);
 }
 
+@media (min-width: 769px) {
+    html,
+    body,
+    #root {
+        height: 100dvh;
+        overflow: hidden;
+    }
+
+    .home-container,
+    .translate-container,
+    .access-container,
+    .profile-container,
+    .login-container,
+    .register-container,
+    .recover-container,
+    .reset-container {
+        height: 100dvh;
+        min-height: 0;
+        overflow-y: hidden;
+    }
+
+    .history-container,
+    .terms-container {
+        height: 100dvh;
+        min-height: 0;
+        overflow-y: auto;
+    }
+}
+
+html.landing-scroll,
+body.landing-scroll,
+body.landing-scroll #root {
+    height: auto;
+    overflow-y: auto;
+}
+
 button,
 input,
 select,

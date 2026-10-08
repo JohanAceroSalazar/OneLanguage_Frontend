@@ -56,11 +56,18 @@ const mobileUi = {
   it: { "auth.recoverTitle": "Reimposta password", "auth.recoverHint": "Inserisci la tua email e ti invieremo il link per creare una nuova password.", "auth.backLogin": "Torna al login", "auth.emailRequired": "L'email è obbligatoria", "auth.emailInvalid": "Inserisci un'email valida", "auth.recoverError": "Impossibile inviare il link. Verifica la tua email.", "auth.resetTitle": "Reimposta password", "auth.resetButton": "Reimposta password", "auth.resetBack": "Torna al login", "auth.invalidLink": "Il link di recupero non è valido o incompleto.", "auth.passwordRules": "La password deve contenere almeno 8 caratteri, una maiuscola, una minuscola e un numero.", "auth.confirmRequired": "Devi confermare la nuova password.", "auth.resetError": "Impossibile reimpostare la password.", "auth.loginError": "Impossibile accedere", "auth.credentialsError": "Email o password non corrette.", "auth.registerError": "Si è verificato un problema nella creazione dell'account." }
 };
 for (const language of Object.keys(mobileUi)) Object.assign((text as any)[language].translation, mobileUi[language as keyof typeof mobileUi]);
+const mobileRecoveryUi = {
+  es: { "auth.recoverSuccess": "Enviamos el enlace de recuperación a tu correo.", "auth.recoverNotFound": "No existe una cuenta registrada con ese correo." },
+  en: { "auth.recoverSuccess": "We sent the recovery link to your email.", "auth.recoverNotFound": "No account is registered with that email." },
+  pt: { "auth.recoverSuccess": "Enviamos o link de recuperação para seu e-mail.", "auth.recoverNotFound": "Não existe uma conta registrada com esse e-mail." },
+  it: { "auth.recoverSuccess": "Abbiamo inviato il link di recupero alla tua email.", "auth.recoverNotFound": "Non esiste un account registrato con questa email." },
+};
+for (const language of Object.keys(mobileRecoveryUi)) Object.assign((text as any)[language].translation, mobileRecoveryUi[language as keyof typeof mobileRecoveryUi]);
 for (const [language, labels] of Object.entries({
-  es: { "auth.weak": "Débil", "auth.strong": "Fuerte", "auth.medium": "Media", "auth.nameRequired": "El nombre es obligatorio", "auth.minChars": "Ingresa al menos 3 caracteres", "auth.passwordRequired": "La contraseña es obligatoria", "auth.acceptTerms": "Debes aceptar los términos y condiciones", "auth.registerSuccess": "Registro exitoso", "auth.registerSuccessMessage": "Tu cuenta quedó lista. Ahora puedes iniciar sesión.", "auth.goLogin": "Ir a iniciar sesión" },
-  en: { "auth.weak": "Weak", "auth.strong": "Strong", "auth.medium": "Medium", "auth.nameRequired": "Name is required", "auth.minChars": "Enter at least 3 characters", "auth.passwordRequired": "Password is required", "auth.acceptTerms": "You must accept the terms and conditions", "auth.registerSuccess": "Registration successful", "auth.registerSuccessMessage": "Your account is ready. You can now log in.", "auth.goLogin": "Go to login" },
-  pt: { "auth.weak": "Fraca", "auth.strong": "Forte", "auth.medium": "Média", "auth.nameRequired": "O nome é obrigatório", "auth.minChars": "Digite pelo menos 3 caracteres", "auth.passwordRequired": "A senha é obrigatória", "auth.acceptTerms": "Você deve aceitar os termos e condições", "auth.registerSuccess": "Cadastro realizado", "auth.registerSuccessMessage": "Sua conta está pronta. Agora você pode entrar.", "auth.goLogin": "Ir para o login" },
-  it: { "auth.weak": "Debole", "auth.strong": "Forte", "auth.medium": "Media", "auth.nameRequired": "Il nome è obbligatorio", "auth.minChars": "Inserisci almeno 3 caratteri", "auth.passwordRequired": "La password è obbligatoria", "auth.acceptTerms": "Devi accettare termini e condizioni", "auth.registerSuccess": "Registrazione riuscita", "auth.registerSuccessMessage": "Il tuo account è pronto. Ora puoi accedere.", "auth.goLogin": "Vai al login" }
+  es: { "auth.weak": "Débil", "auth.strong": "Fuerte", "auth.medium": "Media", "auth.nameRequired": "El nombre es obligatorio", "auth.minChars": "Ingresa al menos 3 caracteres", "auth.passwordRequired": "La contraseña es obligatoria", "auth.acceptTerms": "Debes aceptar los términos y condiciones", "auth.acceptPrefix": "Acepto los", "auth.registerSuccess": "Registro exitoso", "auth.registerSuccessMessage": "Tu cuenta quedó lista. Ahora puedes iniciar sesión.", "auth.goLogin": "Ir a iniciar sesión" },
+  en: { "auth.weak": "Weak", "auth.strong": "Strong", "auth.medium": "Medium", "auth.nameRequired": "Name is required", "auth.minChars": "Enter at least 3 characters", "auth.passwordRequired": "Password is required", "auth.acceptTerms": "You must accept the terms and conditions", "auth.acceptPrefix": "I accept the", "auth.registerSuccess": "Registration successful", "auth.registerSuccessMessage": "Your account is ready. You can now log in.", "auth.goLogin": "Go to login" },
+  pt: { "auth.weak": "Fraca", "auth.strong": "Forte", "auth.medium": "Média", "auth.nameRequired": "O nome é obrigatório", "auth.minChars": "Digite pelo menos 3 caracteres", "auth.passwordRequired": "A senha é obrigatória", "auth.acceptTerms": "Você deve aceitar os termos e condições", "auth.acceptPrefix": "Aceito os", "auth.registerSuccess": "Cadastro realizado", "auth.registerSuccessMessage": "Sua conta está pronta. Agora você pode entrar.", "auth.goLogin": "Ir para o login" },
+  it: { "auth.weak": "Debole", "auth.strong": "Forte", "auth.medium": "Media", "auth.nameRequired": "Il nome è obbligatorio", "auth.minChars": "Inserisci almeno 3 caratteri", "auth.passwordRequired": "La password è obbligatoria", "auth.acceptTerms": "Devi accettare termini e condizioni", "auth.acceptPrefix": "Accetto i", "auth.registerSuccess": "Registrazione riuscita", "auth.registerSuccessMessage": "Il tuo account è pronto. Ora puoi accedere.", "auth.goLogin": "Vai al login" }
 })) Object.assign((text as any)[language].translation, labels);
 
 const accessibilityLabels = {
@@ -91,7 +98,7 @@ const aiIntegrationLabels = {
     "camera.status.waiting": "La seña aún no es suficientemente clara.", "camera.status.translated": "Seña reconocida.",
     "camera.status.no_hands": "No se detectan manos en la cámara.", "camera.status.idle": "No se está realizando una seña.",
     "camera.status.model_error": "No fue posible conectar con el modelo de IA.", "camera.status.camera_error": "No fue posible capturar la cámara.",
-    "camera.status.saved": "Traducción guardada en el historial.", "camera.status.save_error": "No fue posible guardar la traducción.",
+    "camera.status.saved": "Traducción guardada en el historial.", "camera.status.save_error": "No fue posible guardar la traducción.", "camera.status.recording_error": "No fue posible guardar el video de la seña.", "camera.recording": "Grabando", "camera.recordingUnavailable": "La traducción se puede guardar, pero el video no estuvo disponible.",
     "history.emptyText": "Finaliza una traducción y guárdala para verla aquí.", "history.loadError": "No fue posible cargar el historial.",
     "history.deleteError": "No fue posible eliminar la traducción.", "history.delete": "Eliminar traducción",
     "history.deleteAll": "Eliminar todo", "history.deleteAllConfirm": "¿Quieres eliminar todo el historial?",
@@ -110,7 +117,7 @@ const aiIntegrationLabels = {
     "camera.status.waiting": "The sign is not clear enough yet.", "camera.status.translated": "Sign recognized.",
     "camera.status.no_hands": "No hands detected by the camera.", "camera.status.idle": "No sign is being performed.",
     "camera.status.model_error": "Could not connect to the AI model.", "camera.status.camera_error": "Could not capture the camera.",
-    "camera.status.saved": "Translation saved to history.", "camera.status.save_error": "Could not save the translation.",
+    "camera.status.saved": "Translation saved to history.", "camera.status.save_error": "Could not save the translation.", "camera.status.recording_error": "The sign video could not be saved.", "camera.recording": "Recording", "camera.recordingUnavailable": "The translation can be saved, but the video was unavailable.",
     "history.emptyText": "Finish and save a translation to see it here.", "history.loadError": "Could not load history.",
     "history.deleteError": "Could not delete the translation.", "history.delete": "Delete translation",
     "history.deleteAll": "Delete all", "history.deleteAllConfirm": "Do you want to delete all history?",
@@ -129,7 +136,7 @@ const aiIntegrationLabels = {
     "camera.status.waiting": "O sinal ainda não está claro.", "camera.status.translated": "Sinal reconhecido.",
     "camera.status.no_hands": "Nenhuma mão detectada pela câmera.", "camera.status.idle": "Nenhum sinal está sendo feito.",
     "camera.status.model_error": "Não foi possível conectar ao modelo de IA.", "camera.status.camera_error": "Não foi possível capturar a câmera.",
-    "camera.status.saved": "Tradução salva no histórico.", "camera.status.save_error": "Não foi possível salvar a tradução.",
+    "camera.status.saved": "Tradução salva no histórico.", "camera.status.save_error": "Não foi possível salvar a tradução.", "camera.status.recording_error": "Não foi possível salvar o vídeo do sinal.", "camera.recording": "Gravando", "camera.recordingUnavailable": "A tradução pode ser salva, mas o vídeo não ficou disponível.",
     "history.emptyText": "Finalize e salve uma tradução para vê-la aqui.", "history.loadError": "Não foi possível carregar o histórico.",
     "history.deleteError": "Não foi possível excluir a tradução.", "history.delete": "Excluir tradução",
     "history.deleteAll": "Excluir tudo", "history.deleteAllConfirm": "Deseja excluir todo o histórico?",
@@ -148,7 +155,7 @@ const aiIntegrationLabels = {
     "camera.status.waiting": "Il segno non è ancora abbastanza chiaro.", "camera.status.translated": "Segno riconosciuto.",
     "camera.status.no_hands": "Nessuna mano rilevata.", "camera.status.idle": "Non viene eseguito alcun segno.",
     "camera.status.model_error": "Impossibile connettersi al modello IA.", "camera.status.camera_error": "Impossibile acquisire la fotocamera.",
-    "camera.status.saved": "Traduzione salvata nella cronologia.", "camera.status.save_error": "Impossibile salvare la traduzione.",
+    "camera.status.saved": "Traduzione salvata nella cronologia.", "camera.status.save_error": "Impossibile salvare la traduzione.", "camera.status.recording_error": "Impossibile salvare il video del segno.", "camera.recording": "Registrazione", "camera.recordingUnavailable": "La traduzione può essere salvata, ma il video non era disponibile.",
     "history.emptyText": "Termina e salva una traduzione per vederla qui.", "history.loadError": "Impossibile caricare la cronologia.",
     "history.deleteError": "Impossibile eliminare la traduzione.", "history.delete": "Elimina traduzione",
     "history.deleteAll": "Elimina tutto", "history.deleteAllConfirm": "Vuoi eliminare tutta la cronologia?",
@@ -170,7 +177,7 @@ for (const [language, message] of Object.entries(frameProcessingLabels)) {
 }
 
 const cameraPermissionUi = {
-  es: { "cameraPermission.title": "Activar permiso de la cámara", "cameraPermission.message": "Para realizar la traducción de lengua de señas a texto en tiempo real, necesitamos acceder a la cámara de tu dispositivo.", "cameraPermission.privacy": "La cámara se utilizará únicamente para detectar movimientos y gestos de las manos, sin almacenar ni compartir imágenes o videos.", "cameraPermission.reject": "Rechazar", "cameraPermission.requesting": "Solicitando...", "cameraPermission.error": "No fue posible acceder a la cámara. Revisa el permiso del dispositivo e inténtalo de nuevo." },
+  es: { "cameraPermission.title": "Activar permiso de la cámara", "cameraPermission.message": "Para realizar la traducción de lengua de señas a texto en tiempo real, necesitamos acceder a la cámara de tu dispositivo.", "cameraPermission.privacy": "La cámara se usa para detectar gestos. El video solo se conserva de forma privada cuando eliges Guardar en historial; puedes descartarlo al finalizar.", "cameraPermission.reject": "Rechazar", "cameraPermission.requesting": "Solicitando...", "cameraPermission.error": "No fue posible acceder a la cámara. Revisa el permiso del dispositivo e inténtalo de nuevo." },
   en: { "cameraPermission.title": "Enable camera permission", "cameraPermission.message": "To translate sign language into text in real time, we need access to your device camera.", "cameraPermission.privacy": "The camera is used only to detect hand movements and gestures. Images and videos are not stored or shared.", "cameraPermission.reject": "Reject", "cameraPermission.requesting": "Requesting...", "cameraPermission.error": "We could not access the camera. Check the device permission and try again." },
   pt: { "cameraPermission.title": "Ativar permissão da câmera", "cameraPermission.message": "Para traduzir a língua de sinais em texto em tempo real, precisamos acessar a câmera do dispositivo.", "cameraPermission.privacy": "A câmera será usada apenas para detectar movimentos e gestos das mãos, sem armazenar ou compartilhar imagens ou vídeos.", "cameraPermission.reject": "Recusar", "cameraPermission.requesting": "Solicitando...", "cameraPermission.error": "Não foi possível acessar a câmera. Verifique a permissão do dispositivo e tente novamente." },
   it: { "cameraPermission.title": "Attiva il permesso della fotocamera", "cameraPermission.message": "Per tradurre la lingua dei segni in testo in tempo reale, dobbiamo accedere alla fotocamera del dispositivo.", "cameraPermission.privacy": "La fotocamera viene usata solo per rilevare movimenti e gesti delle mani, senza salvare o condividere immagini o video.", "cameraPermission.reject": "Rifiuta", "cameraPermission.requesting": "Richiesta...", "cameraPermission.error": "Impossibile accedere alla fotocamera. Controlla il permesso del dispositivo e riprova." }
@@ -179,17 +186,33 @@ for (const [language, labels] of Object.entries(cameraPermissionUi)) {
   Object.assign((text as any)[language].translation, labels);
 }
 
+const featurePermissionUi = {
+  es: { "common.activated": "Activado", "profile.permissionDenied": "El permiso fue rechazado. Actívalo desde los ajustes del dispositivo para continuar.", "profile.cameraPermissionTitle": "Activar permiso de cámara", "profile.cameraPermissionMessage": "Usaremos la cámara únicamente para reconocer señas y convertirlas en texto en tiempo real.", "profile.audioPermissionTitle": "Activar voz", "profile.audioPermissionMessage": "La voz leerá las traducciones en vivo y las que escuches desde el historial.", "profile.filesPermissionTitle": "Activar acceso a archivos", "profile.filesPermissionMessage": "Permitirá descargar y conservar los videos de traducciones en el almacenamiento de la aplicación.", "history.filePermissionRequired": "Activa Archivos desde tu perfil para descargar el video.", "history.downloaded": "El video se descargó en el almacenamiento de la aplicación.", "history.downloadError": "No fue posible descargar el video." },
+  en: { "common.activated": "Active", "profile.permissionDenied": "The permission was denied. Enable it in the device settings to continue.", "profile.cameraPermissionTitle": "Enable camera permission", "profile.cameraPermissionMessage": "We will use the camera only to recognize signs and translate them into text in real time.", "profile.audioPermissionTitle": "Enable voice", "profile.audioPermissionMessage": "Voice will read live translations and translations played from history.", "profile.filesPermissionTitle": "Enable file access", "profile.filesPermissionMessage": "It will allow downloading and retaining translation videos in the app storage.", "history.filePermissionRequired": "Enable Files from your profile to download the video.", "history.downloaded": "The video was downloaded to the app storage.", "history.downloadError": "The video could not be downloaded." },
+  pt: { "common.activated": "Ativado", "profile.permissionDenied": "A permissão foi negada. Ative-a nas configurações do dispositivo para continuar.", "profile.cameraPermissionTitle": "Ativar permissão da câmera", "profile.cameraPermissionMessage": "Usaremos a câmera apenas para reconhecer sinais e convertê-los em texto em tempo real.", "profile.audioPermissionTitle": "Ativar voz", "profile.audioPermissionMessage": "A voz lerá as traduções ao vivo e as que você ouvir no histórico.", "profile.filesPermissionTitle": "Ativar acesso a arquivos", "profile.filesPermissionMessage": "Permitirá baixar e manter os vídeos de tradução no armazenamento do aplicativo.", "history.filePermissionRequired": "Ative Arquivos no seu perfil para baixar o vídeo.", "history.downloaded": "O vídeo foi baixado para o armazenamento do aplicativo.", "history.downloadError": "Não foi possível baixar o vídeo." },
+  it: { "common.activated": "Attivo", "profile.permissionDenied": "L'autorizzazione è stata negata. Attivala nelle impostazioni del dispositivo per continuare.", "profile.cameraPermissionTitle": "Attiva autorizzazione fotocamera", "profile.cameraPermissionMessage": "Useremo la fotocamera solo per riconoscere i segni e convertirli in testo in tempo reale.", "profile.audioPermissionTitle": "Attiva voce", "profile.audioPermissionMessage": "La voce leggerà le traduzioni dal vivo e quelle ascoltate nella cronologia.", "profile.filesPermissionTitle": "Attiva accesso ai file", "profile.filesPermissionMessage": "Consentirà di scaricare e conservare i video delle traduzioni nella memoria dell'app.", "history.filePermissionRequired": "Attiva File dal profilo per scaricare il video.", "history.downloaded": "Il video è stato scaricato nella memoria dell'app.", "history.downloadError": "Non è stato possibile scaricare il video." },
+};
+for (const [language, labels] of Object.entries(featurePermissionUi)) {
+  Object.assign((text as any)[language].translation, labels);
+}
+
 i18n.use(initReactI18next).init({ resources: text, lng: "es", fallbackLng: "es", interpolation: { escapeValue: false } });
 
+let languageRequestVersion = 0;
+
 export async function loadLanguage() {
+  const requestVersion = ++languageRequestVersion;
   const stored = await AsyncStorage.getItem("language");
   const valid = languageOptions.some((option) => option.code === stored) ? stored! : "es";
+  if (requestVersion !== languageRequestVersion) return;
   await i18n.changeLanguage(valid);
 }
 
 export async function setLanguage(language: string) {
   if (!languageOptions.some((option) => option.code === language)) return;
+  const requestVersion = ++languageRequestVersion;
   await AsyncStorage.setItem("language", language);
+  if (requestVersion !== languageRequestVersion) return;
   await i18n.changeLanguage(language);
 }
 

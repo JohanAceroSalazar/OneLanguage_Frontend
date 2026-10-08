@@ -1,7 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Camera } from "expo-camera";
+import * as Speech from "expo-speech";
 import { useRouter } from "expo-router";
 import {
+    Alert,
     Image,
+    Modal,
     ScrollView,
     StyleSheet,
     Text,
@@ -10,19 +14,31 @@ import {
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { BottomNav } from "../../components/bottom-nav";
+import { BrandWordmark } from "../../components/brand-wordmark";
+import { useMainPager } from "../../components/main-pager-context";
+import { SwipeNavigation } from "../../components/swipe-navigation";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { clearAuthSession, getCurrentUser, getLocalAccessibilitySettings } from "../../src/services/authService";
 import { setLanguage } from "../../src/i18n";
+import {
+    FeaturePermission,
+    FeaturePermissions,
+    getFeaturePermissions,
+    setFeaturePermission,
+} from "../../src/services/featurePermissionService";
 
 type PermissionItemProps = {
     icon: keyof typeof Ionicons.glyphMap;
     title: string;
     description: string;
+    active: boolean;
+    loading: boolean;
+    onPress: () => void;
 };
 
-function PermissionItem({ icon, title, description }: PermissionItemProps) {
+function PermissionItem({ icon, title, description, active, loading, onPress }: PermissionItemProps) {
     const { colors, fontScale } = useTheme();
     const { t } = useTranslation();
 
@@ -35,8 +51,16 @@ function PermissionItem({ icon, title, description }: PermissionItemProps) {
         <Text style={[styles.permissionDescription, { color: colors.textMuted, fontSize: 12 * fontScale }]}>{description}</Text>
     </View>
 
-    <TouchableOpacity activeOpacity={0.85} style={[styles.activateButton, { backgroundColor: colors.accent }]}> 
-        <Text style={[styles.activateText, { color: colors.textOnSurface, fontSize: 13 * fontScale }]}>{t("common.activate")}</Text>
+    <TouchableOpacity
+        activeOpacity={0.85}
+        disabled={loading}
+        onPress={onPress}
+        accessibilityRole="switch"
+        accessibilityState={{ checked: active, disabled: loading }}
+        accessibilityLabel={`${title}: ${active ? t("common.activated") : t("common.activate")}`}
+        style={[styles.activateButton, { backgroundColor: colors.accent }, active && styles.activatedButton, loading && styles.permissionButtonDisabled]}
+    >
+        <Text style={[styles.activateText, { color: colors.textOnSurface, fontSize: 13 * fontScale }]}>{loading ? "..." : active ? t("common.activated") : t("common.activate")}</Text>
     </TouchableOpacity>
     </View>
     );
@@ -45,9 +69,13 @@ function PermissionItem({ icon, title, description }: PermissionItemProps) {
 export default function UserProfile() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const { colors, fontScale, setThemeMode, setFontSizeMode } = useTheme();
+    const { colors, fontScale, setThemeMode, setFontSizeMode, theme } = useTheme();
     const { t } = useTranslation();
+    const mainPager = useMainPager();
     const [user, setUser] = useState<any>(null);
+    const [featurePermissions, setFeaturePermissions] = useState<FeaturePermissions>({ camera: false, audio: false, files: false });
+    const [updatingPermission, setUpdatingPermission] = useState<FeaturePermission | null>(null);
+    const [permissionPrompt, setPermissionPrompt] = useState<FeaturePermission | null>(null);
 
     useEffect(() => {
     const loadUser = async () => {
@@ -65,6 +93,57 @@ export default function UserProfile() {
     loadUser();
 }, [router]);
 
+    useEffect(() => {
+        getFeaturePermissions().then(setFeaturePermissions).catch(() => undefined);
+    }, []);
+
+    useEffect(() => {
+        if (mainPager?.activeTab === "profile") {
+            getFeaturePermissions().then(setFeaturePermissions).catch(() => undefined);
+        }
+    }, [mainPager?.activeTab]);
+
+    const enablePermission = async (feature: FeaturePermission) => {
+        if (updatingPermission) return;
+        setUpdatingPermission(feature);
+        try {
+            let granted = true;
+            if (feature === "camera") {
+                granted = (await Camera.requestCameraPermissionsAsync()).granted;
+            }
+
+            if (!granted) {
+                Alert.alert(t("profile.permissions"), t("profile.permissionDenied"));
+                return;
+            }
+            setFeaturePermissions(await setFeaturePermission(feature, true));
+        } catch {
+            Alert.alert(t("profile.permissions"), t("profile.permissionDenied"));
+        } finally {
+            setUpdatingPermission(null);
+        }
+    };
+
+    const handlePermissionPress = (feature: FeaturePermission) => {
+        if (updatingPermission) return;
+        if (!featurePermissions[feature]) {
+            setPermissionPrompt(feature);
+            return;
+        }
+        void setFeaturePermission(feature, false).then(setFeaturePermissions);
+        if (feature === "audio") Speech.stop();
+    };
+
+    const promptTitle = permissionPrompt ? t(`profile.${permissionPrompt}PermissionTitle`) : "";
+    const promptMessage = permissionPrompt ? t(`profile.${permissionPrompt}PermissionMessage`) : "";
+
+    const confirmPermission = () => {
+        if (!permissionPrompt) return;
+        const feature = permissionPrompt;
+        setPermissionPrompt(null);
+        void enablePermission(feature);
+    };
+
     const handleLogout = async () => {
         await clearAuthSession();
         const anonymousSettings = await getLocalAccessibilitySettings();
@@ -75,13 +154,14 @@ export default function UserProfile() {
     };
 
     return (
+    <SwipeNavigation active="profile">
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
         <ScrollView
         contentContainerStyle={[styles.content, { paddingBottom: 105 + Math.max(insets.bottom, 8) }]}
         showsVerticalScrollIndicator={false}
     >
         <View style={styles.header}>
-            <Text style={[styles.logo, { color: colors.text, fontSize: 20 * fontScale }]}>ONE{"\n"}LANGUAGE</Text>
+            <BrandWordmark color={colors.text} style={styles.logo} />
         <Image
             source={require("../../assets/images/Logo.png")}
             style={styles.avatar}
@@ -122,16 +202,25 @@ export default function UserProfile() {
             icon="camera-outline"
             title={t("common.camera")}
             description={t("profile.cameraText")}
+            active={featurePermissions.camera}
+            loading={updatingPermission === "camera"}
+            onPress={() => handlePermissionPress("camera")}
         />
         <PermissionItem
             icon="musical-notes"
             title={t("common.audio")}
             description={t("profile.audioText")}
+            active={featurePermissions.audio}
+            loading={updatingPermission === "audio"}
+            onPress={() => handlePermissionPress("audio")}
         />
         <PermissionItem
             icon="folder"
             title={t("common.files")}
             description={t("profile.filesText")}
+            active={featurePermissions.files}
+            loading={updatingPermission === "files"}
+            onPress={() => handlePermissionPress("files")}
         />
         </View>
 
@@ -140,12 +229,37 @@ export default function UserProfile() {
             style={styles.logoutButton}
             onPress={handleLogout}
         >
-            <Text style={[styles.logoutText, { color: "#FFFFFF", fontSize: 20 * fontScale }]}>{t("common.logout")}</Text>
+          <Text
+            style={[
+              styles.logoutText,
+              { color: theme === "dark" ? "#FFFFFF" : "#111827", fontSize: 20 * fontScale },
+            ]}
+          >
+            {t("common.logout")}
+          </Text>
         </TouchableOpacity>
     </ScrollView>
 
+        <Modal visible={permissionPrompt !== null} transparent animationType="fade" onRequestClose={() => setPermissionPrompt(null)}>
+            <View style={styles.permissionBackdrop}>
+                <View style={[styles.permissionDialog, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    <Text style={[styles.permissionDialogTitle, { color: colors.textOnSurface, fontSize: 27 * fontScale }]}>{promptTitle}</Text>
+                    <Text style={[styles.permissionDialogText, { color: colors.textOnSurface, fontSize: 17 * fontScale }]}>{promptMessage}</Text>
+                    <View style={styles.permissionDialogActions}>
+                        <TouchableOpacity activeOpacity={0.85} onPress={confirmPermission} style={[styles.permissionDialogButton, { backgroundColor: colors.accent }]}>
+                            <Text style={[styles.permissionDialogButtonText, { color: colors.textOnSurface, fontSize: 17 * fontScale }]}>{t("common.activate")}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity activeOpacity={0.85} onPress={() => setPermissionPrompt(null)} style={[styles.permissionDialogButton, { backgroundColor: colors.accent }]}>
+                            <Text style={[styles.permissionDialogButtonText, { color: colors.textOnSurface, fontSize: 17 * fontScale }]}>{t("cameraPermission.reject")}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
+        </Modal>
+
         <BottomNav active="profile" />
     </SafeAreaView>
+    </SwipeNavigation>
     );
 }
 
@@ -155,8 +269,8 @@ container: {
     backgroundColor: "#2F78CC",
     },
 content: {
-    paddingHorizontal: 16,
-    paddingTop: 18,
+    paddingHorizontal: 20,
+    paddingTop: 20,
     paddingBottom: 105,
     },
 header: {
@@ -166,10 +280,6 @@ header: {
     paddingHorizontal: 2,
     },
 logo: {
-    color: "#FFFFFF",
-    fontSize: 20,
-    fontWeight: "bold",
-    lineHeight: 20,
     marginLeft: 8,
     },
 avatar: {
@@ -284,7 +394,7 @@ permissionDescription: {
     lineHeight: 14,
     },
 activateButton: {
-    width: 64,
+    width: 78,
     minHeight: 42,
     borderRadius: 10,
     backgroundColor: "#FFEB3B",
@@ -296,6 +406,48 @@ activateButton: {
     shadowRadius: 7,
     elevation: 3,
     },
+activatedButton: {
+    backgroundColor: "#D7C81B",
+    },
+permissionButtonDisabled: { opacity: 0.65 },
+permissionBackdrop: {
+    flex: 1,
+    padding: 24,
+    justifyContent: "center",
+    backgroundColor: "rgba(11, 43, 80, 0.56)",
+    },
+permissionDialog: {
+    borderWidth: 2,
+    borderRadius: 20,
+    paddingVertical: 28,
+    paddingHorizontal: 22,
+    },
+permissionDialogTitle: {
+    fontWeight: "700",
+    lineHeight: 33,
+    textAlign: "center",
+    },
+permissionDialogText: {
+    marginTop: 16,
+    lineHeight: 24,
+    textAlign: "center",
+    },
+permissionDialogActions: {
+    flexDirection: "row",
+    gap: 14,
+    marginTop: 28,
+    },
+permissionDialogButton: {
+    flex: 1,
+    minHeight: 48,
+    borderWidth: 1,
+    borderColor: "#111827",
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    },
+permissionDialogButtonText: { fontWeight: "600", textAlign: "center" },
 activateText: {
     color: "#000000",
     fontSize: 13,

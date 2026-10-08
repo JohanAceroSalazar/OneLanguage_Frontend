@@ -43,6 +43,10 @@ const finalExtras = {
   it: { "terms.welcome": "Benvenuto nella nostra applicazione per tradurre la lingua dei segni in testo. Utilizzando l'applicazione, accetti questi Termini e condizioni.", "terms.s1": "1. Accettazione dei termini", "terms.p1": "Accedendo, installando o utilizzando l'Applicazione, dichiari di aver letto, compreso e accettato questi termini.", "terms.s2": "2. Descrizione del servizio", "terms.p2": "L'applicazione può acquisire i segni, interpretarli tramite algoritmi e convertirli in testo e audio.", "terms.s3": "3. Uso consentito", "terms.p3": "L'utente si impegna a usare l'applicazione responsabilmente e senza scopi illegali o dannosi.", "terms.s4": "4. Registrazione e sicurezza", "terms.p4": "L'utente deve fornire informazioni veritiere e proteggere le proprie credenziali.", "terms.s5": "5. Privacy", "terms.p5": "I dati raccolti vengono utilizzati solo per migliorare l'esperienza dell'utente.", "terms.s6": "6. Proprietà intellettuale", "terms.p6": "Tutti i contenuti dell'applicazione appartengono ai suoi sviluppatori.", "terms.s7": "7. Limitazione di responsabilità", "terms.p7": "L'applicazione può contenere errori e non garantisce la precisione totale.", "misc.activating": "Attiva", "misc.textSize": "Dimensione del testo", "misc.passwordStrength": "Robustezza della password", "misc.passwordMismatch": "Le password non coincidono.", "misc.passwordMatch": "Le password coincidono.", "misc.accessibilitySaved": "Modifiche di accessibilità salvate" }
 };
 for (const language of Object.keys(finalExtras)) Object.assign(resources[language].translation, finalExtras[language]);
+Object.assign(resources.es.translation, { "auth.terms": "Acepto los" });
+Object.assign(resources.en.translation, { "auth.terms": "I accept the" });
+Object.assign(resources.pt.translation, { "auth.terms": "Aceito os" });
+Object.assign(resources.it.translation, { "auth.terms": "Accetto i" });
 Object.assign(resources.en.translation, { "misc.accessibilitySaveError": "Your preferences could not be saved to your account." });
 Object.assign(resources.pt.translation, { "misc.accessibilitySaveError": "Não foi possível salvar suas preferências na conta." });
 Object.assign(resources.it.translation, { "misc.accessibilitySaveError": "Non è stato possibile salvare le preferenze nell'account." });
@@ -53,11 +57,11 @@ Object.assign(resources.it.translation, { "home.description": "One Language è u
 const additionalUi = {
   es: {
     "history.dateUnavailable": "Fecha no disponible", "history.loadError": "No se pudo cargar el historial.", "history.deleteError": "No se pudo eliminar la traducción.", "history.deleteAllConfirm": "Se eliminarán todas las traducciones guardadas.", "history.deleteHistoryError": "No se pudo eliminar el historial.",
-    "translate.status.inactive": "Activa la cámara para interpretar señas.", "translate.status.connecting": "Conectando el modelo de interpretación...", "translate.status.ready": "Modelo listo. Muestra una seña a la cámara.", "translate.status.analyzing": "Analizando el movimiento...", "translate.status.waiting": "Aún no hay suficiente certeza para traducir.", "translate.status.no_hands": "No se detecta una seña. Muestra tus manos dentro del encuadre.", "translate.status.idle": "No se detecta una seña en este momento.", "translate.status.saved": "Traducción guardada en tu historial.", "translate.status.save_error": "No se pudo guardar la traducción. Intenta nuevamente.", "translate.status.camera_insecure": "La cámara requiere HTTPS o localhost.", "translate.status.camera_denied": "El navegador no tiene permiso para usar la cámara.", "translate.status.camera_unavailable": "No se encontró una cámara disponible.", "translate.status.camera_busy": "La cámara está siendo usada por otra aplicación.", "translate.status.camera_error": "No se pudo iniciar la cámara.", "translate.status.model_error": "No fue posible conectar con el modelo de IA.", "translate.empty": "Aún no hay una seña reconocida", "translate.confidence": "{{value}}% de confianza", "translate.start": "Iniciar traducción", "translate.finish": "Finalizar traducción", "translate.saving": "Guardando...", "translate.save": "Guardar en historial"
+    "translate.status.inactive": "Activa la cámara para interpretar señas.", "translate.status.connecting": "Conectando el modelo de interpretación...", "translate.status.ready": "Modelo listo. Muestra una seña a la cámara.", "translate.status.analyzing": "Analizando el movimiento...", "translate.status.waiting": "Aún no hay suficiente certeza para traducir.", "translate.status.no_hands": "No se detecta una seña. Muestra tus manos dentro del encuadre.", "translate.status.idle": "No se detecta una seña en este momento.", "translate.status.translated": "Traducción reconocida correctamente.", "translate.status.saved": "Traducción guardada en tu historial.", "translate.status.save_error": "No se pudo guardar la traducción. Intenta nuevamente.", "translate.status.camera_insecure": "La cámara requiere HTTPS o localhost.", "translate.status.camera_denied": "El navegador no tiene permiso para usar la cámara.", "translate.status.camera_unavailable": "No se encontró una cámara disponible.", "translate.status.camera_busy": "La cámara está siendo usada por otra aplicación.", "translate.status.camera_error": "No se pudo iniciar la cámara.", "translate.status.model_error": "No fue posible conectar con el modelo de IA.", "translate.empty": "Aún no hay una seña reconocida", "translate.confidence": "{{value}}% de confianza", "translate.start": "Iniciar traducción", "translate.finish": "Finalizar traducción", "translate.saving": "Guardando...", "translate.save": "Guardar en historial"
   },
   en: {
     "history.dateUnavailable": "Date unavailable", "history.loadError": "Could not load history.", "history.deleteError": "Could not delete the translation.", "history.deleteAllConfirm": "All saved translations will be deleted.", "history.deleteHistoryError": "Could not delete history.",
-    "translate.status.inactive": "Activate the camera to interpret signs.", "translate.status.connecting": "Connecting to the interpretation model...", "translate.status.ready": "Model ready. Show a sign to the camera.", "translate.status.analyzing": "Analyzing movement...", "translate.status.waiting": "There is not enough certainty to translate yet.", "translate.status.no_hands": "No sign detected. Place your hands inside the frame.", "translate.status.idle": "No sign detected at this moment.", "translate.status.saved": "Translation saved to your history.", "translate.status.save_error": "Could not save the translation. Try again.", "translate.status.camera_insecure": "The camera requires HTTPS or localhost.", "translate.status.camera_denied": "The browser does not have permission to use the camera.", "translate.status.camera_unavailable": "No camera was found.", "translate.status.camera_busy": "The camera is being used by another application.", "translate.status.camera_error": "Could not start the camera.", "translate.status.model_error": "Could not connect to the AI model.", "translate.empty": "No sign has been recognized yet", "translate.confidence": "{{value}}% confidence", "translate.start": "Start translation", "translate.finish": "Finish translation", "translate.saving": "Saving...", "translate.save": "Save to history"
+    "translate.status.inactive": "Activate the camera to interpret signs.", "translate.status.connecting": "Connecting to the interpretation model...", "translate.status.ready": "Model ready. Show a sign to the camera.", "translate.status.analyzing": "Analyzing movement...", "translate.status.waiting": "There is not enough certainty to translate yet.", "translate.status.no_hands": "No sign detected. Place your hands inside the frame.", "translate.status.idle": "No sign detected at this moment.", "translate.status.translated": "Translation recognized successfully.", "translate.status.saved": "Translation saved to your history.", "translate.status.save_error": "Could not save the translation. Try again.", "translate.status.camera_insecure": "The camera requires HTTPS or localhost.", "translate.status.camera_denied": "The browser does not have permission to use the camera.", "translate.status.camera_unavailable": "No camera was found.", "translate.status.camera_busy": "The camera is being used by another application.", "translate.status.camera_error": "Could not start the camera.", "translate.status.model_error": "Could not connect to the AI model.", "translate.empty": "No sign has been recognized yet", "translate.confidence": "{{value}}% confidence", "translate.start": "Start translation", "translate.finish": "Finish translation", "translate.saving": "Saving...", "translate.save": "Save to history"
   },
   pt: {
     "history.dateUnavailable": "Data indisponível", "history.loadError": "Não foi possível carregar o histórico.", "history.deleteError": "Não foi possível excluir a tradução.", "history.deleteAllConfirm": "Todas as traduções salvas serão excluídas.", "history.deleteHistoryError": "Não foi possível excluir o histórico.",
@@ -69,6 +73,13 @@ const additionalUi = {
   }
 };
 for (const language of Object.keys(additionalUi)) Object.assign(resources[language].translation, additionalUi[language]);
+const historyRecordingUi = {
+  es: { "history.listen": "Escuchar traducción", "history.playRecording": "Ver grabación", "history.hideRecording": "Ocultar grabación", "history.recordingError": "No se pudo cargar la grabación." },
+  en: { "history.listen": "Listen to translation", "history.playRecording": "Watch recording", "history.hideRecording": "Hide recording", "history.recordingError": "Could not load the recording." },
+  pt: { "history.listen": "Ouvir tradução", "history.playRecording": "Ver gravação", "history.hideRecording": "Ocultar gravação", "history.recordingError": "Não foi possível carregar a gravação." },
+  it: { "history.listen": "Ascolta traduzione", "history.playRecording": "Guarda registrazione", "history.hideRecording": "Nascondi registrazione", "history.recordingError": "Impossibile caricare la registrazione." },
+};
+for (const language of Object.keys(historyRecordingUi)) Object.assign(resources[language].translation, historyRecordingUi[language]);
 const frameProcessingLabels = {
   es: "No se pudo procesar una imagen de la camara. Intentando de nuevo...",
   en: "A camera image could not be processed. Retrying...",
@@ -87,12 +98,44 @@ const resetUi = {
 for (const language of Object.keys(resetUi)) Object.assign(resources[language].translation, resetUi[language]);
 
 const cameraPermissionUi = {
-  es: { "cameraPermission.title": "Activar permiso de la cámara", "cameraPermission.message": "Para realizar la traducción de lengua de señas a texto en tiempo real, necesitamos acceder a la cámara de tu dispositivo.", "cameraPermission.privacy": "La cámara se utilizará únicamente para detectar movimientos y gestos de las manos, sin almacenar ni compartir imágenes o videos.", "cameraPermission.reject": "Rechazar", "cameraPermission.requesting": "Solicitando...", "cameraPermission.error": "No fue posible acceder a la cámara. Revisa el permiso del navegador e inténtalo de nuevo." },
+  es: { "cameraPermission.title": "Activar permiso de la cámara", "cameraPermission.message": "Para realizar la traducción de lengua de señas a texto en tiempo real, necesitamos acceder a la cámara de tu dispositivo.", "cameraPermission.privacy": "La cámara se usa para detectar gestos. El video solo se conserva de forma privada cuando eliges Guardar en historial; puedes descartarlo al finalizar.", "cameraPermission.reject": "Rechazar", "cameraPermission.requesting": "Solicitando...", "cameraPermission.error": "No fue posible acceder a la cámara. Revisa el permiso del navegador e inténtalo de nuevo." },
   en: { "cameraPermission.title": "Enable camera permission", "cameraPermission.message": "To translate sign language into text in real time, we need access to your device camera.", "cameraPermission.privacy": "The camera is used only to detect hand movements and gestures. Images and videos are not stored or shared.", "cameraPermission.reject": "Reject", "cameraPermission.requesting": "Requesting...", "cameraPermission.error": "We could not access the camera. Check the browser permission and try again." },
   pt: { "cameraPermission.title": "Ativar permissão da câmera", "cameraPermission.message": "Para traduzir a língua de sinais em texto em tempo real, precisamos acessar a câmera do dispositivo.", "cameraPermission.privacy": "A câmera será usada apenas para detectar movimentos e gestos das mãos, sem armazenar ou compartilhar imagens ou vídeos.", "cameraPermission.reject": "Recusar", "cameraPermission.requesting": "Solicitando...", "cameraPermission.error": "Não foi possível acessar a câmera. Verifique a permissão do navegador e tente novamente." },
   it: { "cameraPermission.title": "Attiva il permesso della fotocamera", "cameraPermission.message": "Per tradurre la lingua dei segni in testo in tempo reale, dobbiamo accedere alla fotocamera del dispositivo.", "cameraPermission.privacy": "La fotocamera viene usata solo per rilevare movimenti e gesti delle mani, senza salvare o condividere immagini o video.", "cameraPermission.reject": "Rifiuta", "cameraPermission.requesting": "Richiesta...", "cameraPermission.error": "Impossibile accedere alla fotocamera. Controlla il permesso del browser e riprova." }
 };
 for (const language of Object.keys(cameraPermissionUi)) Object.assign(resources[language].translation, cameraPermissionUi[language]);
+
+const landingUi = {
+  es: {
+    "landing.description": "Traduce, consulta tu historial y ajusta la accesibilidad desde una experiencia moderna, clara y lista para acompañar a usuarios, familias y equipos de apoyo.",
+    "landing.start": "Empezar ahora",
+    "landing.hasAccount": "Ya tengo cuenta"
+  },
+  en: {
+    "landing.description": "Translate, review your history and adjust accessibility from a modern, clear experience designed to support users, families and support teams.",
+    "landing.start": "Get started",
+    "landing.hasAccount": "I already have an account"
+  },
+  pt: {
+    "landing.description": "Traduza, consulte seu histórico e ajuste a acessibilidade em uma experiência moderna, clara e preparada para acompanhar usuários, famílias e equipes de apoio.",
+    "landing.start": "Começar agora",
+    "landing.hasAccount": "Já tenho uma conta"
+  },
+  it: {
+    "landing.description": "Traduci, consulta la cronologia e regola l'accessibilità in un'esperienza moderna e chiara, pensata per utenti, famiglie e team di supporto.",
+    "landing.start": "Inizia ora",
+    "landing.hasAccount": "Ho già un account"
+  }
+};
+for (const language of Object.keys(landingUi)) Object.assign(resources[language].translation, landingUi[language]);
+
+const recoveryUi = {
+  es: { "auth.recoverHint": "Escribe tu correo y te enviaremos el enlace para crear una nueva contraseña." },
+  en: { "auth.recoverHint": "Enter your email and we will send you a link to create a new password." },
+  pt: { "auth.recoverHint": "Digite seu e-mail e enviaremos o link para criar uma nova senha." },
+  it: { "auth.recoverHint": "Inserisci la tua e-mail e ti invieremo il link per creare una nuova password." }
+};
+for (const language of Object.keys(recoveryUi)) Object.assign(resources[language].translation, recoveryUi[language]);
 
 const saved = localStorage.getItem("language");
 const initial = languageOptions.some((option) => option.code === saved) ? saved : "es";

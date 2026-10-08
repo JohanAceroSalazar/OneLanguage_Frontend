@@ -9,6 +9,7 @@ import { clearAuthSession } from "../../services/authSession";
 import { getCurrentUser } from "../../services/authService";
 import i18n from "../../i18n";
 import { readStoredAccessibility } from "../../services/accessibilityStorage";
+import { getFeaturePermissions, setFeaturePermission } from "../../services/featurePermissionService";
 
 function Profile() {
     const { t } = useTranslation();
@@ -18,6 +19,8 @@ function Profile() {
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [user, setUser] = useState(null);
     const [profileError, setProfileError] = useState("");
+    const [featurePermissions, setFeaturePermissions] = useState({ camera: false, audio: false, files: false });
+    const [updatingPermission, setUpdatingPermission] = useState(null);
 
     useEffect(() => {
         let active = true;
@@ -35,6 +38,14 @@ function Profile() {
                 }
             });
 
+        getFeaturePermissions()
+            .then((permissions) => {
+                if (active) setFeaturePermissions(permissions);
+            })
+            .catch(() => {
+                if (active) setProfileError(t("profile.loadError", "No se pudo cargar el perfil."));
+            });
+
         return () => {
             active = false;
         };
@@ -44,6 +55,23 @@ function Profile() {
         clearAuthSession();
         i18n.changeLanguage(readStoredAccessibility().language);
         navigate("/login", { replace: true });
+    };
+
+    const toggleFeaturePermission = async (feature) => {
+        if (updatingPermission) return;
+        setUpdatingPermission(feature);
+        try {
+            if (!featurePermissions[feature] && feature === "camera") {
+                const stream = await navigator.mediaDevices?.getUserMedia({ video: true, audio: false });
+                if (!stream) throw new Error("camera_unavailable");
+                stream.getTracks().forEach((track) => track.stop());
+            }
+            setFeaturePermissions(await setFeaturePermission(feature, !featurePermissions[feature]));
+        } catch {
+            setProfileError(t("cameraPermission.error"));
+        } finally {
+            setUpdatingPermission(null);
+        }
     };
 
     // VISTA CÁMARA
@@ -144,7 +172,9 @@ function Profile() {
                                 <p className="perm-desc">{t("profile.cameraText")}</p>
                             </div>
                         </div>
-                        <button className="activate-btn" onClick={() => setView("camera")}>{t("common.activate")}</button>
+                        <button className={`activate-btn ${featurePermissions.camera ? "is-active" : ""}`} onClick={() => toggleFeaturePermission("camera")} disabled={updatingPermission !== null} aria-pressed={featurePermissions.camera}>
+                            {updatingPermission === "camera" ? t("common.loading") : featurePermissions.camera ? t("common.activated", "Activado") : t("common.activate")}
+                        </button>
                     </div>
 
                     <div className="permission-row">
@@ -155,7 +185,9 @@ function Profile() {
                                 <p className="perm-desc">{t("profile.audioText")}</p>
                             </div>
                         </div>
-                        <button className="activate-btn" onClick={() => setView("audio")}>{t("common.activate")}</button>
+                        <button className={`activate-btn ${featurePermissions.audio ? "is-active" : ""}`} onClick={() => toggleFeaturePermission("audio")} disabled={updatingPermission !== null} aria-pressed={featurePermissions.audio}>
+                            {updatingPermission === "audio" ? t("common.loading") : featurePermissions.audio ? t("common.activated", "Activado") : t("common.activate")}
+                        </button>
                     </div>
 
                     <div className="permission-row">
@@ -166,7 +198,9 @@ function Profile() {
                                 <p className="perm-desc">{t("profile.filesText")}</p>
                             </div>
                         </div>
-                        <button className="activate-btn" onClick={() => setView("files")}>{t("common.activate")}</button>
+                        <button className={`activate-btn ${featurePermissions.files ? "is-active" : ""}`} onClick={() => toggleFeaturePermission("files")} disabled={updatingPermission !== null} aria-pressed={featurePermissions.files}>
+                            {updatingPermission === "files" ? t("common.loading") : featurePermissions.files ? t("common.activated", "Activado") : t("common.activate")}
+                        </button>
                     </div>
                 </div>
 

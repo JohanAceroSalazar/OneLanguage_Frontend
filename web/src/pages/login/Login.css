@@ -47,7 +47,7 @@ body {
     text-align: left;
     line-height: 0.92;
     margin: 0;
-    letter-spacing: -0.05em;
+    letter-spacing: 0;
 }
 
 .login-brand-copy {
@@ -207,6 +207,10 @@ body {
         max-width: 100%;
     }
 
+    .brand-name {
+        font-size: clamp(34px, 12vw, 54px);
+    }
+
     .login-brand-copy {
         max-width: 42ch;
     }
@@ -216,10 +220,6 @@ body {
     .login-card {
         padding: 22px 18px;
         border-radius: 24px;
-    }
-
-    .brand-name {
-        font-size: clamp(34px, 12vw, 54px);
     }
 
     .login-brand-copy {

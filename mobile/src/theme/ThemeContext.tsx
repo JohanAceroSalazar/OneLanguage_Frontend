@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { getLocalAccessibilitySettings, persistLocalAccessibilitySettings } from "../services/authService";
 
 type ThemeMode = "light" | "dark";
@@ -66,13 +66,27 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<ThemeMode>("light");
   const [fontSizeMode, setFontSizeModeState] = useState<FontSizeMode>("medium");
   const [loaded, setLoaded] = useState(false);
+  const settingsVersion = useRef(0);
 
   useEffect(() => {
-    getLocalAccessibilitySettings().then((settings) => {
-      setTheme(settings.theme);
-      setFontSizeModeState(settings.textSize);
-      setLoaded(true);
-    });
+    const requestVersion = settingsVersion.current;
+    getLocalAccessibilitySettings()
+      .then((settings) => {
+        if (requestVersion !== settingsVersion.current) return;
+        setTheme(settings.theme);
+        setFontSizeModeState(settings.textSize);
+      })
+      .finally(() => setLoaded(true));
+  }, []);
+
+  const setThemeMode = useCallback((mode: ThemeMode) => {
+    settingsVersion.current += 1;
+    setTheme(mode);
+  }, []);
+
+  const setFontSizeMode = useCallback((mode: FontSizeMode) => {
+    settingsVersion.current += 1;
+    setFontSizeModeState(mode);
   }, []);
 
   useEffect(() => {
@@ -87,12 +101,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     theme,
     fontSizeMode,
     fontScale: fontScaleMap[fontSizeMode],
-    toggleTheme: () => setTheme((current) => (current === "light" ? "dark" : "light")),
-    setThemeMode: setTheme,
-    setFontSizeMode: setFontSizeModeState,
+    toggleTheme: () => setThemeMode(theme === "light" ? "dark" : "light"),
+    setThemeMode,
+    setFontSizeMode,
     colors: theme === "light" ? lightColors : darkColors,
-  }), [fontSizeMode, theme]);
+  }), [fontSizeMode, setFontSizeMode, setThemeMode, theme]);
 
+  if (!loaded) return null;
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 

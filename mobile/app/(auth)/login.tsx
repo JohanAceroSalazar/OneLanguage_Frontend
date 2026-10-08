@@ -13,8 +13,9 @@ import {
   View,
 } from "react-native";
 import { AppAlert } from "../../components/app-alert";
-import { getAccessibilitySettings, getLocalAccessibilitySettings, loginUser } from "../../src/services/authService";
-import { setLanguage } from "../../src/i18n";
+import { BrandWordmark } from "../../components/brand-wordmark";
+import { getAccessibilitySettings, hasLocalAccessibilitySettings, loginUser, persistLocalAccessibilitySettings } from "../../src/services/authService";
+import i18n, { languageOptions } from "../../src/i18n";
 import { useTheme } from "../../src/theme/ThemeContext";
 
 const emailRegex = /\S+@\S+\.\S+/;
@@ -31,7 +32,7 @@ type AlertState = {
 export default function Login() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { colors, setThemeMode, setFontSizeMode } = useTheme();
+  const { colors, theme, fontSizeMode, setThemeMode, setFontSizeMode } = useTheme();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "" });
@@ -91,15 +92,22 @@ export default function Login() {
 
       try {
         const settings = await getAccessibilitySettings();
-        await setLanguage(settings.language);
+        await persistLocalAccessibilitySettings(settings);
+        await i18n.changeLanguage(settings.language);
         setThemeMode(settings.theme);
         setFontSizeMode(settings.textSize);
       } catch {
-        const localSettings = await getLocalAccessibilitySettings();
-        await setLanguage(localSettings.language);
-        setThemeMode(localSettings.theme);
-        setFontSizeMode(localSettings.textSize);
-        // El inicio de sesión no depende de que el backend de preferencias esté disponible.
+        const accountHasSettings = await hasLocalAccessibilitySettings();
+        const activeLanguage = languageOptions.some((option) => option.code === i18n.language)
+          ? i18n.language as "es" | "en" | "pt" | "it"
+          : "es";
+        if (!accountHasSettings) {
+        await persistLocalAccessibilitySettings({
+          language: activeLanguage,
+          theme,
+          textSize: fontSizeMode,
+        });
+        }
       }
 
       setAlert({
@@ -110,7 +118,7 @@ export default function Login() {
         variant: "success",
         onAction: () => {
           closeAlert();
-          router.replace("/(auth)/home");
+          router.replace("/(auth)/main");
         },
       });
     } catch (error: any) {
@@ -130,7 +138,7 @@ export default function Login() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.topBar}>
-        <Text style={[styles.logo, { color: colors.text }]}>ONE{"\n"}LANGUAGE</Text>
+        <BrandWordmark color={colors.text} style={styles.logo} />
       </View>
 
       <Text style={[styles.title, { color: colors.text }]}>{t("auth.login")}</Text>
@@ -208,9 +216,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   logo: {
-    fontWeight: "bold",
-    fontSize: 20,
-    lineHeight: 22,
   },
   title: {
     fontSize: 32,
