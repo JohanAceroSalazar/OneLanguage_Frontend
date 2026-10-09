@@ -27,7 +27,7 @@ export function applyAccessibilitySettings(settings) {
     i18n.changeLanguage(normalized.language);
     document.documentElement.dataset.theme = normalized.theme;
     document.documentElement.style.colorScheme = normalized.theme;
-    document.body.style.zoom = String({ small: 0.92, medium: 1, large: 1.08 }[normalized.textSize]);
+    document.body.style.zoom = "";
     document.documentElement.dataset.textSize = normalized.textSize;
     return normalized;
 }

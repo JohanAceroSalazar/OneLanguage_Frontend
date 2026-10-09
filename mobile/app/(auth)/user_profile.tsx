@@ -58,10 +58,10 @@ function PermissionItem({ icon, title, description, active, loading, onPress }: 
         onPress={onPress}
         accessibilityRole="switch"
         accessibilityState={{ checked: active, disabled: loading }}
-        accessibilityLabel={`${title}: ${active ? t("common.activated") : t("common.activate")}`}
-        style={[styles.activateButton, active && styles.activatedButton, { backgroundColor: colors.accent }, loading && styles.permissionButtonDisabled]}
+        accessibilityLabel={`${title}: ${active ? t("common.deactivate") : t("common.activate")}`}
+        style={[styles.activateButton, active && styles.activatedButton, { backgroundColor: active ? colors.primary : colors.accent }, loading && styles.permissionButtonDisabled]}
     >
-        <Text style={[styles.activateText, { color: colors.textOnSurface, fontSize: 13 * fontScale }]}>{loading ? "..." : active ? t("common.activated") : t("common.activate")}</Text>
+        <Text style={[styles.activateText, { color: active ? colors.text : colors.textOnSurface, fontSize: 13 * fontScale }]}>{loading ? "..." : active ? t("common.deactivate") : t("common.activate")}</Text>
     </TouchableOpacity>
     </View>
     );

@@ -196,6 +196,15 @@
     margin-top: 14px;
 }
 
+@media (min-width: 769px) {
+    .access-container {
+        height: calc(100dvh / var(--app-text-scale));
+        min-height: 0;
+        overflow: hidden;
+    }
+
+}
+
 .modal-overlay {
     position: fixed;
     inset: 0;

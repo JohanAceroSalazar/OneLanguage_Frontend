@@ -137,6 +137,22 @@ const recoveryUi = {
 };
 for (const language of Object.keys(recoveryUi)) Object.assign(resources[language].translation, recoveryUi[language]);
 
+const historyFilterUi = {
+  es: { "history.recent": "Recientes", "history.old": "Antiguos", "history.all": "Todos" },
+  en: { "history.recent": "Recent", "history.old": "Older", "history.all": "All" },
+  pt: { "history.recent": "Recentes", "history.old": "Antigos", "history.all": "Todos" },
+  it: { "history.recent": "Recenti", "history.old": "Meno recenti", "history.all": "Tutti" }
+};
+for (const language of Object.keys(historyFilterUi)) Object.assign(resources[language].translation, historyFilterUi[language]);
+
+const featurePermissionUi = {
+  es: { "common.deactivate": "Desactivar", "profile.permissionDenied": "El permiso fue rechazado. Actívalo desde los ajustes del dispositivo para continuar.", "profile.cameraPermissionTitle": "Activar permiso de cámara", "profile.cameraPermissionMessage": "Usaremos la cámara únicamente para reconocer señas y convertirlas en texto en tiempo real.", "profile.audioPermissionTitle": "Activar voz", "profile.audioPermissionMessage": "La voz leerá las traducciones en vivo y las que escuches desde el historial.", "profile.filesPermissionTitle": "Activar acceso a archivos", "profile.filesPermissionMessage": "Permitirá descargar y conservar los videos de traducciones en el almacenamiento de la aplicación." },
+  en: { "common.deactivate": "Deactivate", "profile.permissionDenied": "The permission was denied. Enable it in the device settings to continue.", "profile.cameraPermissionTitle": "Enable camera permission", "profile.cameraPermissionMessage": "We will use the camera only to recognize signs and translate them into text in real time.", "profile.audioPermissionTitle": "Enable voice", "profile.audioPermissionMessage": "Voice will read live translations and translations played from history.", "profile.filesPermissionTitle": "Enable file access", "profile.filesPermissionMessage": "It will allow downloading and retaining translation videos in the app storage." },
+  pt: { "common.deactivate": "Desativar", "profile.permissionDenied": "A permissão foi negada. Ative-a nas configurações do dispositivo para continuar.", "profile.cameraPermissionTitle": "Ativar permissão da câmera", "profile.cameraPermissionMessage": "Usaremos a câmera apenas para reconhecer sinais e convertê-los em texto em tempo real.", "profile.audioPermissionTitle": "Ativar voz", "profile.audioPermissionMessage": "A voz lerá as traduções ao vivo e as que você ouvir no histórico.", "profile.filesPermissionTitle": "Ativar acesso a arquivos", "profile.filesPermissionMessage": "Permitirá baixar e manter os vídeos de tradução no armazenamento do aplicativo." },
+  it: { "common.deactivate": "Disattiva", "profile.permissionDenied": "L'autorizzazione è stata negata. Attivala nelle impostazioni del dispositivo per continuare.", "profile.cameraPermissionTitle": "Attiva autorizzazione fotocamera", "profile.cameraPermissionMessage": "Useremo la fotocamera solo per riconoscere i segni e convertirli in testo in tempo reale.", "profile.audioPermissionTitle": "Attiva voce", "profile.audioPermissionMessage": "La voce leggerà le traduzioni dal vivo e quelle ascoltate nella cronologia.", "profile.filesPermissionTitle": "Attiva accesso ai file", "profile.filesPermissionMessage": "Consentirà di scaricare e conservare i video delle traduzioni nella memoria dell'app." }
+};
+for (const language of Object.keys(featurePermissionUi)) Object.assign(resources[language].translation, featurePermissionUi[language]);
+
 const saved = localStorage.getItem("language");
 const initial = languageOptions.some((option) => option.code === saved) ? saved : "es";
 i18n.use(initReactI18next).init({ resources, lng: initial, fallbackLng: "es", interpolation: { escapeValue: false } });

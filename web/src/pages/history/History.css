@@ -135,6 +135,7 @@
     font-weight: bold;
     cursor: pointer;
     color: var(--color-accent-text);
+    box-shadow: none !important;
 }
 
 .filter-dropdown {
@@ -150,7 +151,7 @@
     gap: 12px;
     z-index: 100;
     min-width: 180px;
-    box-shadow: var(--color-shadow);
+    box-shadow: none;
 }
 
 .filter-dropdown button {
@@ -162,6 +163,7 @@
     font-weight: bold;
     cursor: pointer;
     text-align: left;
+    box-shadow: none !important;
 }
 
 .filter-dropdown button:hover { opacity: 0.8; }
@@ -246,9 +248,26 @@
     margin-top: 16px;
     overflow-y: auto;
     flex: 1;
+    min-height: 0;
     padding-bottom: 16px;
     width: min(100%, 880px);
     align-self: center;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+}
+
+@media (min-width: 769px) {
+    .history-container {
+        height: calc(100dvh / var(--app-text-scale));
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .history-header,
+    .history-title-section,
+    .history-controls {
+        flex: 0 0 auto;
+    }
 }
 
 .history-item {
@@ -350,7 +369,12 @@
 }
 
 @media (max-width: 768px) {
-    .history-container { padding: 16px; }
+    .history-container {
+        height: auto;
+        min-height: 100dvh;
+        padding: 16px;
+        overflow-y: auto;
+    }
     .history-header { flex-direction: column; align-items: flex-start; gap: 12px; }
     .navbar { gap: 10px; justify-content: flex-start; }
     .nav-item { font-size: 14px; }

@@ -21,6 +21,7 @@ function Profile() {
     const [profileError, setProfileError] = useState("");
     const [featurePermissions, setFeaturePermissions] = useState({ camera: false, audio: false, files: false });
     const [updatingPermission, setUpdatingPermission] = useState(null);
+    const [permissionPrompt, setPermissionPrompt] = useState(null);
 
     useEffect(() => {
         let active = true;
@@ -57,22 +58,41 @@ function Profile() {
         navigate("/login", { replace: true });
     };
 
-    const toggleFeaturePermission = async (feature) => {
+    const updateFeaturePermission = async (feature, enabled) => {
         if (updatingPermission) return;
         setUpdatingPermission(feature);
         try {
-            if (!featurePermissions[feature] && feature === "camera") {
+            if (enabled && feature === "camera") {
                 const stream = await navigator.mediaDevices?.getUserMedia({ video: true, audio: false });
                 if (!stream) throw new Error("camera_unavailable");
                 stream.getTracks().forEach((track) => track.stop());
             }
-            setFeaturePermissions(await setFeaturePermission(feature, !featurePermissions[feature]));
+            setFeaturePermissions(await setFeaturePermission(feature, enabled));
         } catch {
-            setProfileError(t("cameraPermission.error"));
+            setProfileError(t("profile.permissionDenied"));
         } finally {
             setUpdatingPermission(null);
         }
     };
+
+    const handleFeaturePermission = (feature) => {
+        if (updatingPermission) return;
+        if (!featurePermissions[feature]) {
+            setPermissionPrompt(feature);
+            return;
+        }
+        void updateFeaturePermission(feature, false);
+    };
+
+    const confirmFeaturePermission = () => {
+        if (!permissionPrompt) return;
+        const feature = permissionPrompt;
+        setPermissionPrompt(null);
+        void updateFeaturePermission(feature, true);
+    };
+
+    const permissionPromptTitle = permissionPrompt ? t(`profile.${permissionPrompt}PermissionTitle`) : "";
+    const permissionPromptMessage = permissionPrompt ? t(`profile.${permissionPrompt}PermissionMessage`) : "";
 
     // VISTA CÁMARA
     if (view === "camera") {
@@ -172,8 +192,8 @@ function Profile() {
                                 <p className="perm-desc">{t("profile.cameraText")}</p>
                             </div>
                         </div>
-                        <button className={`activate-btn ${featurePermissions.camera ? "is-active" : ""}`} onClick={() => toggleFeaturePermission("camera")} disabled={updatingPermission !== null} aria-pressed={featurePermissions.camera}>
-                            {updatingPermission === "camera" ? t("common.loading") : featurePermissions.camera ? t("common.activated", "Activado") : t("common.activate")}
+                        <button className={`activate-btn ${featurePermissions.camera ? "is-active" : ""}`} onClick={() => handleFeaturePermission("camera")} disabled={updatingPermission !== null} aria-pressed={featurePermissions.camera}>
+                            {updatingPermission === "camera" ? t("common.loading") : featurePermissions.camera ? t("common.deactivate") : t("common.activate")}
                         </button>
                     </div>
 
@@ -185,8 +205,8 @@ function Profile() {
                                 <p className="perm-desc">{t("profile.audioText")}</p>
                             </div>
                         </div>
-                        <button className={`activate-btn ${featurePermissions.audio ? "is-active" : ""}`} onClick={() => toggleFeaturePermission("audio")} disabled={updatingPermission !== null} aria-pressed={featurePermissions.audio}>
-                            {updatingPermission === "audio" ? t("common.loading") : featurePermissions.audio ? t("common.activated", "Activado") : t("common.activate")}
+                        <button className={`activate-btn ${featurePermissions.audio ? "is-active" : ""}`} onClick={() => handleFeaturePermission("audio")} disabled={updatingPermission !== null} aria-pressed={featurePermissions.audio}>
+                            {updatingPermission === "audio" ? t("common.loading") : featurePermissions.audio ? t("common.deactivate") : t("common.activate")}
                         </button>
                     </div>
 
@@ -198,8 +218,8 @@ function Profile() {
                                 <p className="perm-desc">{t("profile.filesText")}</p>
                             </div>
                         </div>
-                        <button className={`activate-btn ${featurePermissions.files ? "is-active" : ""}`} onClick={() => toggleFeaturePermission("files")} disabled={updatingPermission !== null} aria-pressed={featurePermissions.files}>
-                            {updatingPermission === "files" ? t("common.loading") : featurePermissions.files ? t("common.activated", "Activado") : t("common.activate")}
+                        <button className={`activate-btn ${featurePermissions.files ? "is-active" : ""}`} onClick={() => handleFeaturePermission("files")} disabled={updatingPermission !== null} aria-pressed={featurePermissions.files}>
+                            {updatingPermission === "files" ? t("common.loading") : featurePermissions.files ? t("common.deactivate") : t("common.activate")}
                         </button>
                     </div>
                 </div>
@@ -222,6 +242,19 @@ function Profile() {
                             <button className="modal-cancel-btn" onClick={() => setShowLogoutModal(false)}>{t("common.cancel")}</button>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {permissionPrompt && (
+                <div className="modal-overlay" role="presentation">
+                    <section className="modal-box permission-modal" role="dialog" aria-modal="true" aria-labelledby="permission-modal-title" aria-describedby="permission-modal-message">
+                        <h2 id="permission-modal-title" className="permission-modal-title">{permissionPromptTitle}</h2>
+                        <p id="permission-modal-message" className="modal-text">{permissionPromptMessage}</p>
+                        <div className="modal-actions">
+                            <button className="permission-modal-activate" type="button" onClick={confirmFeaturePermission}>{t("common.activate")}</button>
+                            <button className="permission-modal-cancel" type="button" onClick={() => setPermissionPrompt(null)}>{t("cameraPermission.reject")}</button>
+                        </div>
+                    </section>
                 </div>
             )}
         </div>

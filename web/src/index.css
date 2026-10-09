@@ -3,6 +3,7 @@
 }
 
 :root {
+    --app-text-scale: 1;
     --color-page-bg: #3a78c2;
     --color-page-bg-alt: #2f68b4;
     --color-surface: #ffffff;
@@ -22,6 +23,14 @@
     --color-success: #15803d;
     --color-shadow: 0 24px 70px rgba(6, 20, 43, 0.2);
     color-scheme: light;
+}
+
+:root[data-text-size="small"] {
+    --app-text-scale: 0.92;
+}
+
+:root[data-text-size="large"] {
+    --app-text-scale: 1.08;
 }
 
 :root[data-theme="dark"] {
@@ -62,11 +71,12 @@ body {
     background: var(--color-page-bg);
     color: var(--color-text);
     overflow-x: hidden;
+    zoom: var(--app-text-scale);
 }
 
 #root {
     width: 100%;
-    min-height: 100dvh;
+    min-height: calc(100dvh / var(--app-text-scale));
     background: var(--color-page-bg);
 }
 

@@ -229,20 +229,16 @@ function Translate() {
         socket.addEventListener("open", startCapture);
         socket.addEventListener("error", () => {
             clearLivePrediction();
-            setModelStatus("model_error");
+            void finishRecording();
+            stopCamera("model_error");
         });
         socket.addEventListener("close", () => {
             if (socketRef.current !== socket) return;
-            socketRef.current = null;
-            stopCapture();
-            if (!streamRef.current || reconnectTimerRef.current) return;
-            setModelStatus("connecting");
-            reconnectTimerRef.current = window.setTimeout(() => {
-                reconnectTimerRef.current = null;
-                connectModelRef.current?.();
-            }, 1000);
+            clearLivePrediction();
+            void finishRecording();
+            stopCamera("model_error");
         });
-    }, [clearLivePrediction, handleModelMessage, startCapture, stopCapture]);
+    }, [clearLivePrediction, finishRecording, handleModelMessage, startCapture, stopCamera]);
 
     useEffect(() => {
         connectModelRef.current = connectModel;
@@ -282,8 +278,9 @@ function Translate() {
     }, [connectModel, resetSession, reviewPending, startRecording, stopCamera]);
 
     const finishTranslation = useCallback(async () => {
-        await finishRecording();
+        const recording = finishRecording();
         stopCamera();
+        await recording;
         setReviewPending(sessionTranslationsRef.current.length > 0);
     }, [finishRecording, stopCamera]);
 
