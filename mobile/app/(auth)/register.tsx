@@ -3,7 +3,9 @@ import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppAlert } from "../../components/app-alert";
 import { BrandWordmark } from "../../components/brand-wordmark";
 import { registerUser } from "../../src/services/authService";
@@ -33,6 +36,7 @@ export default function Register() {
   const { t } = useTranslation();
   const router = useRouter();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "", acceptedTerms: false });
   const [errors, setErrors] = useState({ name: "", email: "", password: "", confirmPassword: "", acceptedTerms: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -107,29 +111,35 @@ export default function Register() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.keyboard}>
+        <ScrollView
+          contentContainerStyle={[styles.container, { paddingBottom: Math.max(insets.bottom, 24) + 24 }]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
       <View style={styles.topBar}>
         <BrandWordmark color={colors.text} style={styles.logo} />
       </View>
 
       <Text style={[styles.title, { color: colors.text }]}>{t("auth.register")}</Text>
 
-      <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}>
-        <Text style={styles.label}>{t("common.fullName")}</Text>
+      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <Text style={[styles.label, { color: colors.textOnSurface }]}>{t("common.fullName")}</Text>
         <TextInput
-          style={[styles.input, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.name ? "#ef4444" : "#d1d5db" }]}
+          style={[styles.input, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: errors.name ? "#ef4444" : colors.border }]}
           placeholder={t("common.fullName")}
-          placeholderTextColor="#6b7280"
+          placeholderTextColor={colors.textMuted}
           value={form.name}
           onChangeText={(text) => handleChange("name", text)}
         />
         {errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
 
-        <Text style={styles.label}>{t("common.email")}</Text>
+        <Text style={[styles.label, { color: colors.textOnSurface }]}>{t("common.email")}</Text>
         <TextInput
-          style={[styles.input, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.email ? "#ef4444" : "#d1d5db" }]}
+          style={[styles.input, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: errors.email ? "#ef4444" : colors.border }]}
           placeholder="andres@gmail.com"
-          placeholderTextColor="#6b7280"
+          placeholderTextColor={colors.textMuted}
           keyboardType="email-address"
           autoCapitalize="none"
           value={form.email}
@@ -137,35 +147,35 @@ export default function Register() {
         />
         {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
-        <Text style={styles.label}>{t("common.password")}</Text>
+        <Text style={[styles.label, { color: colors.textOnSurface }]}>{t("common.password")}</Text>
         <View style={styles.passwordField}>
           <TextInput
-            style={[styles.inputPassword, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.password ? "#ef4444" : "#d1d5db" }]}
+            style={[styles.inputPassword, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: errors.password ? "#ef4444" : colors.border }]}
           placeholder={t("auth.passwordMin")}
-            placeholderTextColor="#6b7280"
+            placeholderTextColor={colors.textMuted}
             secureTextEntry={!showPassword}
             value={form.password}
             onChangeText={(text) => handleChange("password", text)}
           />
           <TouchableOpacity style={styles.icon} onPress={() => setShowPassword(!showPassword)}>
-            <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color="#6b7280" />
+            <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color={colors.textMuted} />
           </TouchableOpacity>
         </View>
         {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
         {passwordStrength ? <Text style={styles.hint}>{t("misc.passwordStrength")}: {passwordStrength}</Text> : null}
 
-        <Text style={styles.label}>{t("common.confirmPassword")}</Text>
+        <Text style={[styles.label, { color: colors.textOnSurface }]}>{t("common.confirmPassword")}</Text>
         <View style={styles.passwordField}>
           <TextInput
-            style={[styles.inputPassword, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.confirmPassword ? "#ef4444" : "#d1d5db" }]}
+            style={[styles.inputPassword, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: errors.confirmPassword ? "#ef4444" : colors.border }]}
           placeholder={t("auth.repeat")}
-            placeholderTextColor="#6b7280"
+            placeholderTextColor={colors.textMuted}
             secureTextEntry={!showConfirmPassword}
             value={form.confirmPassword}
             onChangeText={(text) => handleChange("confirmPassword", text)}
           />
           <TouchableOpacity style={styles.icon} onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-            <Ionicons name={showConfirmPassword ? "eye-off" : "eye"} size={20} color="#6b7280" />
+            <Ionicons name={showConfirmPassword ? "eye-off" : "eye"} size={20} color={colors.textMuted} />
           </TouchableOpacity>
         </View>
         {errors.confirmPassword ? <Text style={styles.errorText}>{errors.confirmPassword}</Text> : null}
@@ -189,7 +199,7 @@ export default function Register() {
         ) : null}
 
         <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleRegister} disabled={loading}>
-          {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>{t("auth.create")}</Text>}
+          {loading ? <ActivityIndicator color={colors.accentText} /> : <Text style={[styles.buttonText, { color: colors.accentText }]}>{t("auth.create")}</Text>}
         </TouchableOpacity>
       </View>
 
@@ -197,28 +207,32 @@ export default function Register() {
         {t("auth.hasAccount")} <Text style={styles.loginLink} onPress={() => router.push("/(auth)/login")}>{t("auth.login")}</Text>
       </Text>
 
+        </ScrollView>
+      </KeyboardAvoidingView>
       <Modal visible={showTerms} transparent animationType="fade" onRequestClose={() => setShowTerms(false)}>
+        <SafeAreaView style={styles.termsModalSafeArea}>
         <View style={styles.termsModalBackdrop}>
-          <View style={styles.termsModalDialog} accessibilityRole="alert">
+          <View style={[styles.termsModalDialog, { backgroundColor: colors.surface }]} accessibilityRole="alert">
             <View style={styles.termsContentHeader}>
-              <Text style={styles.termsContentTitle}>{t("terms.title")}</Text>
-              <TouchableOpacity style={styles.termsModalClose} onPress={() => setShowTerms(false)} accessibilityLabel={t("common.back")}>
-                <Ionicons name="close" size={20} color="#ffffff" />
+              <Text style={[styles.termsContentTitle, { color: colors.textOnSurface }]}>{t("terms.title")}</Text>
+              <TouchableOpacity style={[styles.termsModalClose, { backgroundColor: colors.primaryStrong }]} onPress={() => setShowTerms(false)} accessibilityLabel={t("common.back")}>
+                <Ionicons name="close" size={20} color={colors.text} />
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.termsContentBody} nestedScrollEnabled showsVerticalScrollIndicator>
-              <Text style={styles.termsContentText}>{t("terms.app")}</Text>
-              <Text style={styles.termsContentText}>{t("terms.updated")}</Text>
-              <Text style={styles.termsContentText}>{t("terms.welcome")}</Text>
+              <Text style={[styles.termsContentText, { color: colors.textOnSurface }]}>{t("terms.app")}</Text>
+              <Text style={[styles.termsContentText, { color: colors.textOnSurface }]}>{t("terms.updated")}</Text>
+              <Text style={[styles.termsContentText, { color: colors.textOnSurface }]}>{t("terms.welcome")}</Text>
               {[1, 2, 3, 4, 5, 6, 7].map((section) => (
                 <View key={section} style={styles.termsSection}>
-                  <Text style={styles.termsContentSubtitle}>{t(`terms.s${section}`)}</Text>
-                  <Text style={styles.termsContentText}>{t(`terms.p${section}`)}</Text>
+                  <Text style={[styles.termsContentSubtitle, { color: colors.textOnSurface }]}>{t(`terms.s${section}`)}</Text>
+                  <Text style={[styles.termsContentText, { color: colors.textOnSurface }]}>{t(`terms.p${section}`)}</Text>
                 </View>
               ))}
             </ScrollView>
           </View>
         </View>
+        </SafeAreaView>
       </Modal>
 
       <AppAlert
@@ -230,16 +244,22 @@ export default function Register() {
         variant={alert.variant}
         onAction={alert.onAction}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
+  },
+  keyboard: {
+    flex: 1,
+  },
+  container: {
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingTop: 72,
+    paddingTop: 24,
     paddingHorizontal: 20,
   },
   topBar: {
@@ -317,6 +337,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
+    flex: 1,
+    flexWrap: "wrap",
   },
   termsPrefix: {
     color: "#111827",
@@ -329,6 +351,9 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textDecorationLine: "underline",
   },
+  termsModalSafeArea: {
+    flex: 1,
+  },
   termsModalBackdrop: {
     flex: 1,
     alignItems: "center",
@@ -339,7 +364,7 @@ const styles = StyleSheet.create({
   termsModalDialog: {
     width: "100%",
     maxWidth: 420,
-    maxHeight: "82%",
+    maxHeight: "100%",
     backgroundColor: "#FFFFFF",
     borderRadius: 8,
     padding: 20,
@@ -355,7 +380,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   termsContentBody: {
-    maxHeight: 480,
+    flexShrink: 1,
     marginTop: 8,
   },
   termsContentText: {

@@ -22,7 +22,8 @@ body {
     align-items: center;
     gap: clamp(24px, 6vw, 72px);
     padding: 32px clamp(18px, 4vw, 56px);
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .login-left {

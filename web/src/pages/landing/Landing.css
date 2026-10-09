@@ -91,17 +91,17 @@
 
 .landing-link-button {
     background: var(--color-surface);
-    color: var(--color-page-bg);
+    color: var(--color-text);
 }
 
 .landing-secondary-button {
     background: var(--color-surface);
-    color: var(--color-page-bg);
+    color: var(--color-text);
 }
 
 .landing-primary-button {
     background: var(--color-accent);
-    color: #ffffff;
+    color: var(--color-accent-text);
     box-shadow: 0 16px 30px color-mix(in srgb, var(--color-accent) 28%, transparent);
 }
 
@@ -254,7 +254,7 @@
 
 .landing-mini-grid svg {
     font-size: 24px;
-    color: var(--color-page-bg);
+    color: var(--color-control-bg);
     margin-bottom: 12px;
 }
 

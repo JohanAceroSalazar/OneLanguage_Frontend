@@ -84,7 +84,7 @@ function Profile() {
                 </div>
                 <div className="profile-center">
                     <div className="permission-card">
-                        <FaCamera size={140} color="#333" />
+                        <FaCamera size={140} color="currentColor" />
                     </div>
                     <button className="yellow-btn" onClick={() => setView("profile")}>{t("profile.activateCamera")}</button>
                 </div>
@@ -102,7 +102,7 @@ function Profile() {
                 </div>
                 <div className="profile-center">
                     <div className="permission-card">
-                        <FaMusic size={140} color="#333" />
+                        <FaMusic size={140} color="currentColor" />
                     </div>
                     <button className="yellow-btn" onClick={() => setView("profile")}>{t("profile.activateMic")}</button>
                 </div>
@@ -120,7 +120,7 @@ function Profile() {
                 </div>
                 <div className="profile-center">
                     <div className="permission-card">
-                        <FaFolder size={140} color="#333" />
+                        <FaFolder size={140} color="currentColor" />
                     </div>
                     <button className="yellow-btn" onClick={() => setView("profile")}>{t("profile.grantFiles")}</button>
                 </div>
@@ -144,7 +144,7 @@ function Profile() {
                 <div className="profile-section">
                     <div className="profile-avatar-col">
                         <div className="profile-avatar">
-                            <FaUser size={40} color="#333" />
+                            <FaUser size={40} color="currentColor" />
                         </div>
                     </div>
                     <div className="profile-info-col">
