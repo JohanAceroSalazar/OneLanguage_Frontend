@@ -16,7 +16,7 @@ import {
     useWindowDimensions,
     View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
 import { AI_WEBSOCKET_URL } from "../../src/config/network";
@@ -53,6 +53,7 @@ export default function Camera() {
     const { colors, fontScale } = useTheme();
     const mainPager = useMainPager();
     const { height } = useWindowDimensions();
+    const insets = useSafeAreaInsets();
     const [permission, requestPermission] = useCameraPermissions();
     const [facing, setFacing] = useState<CameraType>("front");
     const [cameraActive, setCameraActive] = useState(false);
@@ -167,7 +168,7 @@ export default function Camera() {
         confidenceRef.current = nextConfidence;
         if (status !== "translated" || !message.text || !message.is_new_translation) return;
 
-        const nextSession = [message.text];
+        const nextSession = [...sessionRef.current, message.text];
         sessionRef.current = nextSession;
         setSessionTranslations(nextSession);
         setTranslation(message.text);
@@ -235,9 +236,11 @@ export default function Camera() {
     }, [clearCapture]);
 
     useEffect(() => {
-        if (mainPager && mainPager.activeTab !== "camera" && cameraActive) {
+        if (!cameraActive || mainPager?.activeTab !== "camera") return;
+
+        return () => {
             stopCamera();
-        }
+        };
     }, [cameraActive, mainPager?.activeTab, stopCamera]);
 
     const startCamera = useCallback(async () => {
@@ -320,7 +323,11 @@ export default function Camera() {
         Speech.stop();
     }, [stopCamera]);
 
-    const displayedTranslation = reviewPending ? sessionTranslations.join(" ") : translation;
+    const displayedTranslations = sessionTranslations.length > 1
+        ? sessionTranslations
+        : translation
+            ? [translation]
+            : [];
     const availableHeight = height - 112;
     const compactLayout = availableHeight < 780 || fontScale > 1;
     const cameraHeight = compactLayout
@@ -331,9 +338,13 @@ export default function Camera() {
         <SwipeNavigation active="camera">
         <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
         <ScrollView
-            contentContainerStyle={[styles.content, compactLayout && styles.compactContent]}
+            contentContainerStyle={[
+                styles.content,
+                compactLayout && styles.compactContent,
+                { paddingBottom: 86 + Math.max(insets.bottom, 8) },
+            ]}
             showsVerticalScrollIndicator={false}
-            scrollEnabled={compactLayout || availableHeight < 860 || reviewPending}
+            scrollEnabled={compactLayout || availableHeight < 860 || reviewPending || sessionTranslations.length > 1}
         >
         <View style={styles.header}>
         <BrandWordmark color={colors.text} style={styles.logo} />
@@ -391,9 +402,11 @@ export default function Camera() {
 
     <View style={[styles.resultCard, compactLayout && styles.compactResultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         <Text style={[styles.eyebrow, { color: colors.primary }]}>{t("camera.realtime")}</Text>
-        <Text style={[styles.resultText, { color: colors.textOnSurface, fontSize: 27 * fontScale }]}>{displayedTranslation || t("camera.empty")}</Text>
+        {displayedTranslations.length ? displayedTranslations.map((item, index) => (
+            <Text key={`${item}-${index}`} style={[styles.resultText, { color: colors.textOnSurface, fontSize: 27 * fontScale }]}>{item}</Text>
+        )) : <Text style={[styles.resultText, { color: colors.textOnSurface, fontSize: 27 * fontScale }]}>{t("camera.empty")}</Text>}
         <Text style={[styles.statusText, { color: colors.textOnSurface }]}>{t(`camera.status.${modelStatus}`)}</Text>
-        {confidence !== null && displayedTranslation ? <Text style={[styles.confidenceText, { color: colors.textOnSurface }]}>{t("camera.confidence", { value: Math.round(confidence * 100) })}</Text> : null}
+        {confidence !== null && displayedTranslations.length ? <Text style={[styles.confidenceText, { color: colors.textOnSurface }]}>{t("camera.confidence", { value: Math.round(confidence * 100) })}</Text> : null}
     </View>
 
     {reviewPending ? <View style={styles.reviewActions}>

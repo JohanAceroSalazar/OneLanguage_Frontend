@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { resetPassword } from "../../src/services/authService";
@@ -31,6 +32,7 @@ export default function ResetPassword() {
   const router = useRouter();
   const params = useLocalSearchParams<{ id?: string; token?: string }>();
   const { colors, fontScale } = useTheme();
+  const insets = useSafeAreaInsets();
   const tokenIdentifier = getParam(params.id);
   const token = getParam(params.token);
 
@@ -98,12 +100,13 @@ export default function ResetPassword() {
   };
 
   return (
+    <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={[styles.keyboard, { backgroundColor: colors.background }]}
     >
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[styles.container, { paddingBottom: Math.max(insets.bottom, 24) + 24 }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -119,20 +122,20 @@ export default function ResetPassword() {
           resizeMode="contain"
         />
 
-        <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}>
-          <Text style={styles.label}>{t("auth.newPassword")}</Text>
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.label, { color: colors.textOnSurface }]}>{t("auth.newPassword")}</Text>
           <View style={styles.passwordField}>
             <TextInput
               style={[
                 styles.inputPassword,
                 {
-                  backgroundColor: "#ffffff",
-                  color: "#111827",
-                  borderColor: form.password && !passwordValid ? "#ef4444" : "#d1d5db",
+                  backgroundColor: colors.surfaceAlt,
+                  color: colors.textOnSurface,
+                  borderColor: form.password && !passwordValid ? "#ef4444" : colors.border,
                 },
               ]}
               placeholder={t("auth.passwordMin")}
-              placeholderTextColor="#6b7280"
+              placeholderTextColor={colors.textMuted}
               secureTextEntry={!showPassword}
               value={form.password}
               onChangeText={(text) => handleChange("password", text)}
@@ -140,7 +143,7 @@ export default function ResetPassword() {
               autoCorrect={false}
             />
             <TouchableOpacity style={styles.icon} onPress={() => setShowPassword((current) => !current)}>
-              <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color="#6b7280" />
+              <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color={colors.textMuted} />
             </TouchableOpacity>
           </View>
 
@@ -148,19 +151,19 @@ export default function ResetPassword() {
             Minimo 8 caracteres, una mayuscula, una minuscula y un numero.
           </Text>
 
-          <Text style={styles.label}>{t("common.confirmPassword")}</Text>
+          <Text style={[styles.label, { color: colors.textOnSurface }]}>{t("common.confirmPassword")}</Text>
           <View style={styles.passwordField}>
             <TextInput
               style={[
                 styles.inputPassword,
                 {
-                  backgroundColor: "#ffffff",
-                  color: "#111827",
-                  borderColor: confirmError ? "#ef4444" : "#d1d5db",
+                  backgroundColor: colors.surfaceAlt,
+                  color: colors.textOnSurface,
+                  borderColor: confirmError ? "#ef4444" : colors.border,
                 },
               ]}
               placeholder={t("auth.confirmNew")}
-              placeholderTextColor="#6b7280"
+              placeholderTextColor={colors.textMuted}
               secureTextEntry={!showConfirmPassword}
               value={form.confirmPassword}
               onChangeText={(text) => handleChange("confirmPassword", text)}
@@ -168,7 +171,7 @@ export default function ResetPassword() {
               autoCorrect={false}
             />
             <TouchableOpacity style={styles.icon} onPress={() => setShowConfirmPassword((current) => !current)}>
-              <Ionicons name={showConfirmPassword ? "eye-off" : "eye"} size={20} color="#6b7280" />
+              <Ionicons name={showConfirmPassword ? "eye-off" : "eye"} size={20} color={colors.textMuted} />
             </TouchableOpacity>
           </View>
 
@@ -185,9 +188,9 @@ export default function ResetPassword() {
             activeOpacity={0.85}
           >
             {loading ? (
-              <ActivityIndicator color="#000" />
+              <ActivityIndicator color={colors.accentText} />
             ) : (
-              <Text style={[styles.buttonText, { fontSize: 16 * fontScale }]}>{t("auth.resetButton")}</Text>
+              <Text style={[styles.buttonText, { color: colors.accentText, fontSize: 16 * fontScale }]}>{t("auth.resetButton")}</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -199,10 +202,14 @@ export default function ResetPassword() {
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   keyboard: {
     flex: 1,
   },

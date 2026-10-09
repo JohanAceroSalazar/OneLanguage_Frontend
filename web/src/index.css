@@ -19,6 +19,7 @@
     --color-control-bg: #2a5fa0;
     --color-control-text: #ffffff;
     --color-danger: #e53935;
+    --color-success: #15803d;
     --color-shadow: 0 24px 70px rgba(6, 20, 43, 0.2);
     color-scheme: light;
 }
@@ -40,6 +41,7 @@
     --color-control-bg: #15294a;
     --color-control-text: #f8fafc;
     --color-danger: #ef4444;
+    --color-success: #4ade80;
     --color-shadow: 0 28px 78px rgba(0, 0, 0, 0.38);
     color-scheme: dark;
 }
@@ -66,35 +68,6 @@ body {
     width: 100%;
     min-height: 100dvh;
     background: var(--color-page-bg);
-}
-
-@media (min-width: 769px) {
-    html,
-    body,
-    #root {
-        height: 100dvh;
-        overflow: hidden;
-    }
-
-    .home-container,
-    .translate-container,
-    .access-container,
-    .profile-container,
-    .login-container,
-    .register-container,
-    .recover-container,
-    .reset-container {
-        height: 100dvh;
-        min-height: 0;
-        overflow-y: hidden;
-    }
-
-    .history-container,
-    .terms-container {
-        height: 100dvh;
-        min-height: 0;
-        overflow-y: auto;
-    }
 }
 
 html.landing-scroll,

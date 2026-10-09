@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { forgotPassword } from "../../src/services/authService";
 import { BrandWordmark } from "../../components/brand-wordmark";
@@ -23,6 +24,7 @@ export default function RecoverPassword() {
   const { t } = useTranslation();
   const router = useRouter();
   const { colors, fontScale } = useTheme();
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -65,12 +67,13 @@ export default function RecoverPassword() {
   };
 
   return (
+    <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={[styles.keyboard, { backgroundColor: colors.background }]}
     >
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[styles.container, { paddingBottom: Math.max(insets.bottom, 24) + 24 }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -93,20 +96,20 @@ export default function RecoverPassword() {
             {t("auth.recoverHint")}
           </Text>
 
-          <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}>
-            <Text style={styles.label}>{t("common.email")}</Text>
+          <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.label, { color: colors.textOnSurface }]}>{t("common.email")}</Text>
 
             <TextInput
               style={[
                 styles.input,
                 {
-                  backgroundColor: "#ffffff",
-                  color: "#111827",
-                  borderColor: error ? "#ef4444" : "#d1d5db",
+                  backgroundColor: colors.surfaceAlt,
+                  color: colors.textOnSurface,
+                  borderColor: error ? "#ef4444" : colors.border,
                 },
               ]}
               placeholder="andres@gmail.com"
-              placeholderTextColor="#6b7280"
+              placeholderTextColor={colors.textMuted}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -124,9 +127,9 @@ export default function RecoverPassword() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="#000" />
+                <ActivityIndicator color={colors.accentText} />
               ) : (
-                <Text style={[styles.buttonText, { fontSize: 16 * fontScale }]}>
+                <Text style={[styles.buttonText, { color: colors.accentText, fontSize: 16 * fontScale }]}>
                   {t("auth.sendLink")}
                 </Text>
               )}
@@ -141,10 +144,14 @@ export default function RecoverPassword() {
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   keyboard: {
     flex: 1,
   },

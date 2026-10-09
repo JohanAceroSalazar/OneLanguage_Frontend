@@ -12,6 +12,7 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
+    useWindowDimensions,
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -22,6 +23,8 @@ import { getFeaturePermissions, setFeaturePermission } from "../../src/services/
 export default function Home() {
     const { t } = useTranslation();
     const { colors, fontScale } = useTheme();
+    const { width } = useWindowDimensions();
+    const stackPermissionActions = width < 360 || fontScale > 1;
     const router = useRouter();
     const mainPager = useMainPager();
     const [permissionDialogVisible, setPermissionDialogVisible] = useState(false);
@@ -78,28 +81,32 @@ export default function Home() {
         </Text>
 
         <TouchableOpacity activeOpacity={0.85} onPress={() => void openTranslator()} style={[styles.button, { backgroundColor: colors.accent }]}>
-            <Text style={[styles.buttonText, { color: colors.textOnSurface, fontSize: 25 * fontScale }]}>{t("home.start")}</Text>
+            <Text style={[styles.buttonText, { color: colors.accentText, fontSize: 25 * fontScale }]}>{t("home.start")}</Text>
         </TouchableOpacity>
         </View>
         </ScrollView>
         <BottomNav active="home" />
-        <Modal visible={permissionDialogVisible} transparent animationType="fade" onRequestClose={() => setPermissionDialogVisible(false)}>
+        <Modal visible={permissionDialogVisible} transparent animationType="fade" statusBarTranslucent onRequestClose={() => setPermissionDialogVisible(false)}>
+            <SafeAreaView edges={["top", "right", "bottom", "left"]} style={styles.permissionModalSafeArea}>
             <View style={styles.permissionBackdrop}>
-                <View style={[styles.permissionDialog, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={[styles.permissionDialogShell, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <ScrollView style={styles.permissionDialogScroll} contentContainerStyle={styles.permissionDialogContent} showsVerticalScrollIndicator={false} bounces={false}>
                     <Text style={[styles.permissionTitle, { color: colors.textOnSurface, fontSize: 30 * fontScale }]}>{t("cameraPermission.title")}</Text>
                     <Text style={[styles.permissionText, { color: colors.textOnSurface, fontSize: 19 * fontScale }]}>{t("cameraPermission.message")}</Text>
                     <Text style={[styles.permissionText, styles.permissionPrivacy, { color: colors.textOnSurface, fontSize: 19 * fontScale }]}>{t("cameraPermission.privacy")}</Text>
                     {permissionError ? <Text style={styles.permissionError}>{t("cameraPermission.error")}</Text> : null}
-                    <View style={styles.permissionActions}>
-                        <TouchableOpacity disabled={requestingPermission} activeOpacity={0.85} onPress={requestCameraPermission} style={[styles.permissionButton, { backgroundColor: colors.accent }, requestingPermission && styles.permissionButtonDisabled]}>
-                            <Text style={[styles.permissionButtonText, { color: colors.textOnSurface, fontSize: 19 * fontScale }]}>{requestingPermission ? t("cameraPermission.requesting") : t("common.ok")}</Text>
+                    <View style={[styles.permissionActions, stackPermissionActions && styles.permissionActionsStacked]}>
+                        <TouchableOpacity disabled={requestingPermission} activeOpacity={0.85} onPress={requestCameraPermission} style={[styles.permissionButton, stackPermissionActions && styles.permissionButtonStacked, { backgroundColor: colors.accent }, requestingPermission && styles.permissionButtonDisabled]}>
+                            <Text style={[styles.permissionButtonText, { color: colors.accentText, fontSize: 19 * fontScale }]}>{requestingPermission ? t("cameraPermission.requesting") : t("common.ok")}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity disabled={requestingPermission} activeOpacity={0.85} onPress={() => setPermissionDialogVisible(false)} style={[styles.permissionButton, { backgroundColor: colors.accent }, requestingPermission && styles.permissionButtonDisabled]}>
-                            <Text style={[styles.permissionButtonText, { color: colors.textOnSurface, fontSize: 19 * fontScale }]}>{t("cameraPermission.reject")}</Text>
+                        <TouchableOpacity disabled={requestingPermission} activeOpacity={0.85} onPress={() => setPermissionDialogVisible(false)} style={[styles.permissionButton, stackPermissionActions && styles.permissionButtonStacked, { backgroundColor: colors.accent }, requestingPermission && styles.permissionButtonDisabled]}>
+                            <Text style={[styles.permissionButtonText, { color: colors.accentText, fontSize: 19 * fontScale }]}>{t("cameraPermission.reject")}</Text>
                         </TouchableOpacity>
                     </View>
+                </ScrollView>
                 </View>
             </View>
+            </SafeAreaView>
         </Modal>
     </SafeAreaView>
     </SwipeNavigation>
@@ -188,16 +195,22 @@ buttonText: {
     },
 permissionBackdrop: {
     flex: 1,
-    padding: 24,
+    padding: 16,
     justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "rgba(11, 43, 80, 0.56)",
     },
-permissionDialog: {
+permissionModalSafeArea: { flex: 1 },
+permissionDialogShell: {
+    width: "100%",
+    maxWidth: 420,
+    maxHeight: "92%",
     borderWidth: 2,
     borderRadius: 20,
-    paddingVertical: 28,
-    paddingHorizontal: 22,
+    overflow: "hidden",
     },
+permissionDialogScroll: { width: "100%" },
+permissionDialogContent: { paddingVertical: 24, paddingHorizontal: 20, flexGrow: 1 },
 permissionTitle: {
     fontWeight: "700",
     lineHeight: 36,
@@ -221,6 +234,7 @@ permissionActions: {
     gap: 14,
     marginTop: 28,
     },
+permissionActionsStacked: { flexDirection: "column", gap: 10 },
 permissionButton: {
     flex: 1,
     minHeight: 48,
@@ -231,6 +245,7 @@ permissionButton: {
     justifyContent: "center",
     paddingHorizontal: 10,
     },
+permissionButtonStacked: { width: "100%", flex: 0 },
 permissionButtonDisabled: { opacity: 0.65 },
 permissionButtonText: { fontWeight: "600", textAlign: "center" },
 });

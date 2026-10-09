@@ -1,4 +1,6 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "../src/theme/ThemeContext";
 
 type AppAlertVariant = "success" | "error" | "info";
 
@@ -28,52 +30,68 @@ export function AppAlert({
   onAction,
 }: AppAlertProps) {
   const statusColor = variantColors[variant];
+  const { colors, fontScale } = useTheme();
 
   return (
     <Modal transparent visible={visible} animationType="fade" statusBarTranslucent>
+      <SafeAreaView edges={["top", "right", "bottom", "left"]} style={styles.safeArea}>
       <View style={styles.overlay}>
-        <View style={[styles.box, { borderTopColor: statusColor }]}>
+        <View style={[styles.box, { borderTopColor: statusColor, backgroundColor: colors.surface }]}>
+          <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} bounces={false}>
           {label ? (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{label}</Text>
+            <View style={[styles.badge, { backgroundColor: colors.accent }]}>
+              <Text style={[styles.badgeText, { color: colors.accentText, fontSize: 13 * fontScale }]}>{label}</Text>
             </View>
           ) : null}
 
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.message}>{message}</Text>
+          <Text style={[styles.title, { color: colors.textOnSurface, fontSize: 29 * fontScale }]}>{title}</Text>
+          <Text style={[styles.message, { color: colors.textMuted, fontSize: 17 * fontScale }]}>{message}</Text>
 
-          <TouchableOpacity activeOpacity={0.88} style={styles.button} onPress={onAction}>
-            <Text style={styles.buttonText}>{actionText}</Text>
+          <TouchableOpacity activeOpacity={0.88} style={[styles.button, { backgroundColor: colors.accent }]} onPress={onAction}>
+            <Text style={[styles.buttonText, { color: colors.accentText, fontSize: 18 * fontScale }]}>{actionText}</Text>
           </TouchableOpacity>
+          </ScrollView>
         </View>
       </View>
+      </SafeAreaView>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   overlay: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 18,
+    padding: 16,
     backgroundColor: "rgba(5, 16, 32, 0.42)",
   },
   box: {
     width: "100%",
     maxWidth: 360,
+    maxHeight: "92%",
     alignItems: "center",
     borderTopWidth: 6,
     borderRadius: 24,
     paddingHorizontal: 28,
     paddingTop: 34,
     paddingBottom: 34,
-    backgroundColor: "#ffffff",
     shadowColor: "#13294b",
     shadowOffset: { width: 0, height: 18 },
     shadowOpacity: 0.28,
     shadowRadius: 28,
     elevation: 12,
+  },
+  content: {
+    flexGrow: 1,
+    alignItems: "center",
+  },
+  scroll: {
+    alignSelf: "stretch",
+    flexShrink: 1,
   },
   badge: {
     minWidth: 80,
@@ -82,7 +100,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     marginBottom: 14,
-    backgroundColor: "#FFF5BE",
   },
   badgeText: {
     color: "#111827",
@@ -112,7 +129,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 15,
     paddingHorizontal: 18,
-    backgroundColor: "#F4DC2E",
     shadowColor: "#F4DC2E",
     shadowOffset: { width: 0, height: 14 },
     shadowOpacity: 0.34,

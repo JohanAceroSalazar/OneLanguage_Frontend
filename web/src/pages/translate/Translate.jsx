@@ -175,7 +175,7 @@ function Translate() {
         confidenceRef.current = nextConfidence;
         if (message.status !== "translated" || !message.text || !message.is_new_translation) return;
 
-        const nextSession = [message.text];
+        const nextSession = [...sessionTranslationsRef.current, message.text];
         sessionTranslationsRef.current = nextSession;
         setSessionTranslations(nextSession);
         setTranslation(message.text);
@@ -319,8 +319,11 @@ function Translate() {
         if (speechSupported) window.speechSynthesis.cancel();
     }, [finishRecording, speechSupported, stopCamera]);
 
-    const sessionText = sessionTranslations.join(" ");
-    const displayedTranslation = reviewPending ? sessionText : translation;
+    const displayedTranslations = sessionTranslations.length > 1
+        ? sessionTranslations
+        : translation
+            ? [translation]
+            : [];
     const confidenceText = confidence === null ? null : t("translate.confidence", { value: Math.round(confidence * 100) });
     const statusText = t(`translate.status.${modelStatus}`, { defaultValue: t("translate.status.model_error") });
     const canStartFromPreview = !cameraActive && !reviewPending;
@@ -339,7 +342,9 @@ function Translate() {
             <main className={`translate-content ${flipped ? "flipped" : ""}`}>
                 <section className="translate-text-box" aria-live="polite">
                     <p className="translation-eyebrow">{t("translate.realtime")}</p>
-                    <h1>{displayedTranslation || t("translate.empty")}</h1>
+                    <div className="translation-results">
+                        {displayedTranslations.length ? displayedTranslations.map((item, index) => <p key={`${item}-${index}`}>{item}</p>) : <h1>{t("translate.empty")}</h1>}
+                    </div>
                     <p className="translation-status">{statusText}</p>
                     {confidenceText && <p className="translation-confidence">{confidenceText}</p>}
                 </section>

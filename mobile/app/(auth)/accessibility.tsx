@@ -20,13 +20,14 @@ type DropdownOption = {
     value: string;
 };
 
-function Dropdown({ title, icon, options, selectedValue, onSelect, accentColor, textColor, borderColor, menuBackgroundColor, menuTextColor, selectedBackgroundColor, selectedTextColor, open, onToggle }: {
+function Dropdown({ title, icon, options, selectedValue, onSelect, accentColor, accentTextColor, textColor, borderColor, menuBackgroundColor, menuTextColor, selectedBackgroundColor, selectedTextColor, open, onToggle }: {
     title: string;
     icon: keyof typeof Ionicons.glyphMap;
     options: DropdownOption[];
     selectedValue: string;
     onSelect: (value: string) => void;
     accentColor: string;
+    accentTextColor: string;
     textColor: string;
     borderColor: string;
     menuBackgroundColor: string;
@@ -42,8 +43,8 @@ function Dropdown({ title, icon, options, selectedValue, onSelect, accentColor, 
             <View style={styles.optionContent}>
                 <Text style={[styles.optionText, { color: textColor }]}>{title}</Text>
                 <TouchableOpacity activeOpacity={0.9} style={[styles.dropdownButton, { backgroundColor: accentColor }]} onPress={onToggle}>
-                    <Text style={[styles.dropdownButtonText, { color: "#111827" }]}>{selectedValue}</Text>
-                    <Ionicons name="chevron-down" size={18} color="#111827" />
+                    <Text style={[styles.dropdownButtonText, { color: accentTextColor }]}>{selectedValue}</Text>
+                    <Ionicons name="chevron-down" size={18} color={accentTextColor} />
                 </TouchableOpacity>
                 {open ? (
                     <View style={[styles.dropdownMenu, { borderColor, backgroundColor: menuBackgroundColor }]}> 
@@ -143,6 +144,7 @@ export default function Accessibility() {
                         setOpenDropdown(null);
                     }}
                     accentColor={colors.accent}
+                    accentTextColor={colors.accentText}
                     textColor={colors.textOnSurface}
                     borderColor={colors.border}
                     menuBackgroundColor={theme === "dark" ? "#111827" : "#ffffff"}
@@ -165,6 +167,7 @@ export default function Accessibility() {
                         setOpenDropdown(null);
                     }}
                     accentColor={colors.accent}
+                    accentTextColor={colors.accentText}
                     textColor={colors.textOnSurface}
                     borderColor={colors.border}
                     menuBackgroundColor={theme === "dark" ? "#111827" : "#ffffff"}
@@ -186,6 +189,7 @@ export default function Accessibility() {
                         setOpenDropdown(null);
                     }}
                     accentColor={colors.accent}
+                    accentTextColor={colors.accentText}
                     textColor={colors.textOnSurface}
                     borderColor={colors.border}
                     menuBackgroundColor={theme === "dark" ? "#111827" : "#ffffff"}
@@ -197,7 +201,7 @@ export default function Accessibility() {
                 />
 
                 <TouchableOpacity activeOpacity={0.85} style={[styles.saveButton, { backgroundColor: colors.accent }]} onPress={handleSave}>
-                    <Text style={styles.saveButtonText}>{t("accessibility.save")}</Text>
+                    <Text style={[styles.saveButtonText, { color: colors.accentText }]}>{t("accessibility.save")}</Text>
                 </TouchableOpacity>
             </View>
             </ScrollView>
@@ -252,6 +256,8 @@ const styles = StyleSheet.create({
     },
     card: {
         width: "100%",
+        maxWidth: 520,
+        alignSelf: "center",
         marginTop: 60,
         minHeight: 405,
         borderRadius: 25,
@@ -331,7 +337,6 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     saveButtonText: {
-        color: "#000000",
         fontSize: 27,
         fontWeight: "bold",
     },

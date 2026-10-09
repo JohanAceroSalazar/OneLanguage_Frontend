@@ -6,12 +6,16 @@ import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppAlert } from "../../components/app-alert";
 import { BrandWordmark } from "../../components/brand-wordmark";
 import { getAccessibilitySettings, hasLocalAccessibilitySettings, loginUser, persistLocalAccessibilitySettings } from "../../src/services/authService";
@@ -33,6 +37,7 @@ export default function Login() {
   const { t } = useTranslation();
   const router = useRouter();
   const { colors, theme, fontSizeMode, setThemeMode, setFontSizeMode } = useTheme();
+  const insets = useSafeAreaInsets();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "" });
@@ -136,7 +141,13 @@ export default function Login() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.keyboard}>
+        <ScrollView
+          contentContainerStyle={[styles.container, { paddingBottom: Math.max(insets.bottom, 24) + 24 }]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
       <View style={styles.topBar}>
         <BrandWordmark color={colors.text} style={styles.logo} />
       </View>
@@ -145,37 +156,37 @@ export default function Login() {
 
       <Image source={require("../../assets/images/Logo.png")} style={styles.logoImg} resizeMode="contain" />
 
-      <View style={[styles.card, { backgroundColor: "#ffffff", borderColor: colors.border }]}>
-        <Text style={styles.label}>{t("common.email")}</Text>
+      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <Text style={[styles.label, { color: colors.textOnSurface }]}>{t("common.email")}</Text>
         <TextInput
-          style={[styles.input, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.email ? "#ef4444" : "#d1d5db" }]}
+          style={[styles.input, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: errors.email ? "#ef4444" : colors.border }]}
           placeholder="andres@gmail.com"
           keyboardType="email-address"
           autoCapitalize="none"
-          placeholderTextColor="#6b7280"
+          placeholderTextColor={colors.textMuted}
           value={form.email}
           onChangeText={(val) => handleChange("email", val)}
         />
         {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
-        <Text style={styles.label}>{t("common.password")}</Text>
+        <Text style={[styles.label, { color: colors.textOnSurface }]}>{t("common.password")}</Text>
         <View style={styles.passwordField}>
           <TextInput
-            style={[styles.inputPassword, { backgroundColor: "#ffffff", color: "#111827", borderColor: errors.password ? "#ef4444" : "#d1d5db" }]}
+            style={[styles.inputPassword, { backgroundColor: colors.surfaceAlt, color: colors.textOnSurface, borderColor: errors.password ? "#ef4444" : colors.border }]}
             placeholder="********"
-            placeholderTextColor="#6b7280"
+            placeholderTextColor={colors.textMuted}
             secureTextEntry={!showPassword}
             value={form.password}
             onChangeText={(val) => handleChange("password", val)}
           />
           <TouchableOpacity style={styles.icon} onPress={() => setShowPassword(!showPassword)}>
-            <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color="#6b7280" />
+            <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color={colors.textMuted} />
           </TouchableOpacity>
         </View>
         {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
 
         <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleSubmit} disabled={loading}>
-          {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>{t("auth.login")}</Text>}
+          {loading ? <ActivityIndicator color={colors.accentText} /> : <Text style={[styles.buttonText, { color: colors.accentText }]}>{t("auth.login")}</Text>}
         </TouchableOpacity>
       </View>
 
@@ -187,6 +198,8 @@ export default function Login() {
         {t("auth.noAccount")} <Text style={styles.registerLink} onPress={() => router.push("/(auth)/register")}>{t("auth.register")}</Text>
       </Text>
 
+        </ScrollView>
+      </KeyboardAvoidingView>
       <AppAlert
         visible={alert.visible}
         label={t("common.ok")}
@@ -196,16 +209,22 @@ export default function Login() {
         variant={alert.variant}
         onAction={alert.onAction}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
+  },
+  keyboard: {
+    flex: 1,
+  },
+  container: {
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingTop: 56,
+    paddingTop: 24,
     paddingHorizontal: 24,
   },
   topBar: {

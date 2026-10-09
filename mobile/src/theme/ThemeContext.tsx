@@ -20,8 +20,10 @@ type ThemeContextValue = {
     textMuted: string;
     primary: string;
     primaryStrong: string;
+    navigation: string;
     border: string;
     accent: string;
+    accentText: string;
     shadow: string;
   };
 };
@@ -37,8 +39,10 @@ const lightColors = {
   textMuted: "#4b5563",
   primary: "#3A78C2",
   primaryStrong: "#2f78cc",
+  navigation: "#1D1B3D",
   border: "#ffffff",
   accent: "#F4DC2E",
+  accentText: "#111827",
   shadow: "rgba(0, 0, 0, 0.16)",
 };
 
@@ -51,8 +55,10 @@ const darkColors = {
   textMuted: "#cbd5e1",
   primary: "#8dc5ff",
   primaryStrong: "#0f172a",
+  navigation: "#111827",
   border: "#e2e8f0",
   accent: "#f4dc2e",
+  accentText: "#111827",
   shadow: "rgba(0, 0, 0, 0.45)",
 };
 

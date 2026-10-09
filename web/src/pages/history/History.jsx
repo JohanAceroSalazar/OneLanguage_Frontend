@@ -157,7 +157,7 @@ function History() {
             ) : visibleTranslations.length === 0 ? (
                 <div className="history-empty">
                     <div className="history-card">
-                        <FaCamera size={48} color="#999" />
+                        <FaCamera size={48} color="currentColor" />
                         <p className="empty-title">{t("history.empty")}</p>
                         <p className="empty-text">{t("history.emptyText")}</p>
                     </div>

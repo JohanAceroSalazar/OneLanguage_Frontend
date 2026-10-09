@@ -3,7 +3,7 @@ import { useFocusEffect } from "expo-router";
 import { useVideoPlayer, VideoView } from "expo-video";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Speech from "expo-speech";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BottomNav } from "../../components/bottom-nav";
@@ -42,6 +42,7 @@ export default function History() {
     const [openRecordingId, setOpenRecordingId] = useState<string | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [downloadingId, setDownloadingId] = useState<string | null>(null);
+    const downloadSequenceRef = useRef(0);
 
     useEffect(() => {
         AsyncStorage.getItem("token").then(setToken).catch(() => setToken(null));
@@ -64,7 +65,18 @@ export default function History() {
     }, [loadTranslations]));
 
     useEffect(() => {
-        if (mainPager?.activeTab === "history") void loadTranslations();
+        if (mainPager?.activeTab !== "history") return;
+
+        let cancelled = false;
+        const refreshForPager = async () => {
+            await Promise.resolve();
+            if (!cancelled) await loadTranslations();
+        };
+
+        void refreshForPager();
+        return () => {
+            cancelled = true;
+        };
     }, [loadTranslations, mainPager?.activeTab]);
 
     const removeOne = (translation: Translation) => {
@@ -160,10 +172,11 @@ export default function History() {
 
         const documentDirectory = FileSystem.documentDirectory;
         if (!documentDirectory || downloadingId) return;
-        const target = `${documentDirectory}onelanguage-${translation.id}-${Date.now()}.mp4`;
+        downloadSequenceRef.current += 1;
+        const target = `${documentDirectory}onelanguage-${translation.id}-${downloadSequenceRef.current}.mp4`;
         setDownloadingId(translation.id);
         try {
-            const download = await FileSystem.downloadAsync(
+            await FileSystem.downloadAsync(
                 getTranslationRecordingUrl(translation.id),
                 target,
                 { headers: token ? { Authorization: `Bearer ${token}` } : undefined },

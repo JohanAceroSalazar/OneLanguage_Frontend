@@ -36,10 +36,9 @@ const tabs: {
 export function BottomNav({ active, onNavigate, renderInPager = false }: BottomNavProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { colors, theme } = useTheme();
+  const { colors } = useTheme();
   const mainPager = useMainPager();
 
-  const isDark = theme === "dark";
   const safeBottom = Math.max(insets.bottom, 8);
 
   if (mainPager && !renderInPager) return null;
@@ -49,7 +48,7 @@ export function BottomNav({ active, onNavigate, renderInPager = false }: BottomN
       style={[
         styles.tabBar,
         {
-          backgroundColor: isDark ? "#0f172a" : "#1D1B3D",
+          backgroundColor: colors.navigation,
           height: 70 + safeBottom,
           paddingBottom: safeBottom,
         },
@@ -57,7 +56,7 @@ export function BottomNav({ active, onNavigate, renderInPager = false }: BottomN
     >
       {tabs.map((tab) => {
         const isActive = tab.name === active;
-        const iconColor = isDark ? colors.accent : "#FFEB3B";
+        const iconColor = colors.accent;
         const icon = tab.name === "history" ? (
           <Ionicons name={isActive ? "document-text" : "document-text-outline"} size={34} color={iconColor} />
         ) : !isActive && tab.name === "profile" ? (
@@ -109,8 +108,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   tabButton: {
-    width: 48,
-    height: 48,
+    flex: 1,
+    minHeight: 48,
     alignItems: "center",
     justifyContent: "center",
   },

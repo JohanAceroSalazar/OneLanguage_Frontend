@@ -10,6 +10,7 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
+    useWindowDimensions,
     View,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -58,7 +59,7 @@ function PermissionItem({ icon, title, description, active, loading, onPress }: 
         accessibilityRole="switch"
         accessibilityState={{ checked: active, disabled: loading }}
         accessibilityLabel={`${title}: ${active ? t("common.activated") : t("common.activate")}`}
-        style={[styles.activateButton, { backgroundColor: colors.accent }, active && styles.activatedButton, loading && styles.permissionButtonDisabled]}
+        style={[styles.activateButton, active && styles.activatedButton, { backgroundColor: colors.accent }, loading && styles.permissionButtonDisabled]}
     >
         <Text style={[styles.activateText, { color: colors.textOnSurface, fontSize: 13 * fontScale }]}>{loading ? "..." : active ? t("common.activated") : t("common.activate")}</Text>
     </TouchableOpacity>
@@ -69,7 +70,9 @@ function PermissionItem({ icon, title, description, active, loading, onPress }: 
 export default function UserProfile() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const { colors, fontScale, setThemeMode, setFontSizeMode, theme } = useTheme();
+    const { colors, fontScale, setThemeMode, setFontSizeMode } = useTheme();
+    const { width } = useWindowDimensions();
+    const stackPermissionActions = width < 360 || fontScale > 1;
     const { t } = useTranslation();
     const mainPager = useMainPager();
     const [user, setUser] = useState<any>(null);
@@ -157,7 +160,7 @@ export default function UserProfile() {
     <SwipeNavigation active="profile">
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
         <ScrollView
-        contentContainerStyle={[styles.content, { paddingBottom: 105 + Math.max(insets.bottom, 8) }]}
+        contentContainerStyle={[styles.content, { paddingBottom: 86 + Math.max(insets.bottom, 8) }]}
         showsVerticalScrollIndicator={false}
     >
         <View style={styles.header}>
@@ -232,7 +235,7 @@ export default function UserProfile() {
           <Text
             style={[
               styles.logoutText,
-              { color: theme === "dark" ? "#FFFFFF" : "#111827", fontSize: 20 * fontScale },
+              { color: colors.accentText, fontSize: 20 * fontScale },
             ]}
           >
             {t("common.logout")}
@@ -240,21 +243,30 @@ export default function UserProfile() {
         </TouchableOpacity>
     </ScrollView>
 
-        <Modal visible={permissionPrompt !== null} transparent animationType="fade" onRequestClose={() => setPermissionPrompt(null)}>
+        <Modal visible={permissionPrompt !== null} transparent animationType="fade" statusBarTranslucent onRequestClose={() => setPermissionPrompt(null)}>
+            <SafeAreaView edges={["top", "right", "bottom", "left"]} style={styles.permissionModalSafeArea}>
             <View style={styles.permissionBackdrop}>
-                <View style={[styles.permissionDialog, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={[styles.permissionDialogShell, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <ScrollView
+                    style={styles.permissionDialogScroll}
+                    contentContainerStyle={styles.permissionDialogContent}
+                    showsVerticalScrollIndicator={false}
+                    bounces={false}
+                >
                     <Text style={[styles.permissionDialogTitle, { color: colors.textOnSurface, fontSize: 27 * fontScale }]}>{promptTitle}</Text>
                     <Text style={[styles.permissionDialogText, { color: colors.textOnSurface, fontSize: 17 * fontScale }]}>{promptMessage}</Text>
-                    <View style={styles.permissionDialogActions}>
-                        <TouchableOpacity activeOpacity={0.85} onPress={confirmPermission} style={[styles.permissionDialogButton, { backgroundColor: colors.accent }]}>
-                            <Text style={[styles.permissionDialogButtonText, { color: colors.textOnSurface, fontSize: 17 * fontScale }]}>{t("common.activate")}</Text>
+                    <View style={[styles.permissionDialogActions, stackPermissionActions && styles.permissionDialogActionsStacked]}>
+                        <TouchableOpacity activeOpacity={0.85} onPress={confirmPermission} style={[styles.permissionDialogButton, stackPermissionActions && styles.permissionDialogButtonStacked, { backgroundColor: colors.accent }]}>
+                            <Text style={[styles.permissionDialogButtonText, { color: colors.accentText, fontSize: 17 * fontScale }]}>{t("common.activate")}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity activeOpacity={0.85} onPress={() => setPermissionPrompt(null)} style={[styles.permissionDialogButton, { backgroundColor: colors.accent }]}>
-                            <Text style={[styles.permissionDialogButtonText, { color: colors.textOnSurface, fontSize: 17 * fontScale }]}>{t("cameraPermission.reject")}</Text>
+                        <TouchableOpacity activeOpacity={0.85} onPress={() => setPermissionPrompt(null)} style={[styles.permissionDialogButton, stackPermissionActions && styles.permissionDialogButtonStacked, { backgroundColor: colors.accent }]}>
+                            <Text style={[styles.permissionDialogButtonText, { color: colors.accentText, fontSize: 17 * fontScale }]}>{t("cameraPermission.reject")}</Text>
                         </TouchableOpacity>
                     </View>
+                </ScrollView>
                 </View>
             </View>
+            </SafeAreaView>
         </Modal>
 
         <BottomNav active="profile" />
@@ -407,20 +419,32 @@ activateButton: {
     elevation: 3,
     },
 activatedButton: {
-    backgroundColor: "#D7C81B",
+    opacity: 1,
     },
 permissionButtonDisabled: { opacity: 0.65 },
 permissionBackdrop: {
     flex: 1,
-    padding: 24,
+    padding: 16,
     justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "rgba(11, 43, 80, 0.56)",
     },
-permissionDialog: {
+permissionModalSafeArea: {
+    flex: 1,
+    },
+permissionDialogShell: {
+    width: "100%",
+    maxWidth: 420,
+    maxHeight: "92%",
     borderWidth: 2,
     borderRadius: 20,
-    paddingVertical: 28,
-    paddingHorizontal: 22,
+    overflow: "hidden",
+    },
+permissionDialogScroll: { width: "100%" },
+permissionDialogContent: {
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    flexGrow: 1,
     },
 permissionDialogTitle: {
     fontWeight: "700",
@@ -437,6 +461,10 @@ permissionDialogActions: {
     gap: 14,
     marginTop: 28,
     },
+permissionDialogActionsStacked: {
+    flexDirection: "column",
+    gap: 10,
+    },
 permissionDialogButton: {
     flex: 1,
     minHeight: 48,
@@ -447,6 +475,7 @@ permissionDialogButton: {
     justifyContent: "center",
     paddingHorizontal: 10,
     },
+permissionDialogButtonStacked: { width: "100%", flex: 0 },
 permissionDialogButtonText: { fontWeight: "600", textAlign: "center" },
 activateText: {
     color: "#000000",
