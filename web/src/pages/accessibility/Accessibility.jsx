@@ -31,8 +31,7 @@ function Accessibility() {
     const { t } = useTranslation();
 
     useEffect(() => {
-        const zoom = fontSizeOptions[fontSize] || 1;
-        document.body.style.zoom = String(zoom);
+        document.body.style.zoom = "";
         document.documentElement.dataset.textSize = fontSize;
     }, [fontSize]);
 

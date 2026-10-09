@@ -12,6 +12,20 @@
     overflow-y: auto;
 }
 
+@media (min-width: 769px) {
+    .profile-container {
+        height: calc(100dvh / var(--app-text-scale));
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .profile-card {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+    }
+}
+
 .profile-header {
     display: flex;
     justify-content: space-between;
@@ -198,9 +212,9 @@
 }
 
 .activate-btn.is-active {
-    background: var(--color-control-bg);
-    border-color: var(--color-control-bg);
-    color: var(--color-control-text);
+    background: #2f78cc;
+    border-color: #2f78cc;
+    color: #ffffff;
 }
 
 .activate-btn:disabled {
@@ -341,7 +355,9 @@
 }
 
 .modal-logout-btn,
-.modal-cancel-btn {
+.modal-cancel-btn,
+.permission-modal-activate,
+.permission-modal-cancel {
     padding: 10px 24px;
     border: 2px solid #111;
     border-radius: 10px;
@@ -358,6 +374,24 @@
 .modal-cancel-btn {
     background: var(--color-control-bg);
     color: var(--color-control-text);
+}
+
+.permission-modal {
+    max-width: 420px;
+}
+
+.permission-modal-title {
+    color: var(--color-text);
+    font-size: 24px;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.permission-modal-activate,
+.permission-modal-cancel {
+    flex: 1;
+    background: var(--color-accent);
+    color: var(--color-accent-text);
 }
 
 @media (max-width: 1024px) {
@@ -377,5 +411,5 @@
     .permission-card { max-width: 100%; min-height: 240px; padding: 48px 32px; }
     .yellow-btn { width: 100%; min-width: 0; padding: 16px 24px; font-size: 17px; }
     .modal-actions { flex-direction: column; width: 100%; }
-    .modal-logout-btn, .modal-cancel-btn { width: 100%; }
+    .modal-logout-btn, .modal-cancel-btn, .permission-modal-activate, .permission-modal-cancel { width: 100%; }
 }

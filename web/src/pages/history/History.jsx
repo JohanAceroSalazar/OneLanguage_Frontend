@@ -58,11 +58,22 @@ function History() {
         Object.values(recordingUrlsRef.current).forEach((url) => URL.revokeObjectURL(url));
     }, []);
 
-    const visibleTranslations = useMemo(() => [...translations].sort((first, second) => {
-        const firstDate = new Date(first.createdAt).getTime();
-        const secondDate = new Date(second.createdAt).getTime();
-        return sortOrder === "newest" ? secondDate - firstDate : firstDate - secondDate;
-    }), [sortOrder, translations]);
+    const filterOptions = [
+        { value: "newest", label: t("history.recent") },
+        { value: "oldest", label: t("history.old") },
+        { value: "all", label: t("history.all") },
+    ];
+
+    const visibleTranslations = useMemo(() => {
+        const items = [...translations];
+        if (sortOrder === "all") return items;
+
+        return items.sort((first, second) => {
+            const firstDate = new Date(first.createdAt).getTime();
+            const secondDate = new Date(second.createdAt).getTime();
+            return sortOrder === "newest" ? secondDate - firstDate : firstDate - secondDate;
+        });
+    }, [sortOrder, translations]);
 
     const selectSortOrder = (nextOrder) => {
         setSortOrder(nextOrder);
@@ -167,12 +178,13 @@ function History() {
                     <div className="history-controls">
                         <div className="filter-wrapper" ref={filterRef}>
                             <button className="filter-btn" type="button" onClick={() => setFilterOpen((open) => !open)}>
-                                {sortOrder === "newest" ? "Mas reciente" : "Mas antiguo"} <FaChevronDown aria-hidden="true" />
+                                {filterOptions.find((option) => option.value === sortOrder)?.label} <FaChevronDown aria-hidden="true" />
                             </button>
                             {filterOpen && (
                                 <div className="filter-dropdown">
-                                    <button type="button" onClick={() => selectSortOrder("newest")}>{t("history.newest")}</button>
-                                    <button type="button" onClick={() => selectSortOrder("oldest")}>{t("history.oldest")}</button>
+                                    {filterOptions.map((option) => (
+                                        <button type="button" key={option.value} onClick={() => selectSortOrder(option.value)}>{option.label}</button>
+                                    ))}
                                 </div>
                             )}
                         </div>
