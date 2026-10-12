@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
-import { FaCamera, FaMusic, FaFolder, FaUser } from "react-icons/fa";
+import { FaCamera, FaMusic, FaUser } from "react-icons/fa";
 import BrandLogo from "../../components/BrandLogo/BrandLogo";
 import NavBar from "../../components/NavBar/NavBar";
 import { clearAuthSession } from "../../services/authSession";
@@ -15,11 +15,11 @@ function Profile() {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const [view, setView] = useState("profile"); // profile | password | camera | audio | files
+    const [view, setView] = useState("profile"); // profile | password | camera | audio
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [user, setUser] = useState(null);
     const [profileError, setProfileError] = useState("");
-    const [featurePermissions, setFeaturePermissions] = useState({ camera: false, audio: false, files: false });
+    const [featurePermissions, setFeaturePermissions] = useState({ camera: false, audio: false });
     const [updatingPermission, setUpdatingPermission] = useState(null);
     const [permissionPrompt, setPermissionPrompt] = useState(null);
 
@@ -130,24 +130,6 @@ function Profile() {
         );
     }
 
-    // VISTA ARCHIVOS
-    if (view === "files") {
-        return (
-            <div className="profile-container">
-                <div className="profile-header">
-                    <BrandLogo className="profile-logo" />
-                    <NavBar />
-                </div>
-                <div className="profile-center">
-                    <div className="permission-card">
-                        <FaFolder size={140} color="currentColor" />
-                    </div>
-                    <button className="yellow-btn" onClick={() => setView("profile")}>{t("profile.grantFiles")}</button>
-                </div>
-            </div>
-        );
-    }
-
     // VISTA PRINCIPAL
     return (
         <div className="profile-container">
@@ -210,18 +192,6 @@ function Profile() {
                         </button>
                     </div>
 
-                    <div className="permission-row">
-                        <div className="permission-left">
-                            <FaFolder size={20} />
-                            <div>
-                                <p className="perm-name">{t("common.files")}</p>
-                                <p className="perm-desc">{t("profile.filesText")}</p>
-                            </div>
-                        </div>
-                        <button className={`activate-btn ${featurePermissions.files ? "is-active" : ""}`} onClick={() => handleFeaturePermission("files")} disabled={updatingPermission !== null} aria-pressed={featurePermissions.files}>
-                            {updatingPermission === "files" ? t("common.loading") : featurePermissions.files ? t("common.deactivate") : t("common.activate")}
-                        </button>
-                    </div>
                 </div>
 
                 <div className="profile-divider" />

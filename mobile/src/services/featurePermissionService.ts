@@ -1,14 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_BASE_URL } from "../config/network";
 
-export type FeaturePermission = "camera" | "audio" | "files";
+export type FeaturePermission = "camera" | "audio";
 
 export type FeaturePermissions = Record<FeaturePermission, boolean>;
 
 const defaultPermissions: FeaturePermissions = {
     camera: false,
     audio: false,
-    files: false,
 };
 
 const request = async (options: RequestInit = {}) => {
@@ -29,8 +28,8 @@ const request = async (options: RequestInit = {}) => {
 };
 
 const normalizePermissions = (data: Partial<FeaturePermissions>): FeaturePermissions => ({
-    ...defaultPermissions,
-    ...data,
+    camera: Boolean(data?.camera ?? defaultPermissions.camera),
+    audio: Boolean(data?.audio ?? defaultPermissions.audio),
 });
 
 export const getFeaturePermissions = async (): Promise<FeaturePermissions> =>

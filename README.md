@@ -1,325 +1,103 @@
 # OneLanguage Frontend
 
-Repositorio del frontend del proyecto **OneLanguage**.
+Frontend del proyecto **One Language**, con dos aplicaciones independientes:
 
-Este repositorio contiene dos aplicaciones separadas:
+- **Web**: React 19, Vite, React Router y Axios.
+- **Mobile**: React Native 0.86.3, Expo 57, Expo Router y TypeScript.
 
-- `web`: frontend web en **React + Vite**
-- `mobile`: frontend movil en **Expo + React Native**
+Ambas consumen el backend Spring Boot y comparten autenticación, perfil, accesibilidad, traducción e historial.
 
-Ambas aplicaciones consumen el backend Spring Boot del proyecto para autenticar usuarios, registrar informacion y preparar el flujo de traduccion de señas.
+## Requisitos
 
-## Arquitectura general
+Node.js, npm, backend disponible en el puerto 8084, PostgreSQL migrado y, para la traducción en tiempo real, el servicio WebSocket de IA. Mobile requiere Expo Go o un emulador/dispositivo.
 
-La arquitectura del frontend esta separada por plataforma:
+## Estructura
 
-- **Web**
-
-  - Interfaz accesible desde navegador
-  - Rutas con `react-router-dom`
-  - Llamadas HTTP al backend con `axios`
-  - Empaquetado para produccion con `Dockerfile` + `nginx`
-- **Movil**
-
-  - Aplicacion para Android/iOS usando Expo
-  - Navegacion por carpetas con `expo-router`
-  - Llamadas HTTP al backend con `fetch`
-  - Se ejecuta normalmente en desarrollo con Expo Go o emulador
-
-## Estructura del repositorio
-
-```text
+~~~text
 OneLanguage_Frontend/
-├── README.md
-├── web/
+├── web/       # React + Vite
+│   ├── src/components, pages, routes, services
 │   ├── Dockerfile
 │   ├── nginx.conf
-│   ├── package.json
-│   └── src/
-│       ├── routes/
-│       ├── pages/
-│       ├── services/
-│       └── components/
-└── mobile/
-    ├── package.json
-    ├── app/
-    ├── components/
-    ├── hooks/
-    ├── constants/
-    └── src/
-        └── services/
-```
+│   └── package.json
+└── mobile/    # React Native + Expo
+    ├── app/                 # Rutas Expo Router
+    ├── components/, hooks/, constants/
+    ├── src/config, src/services
+    ├── src/i18n.ts
+    └── package.json
+~~~
 
 ## Web
 
-### Tecnologias
+### Instalación, configuración y comandos
 
-- React 19
-- Vite
-- React Router DOM
-- Axios
-- React Icons
-
-### Arquitectura de la web
-
-La web esta organizada por funcionalidad:
-
-- `src/routes`
-
-  - Define las rutas principales de la aplicacion.
-- `src/pages`
-
-  - Contiene las vistas o pantallas.
-  - Ejemplos: `login`, `register`, `home`, `history`, `translate`.
-- `src/components`
-
-  - Contiene componentes reutilizables como `Button` e `Input`.
-- `src/services`
-
-  - Contiene la capa de acceso a API.
-  - Aqui esta configurado `axios` y el servicio de autenticacion/registro.
-
-### Conexion con el backend
-
-La web apunta al backend mediante la variable:
-
-```bash
-VITE_API_URL
-```
-
-Si no se define, usa por defecto:
-
-```text
-http://localhost:8084
-```
-
-### Endpoints usados por ahora
-
-- `POST /api/users`
-
-  - Registro de usuario
-- `GET /api/users`
-
-  - Listado de usuarios
-- `GET /api/users/{id}`
-
-  - Consulta de usuario por id
-- `DELETE /api/users/{id}`
-
-  - Borrado logico de usuario
-
-### Ajuste importante
-
-El frontend web tenia una URL vieja apuntando a `http://localhost:8000`.
-Eso ya fue corregido para que consuma el backend real en `8084`.
-
-## Web en Docker
-
-Se agrego:
-
-- [`web/Dockerfile`](./web/Dockerfile)
-- [`web/nginx.conf`](./web/nginx.conf)
-
-### Que hace el Dockerfile
-
-1. Compila la aplicacion con Node.
-2. Inyecta la variable `VITE_API_URL`.
-3. Sirve la carpeta `dist` con Nginx.
-
-### Que hace nginx.conf
-
-- Sirve la SPA de React correctamente.
-- Permite refrescar rutas como `/login` o `/register` sin error 404.
-- Entrega archivos estaticos con cache.
-
-### Build de la web
-
-Desde `OneLanguage_Frontend/web`:
-
-```bash
-docker build --build-arg VITE_API_URL=http://localhost:8084 -t onelanguage-web .
-```
-
-### Run de la web
-
-```bash
-docker run -p 3000:80 onelanguage-web
-```
-
-Luego puedes abrir:
-
-- `http://localhost:3000`
-
-## Movil
-
-### Tecnologias
-
-- Expo
-- React Native
-- Expo Router
-- TypeScript
-
-### Arquitectura de la movil
-
-La app movil usa una estructura por rutas en la carpeta `app`:
-
-- `app/_layout.tsx`
-
-  - Define el stack general de navegacion.
-- `app/(auth)/`
-
-  - Agrupa pantallas de autenticacion y flujo principal.
-- `components/`
-
-  - Componentes reutilizables de UI.
-- `hooks/`
-
-  - Hooks compartidos de tema y color.
-- `constants/`
-
-  - Valores globales de estilo o tema.
-- `src/services/`
-
-  - Llamadas al backend.
-
-### Conexion con el backend
-
-La movil usa esta variable:
-
-```bash
-EXPO_PUBLIC_API_URL
-```
-
-Si no se define, usa:
-
-```text
-http://localhost:8084
-```
-
-### Importante para movil
-
-- En Android Emulator, normalmente el backend local se consume con `http://10.0.2.2:8084`
-- En celular fisico, debes usar la IP local de tu PC, por ejemplo `http://192.168.1.50:8084`
-
-## Como correr el proyecto
-
-### Opcion 1: correr solo la web
-
-1. Entra a `web`
-2. Instala dependencias
-
-```bash
+~~~bash
+cd OneLanguage_Frontend/web
 npm install
-```
-
-3. Crea un archivo `.env` si quieres cambiar el backend
-
-```bash
-VITE_API_URL=http://localhost:8084
-```
-
-4. Levanta en modo desarrollo
-
-```bash
 npm run dev
-```
+npm run lint
+npm run build
+npm run preview
+~~~
 
-5. Levantar en intranet
+Variables disponibles en web/.env (ver web/.env.example):
 
-```bash
-npm run dev -- --host 0.0.0.0
-```
+~~~dotenv
+VITE_API_URL=
+VITE_AI_WS_URL=
+VITE_DEV_HTTPS_CERT=./certs/onelanguage-cert.pem
+VITE_DEV_HTTPS_KEY=./certs/onelanguage-key.pem
+~~~
 
-### Opcion 2: correr la web con Docker
+VITE_API_URL configura el backend; vacío usa el proxy/origen configurado por Vite. VITE_AI_WS_URL configura el WebSocket de reconocimiento. Para exponer Vite en la red local: npm run dev -- --host 0.0.0.0.
 
-1. Asegura que el backend este levantado
-2. Construye la imagen
+La imagen se construye y sirve con Docker/Nginx:
 
-```bash
-docker build --build-arg VITE_API_URL=http://localhost:8084 -t onelanguage-web .
-```
+~~~bash
+docker build --build-arg VITE_API_URL=http://localhost:8084 -t onelanguage-web ./web
+docker run --rm -p 3000:80 onelanguage-web
+~~~
 
-3. Ejecuta el contenedor
+### Funcionalidades
 
-```bash
-docker run -p 3000:80 onelanguage-web
-```
+Registro, inicio de sesión, recuperación/restablecimiento de contraseña, sesión JWT, perfil, accesibilidad, cambio de idioma, permisos de cámara y audio, traducción por WebSocket, lectura por voz e historial.
 
-### Opcion 3: correr la movil
+El historial puede reproducir grabaciones obtenidas desde el backend. El permiso files no existe en el frontend actual y no se ofrece descarga local como funcionalidad.
 
-1. Entra a `mobile`
-2. Instala dependencias
+## Mobile
 
-```bash
+### Instalación y comandos
+
+~~~bash
+cd OneLanguage_Frontend/mobile
 npm install
-```
-
-3. Define la URL del backend si hace falta
-
-```bash
-EXPO_PUBLIC_API_URL=http://localhost:8084
-```
-
-4. Inicia Expo
-
-```bash
 npm run start
-```
+npm run android
+npm run ios
+npm run web
+npm run lint
+npx tsc --noEmit
+~~~
 
-O tambien:
+La configuración de red está en mobile/src/config/network.ts. Variables de mobile/.env.example:
 
-```bash
-npx expo start
-```
+~~~dotenv
+EXPO_PUBLIC_API_URL=http://192.168.1.100:8084
+EXPO_PUBLIC_AI_WS_URL=ws://192.168.1.100:8000/ws/recognize
+~~~
 
-## Relacion con el backend
+Para Android Emulator suele utilizarse http://10.0.2.2:8084; en un dispositivo físico se debe usar una IP accesible de la máquina que ejecuta el backend.
 
-Este frontend se conecta al backend del repositorio:
+Expo Router organiza autenticación, inicio, cámara/traducción, historial, perfil, accesibilidad y términos bajo mobile/app. La cámara usa expo-camera, el audio/lectura usa expo-speech y el historial reproduce grabaciones remotas con expo-video.
 
-- `OneLanguage-Backend`
+Mobile solo gestiona los permisos camera y audio. Se eliminó el permiso files y la descarga/almacenamiento local de videos; la reproducción remota permanece disponible.
 
-El backend debe estar corriendo en:
+## Internacionalización
 
-- `http://localhost:8084`
+Los catálogos están en web/src/i18n.js y mobile/src/i18n.ts. Los idiomas disponibles son es, en, pt e it; el cambio dinámico se persiste localmente y los textos están guardados en UTF-8.
 
-Tambien debe estar levantada la base de datos del proyecto para que los endpoints funcionen correctamente.
+## Integración y estado
 
-## Flujos implementados
+El backend normalmente se ejecuta en http://localhost:8084; CORS, PostgreSQL y el servicio WebSocket deben estar disponibles según el entorno. La traducción en tiempo real depende del servicio de IA y la reproducción depende de que exista una grabación asociada. No existe un compose global para levantar los tres repositorios juntos.
 
-### Web
-
-- Registro
-- Login visual
-- Home
-- Historia
-- Traduccion
-- Accesibilidad
-- Perfil
-- Recuperacion de contrasena
-
-### Movil
-
-- Login
-- Registro
-- Recuperacion de contrasena
-- Home
-- Historia
-- Camara
-- Accesibilidad
-- Perfil
-- Terminos
-
-## Notas importantes
-
-- La web ya tiene Dockerfile.
-- La movil normalmente no necesita Dockerfile para desarrollo.
-- La conexion al backend depende de CORS y de la URL correcta del entorno.
-- Si cambias el puerto del backend, debes actualizar `VITE_API_URL` y `EXPO_PUBLIC_API_URL`.
-
-## Siguiente paso recomendado
-
-Lo mas util ahora seria:
-
-1. crear un `docker-compose.yml` global para levantar frontend, backend y base de datos juntos,
-2. o documentar en detalle las variables de entorno de cada app,
-3. o terminar el flujo real de login y registro consumiendo el backend.
