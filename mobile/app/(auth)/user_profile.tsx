@@ -76,7 +76,7 @@ export default function UserProfile() {
     const { t } = useTranslation();
     const mainPager = useMainPager();
     const [user, setUser] = useState<any>(null);
-    const [featurePermissions, setFeaturePermissions] = useState<FeaturePermissions>({ camera: false, audio: false, files: false });
+    const [featurePermissions, setFeaturePermissions] = useState<FeaturePermissions>({ camera: false, audio: false });
     const [updatingPermission, setUpdatingPermission] = useState<FeaturePermission | null>(null);
     const [permissionPrompt, setPermissionPrompt] = useState<FeaturePermission | null>(null);
 
@@ -216,14 +216,6 @@ export default function UserProfile() {
             active={featurePermissions.audio}
             loading={updatingPermission === "audio"}
             onPress={() => handlePermissionPress("audio")}
-        />
-        <PermissionItem
-            icon="folder"
-            title={t("common.files")}
-            description={t("profile.filesText")}
-            active={featurePermissions.files}
-            loading={updatingPermission === "files"}
-            onPress={() => handlePermissionPress("files")}
         />
         </View>
 

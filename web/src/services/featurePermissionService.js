@@ -3,11 +3,13 @@ import api from "./api";
 const defaultPermissions = {
     camera: false,
     audio: false,
-    files: false,
 };
 
 function normalizePermissions(data) {
-    return { ...defaultPermissions, ...data };
+    return {
+        camera: Boolean(data?.camera ?? defaultPermissions.camera),
+        audio: Boolean(data?.audio ?? defaultPermissions.audio),
+    };
 }
 
 export async function getFeaturePermissions() {

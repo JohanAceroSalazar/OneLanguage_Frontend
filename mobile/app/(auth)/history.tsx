@@ -1,9 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useVideoPlayer, VideoView } from "expo-video";
-import * as FileSystem from "expo-file-system/legacy";
 import * as Speech from "expo-speech";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BottomNav } from "../../components/bottom-nav";
@@ -41,8 +40,6 @@ export default function History() {
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [openRecordingId, setOpenRecordingId] = useState<string | null>(null);
     const [token, setToken] = useState<string | null>(null);
-    const [downloadingId, setDownloadingId] = useState<string | null>(null);
-    const downloadSequenceRef = useRef(0);
 
     useEffect(() => {
         AsyncStorage.getItem("token").then(setToken).catch(() => setToken(null));
@@ -152,43 +149,6 @@ export default function History() {
         Speech.speak(text, { language: "es-CO" });
     };
 
-    const downloadRecording = async (translation: Translation) => {
-        if (!(await getFeaturePermissions()).files) {
-            Alert.alert(
-                t("profile.filesPermissionTitle"),
-                t("profile.filesPermissionMessage"),
-                [
-                    { text: t("cameraPermission.reject"), style: "cancel" },
-                    {
-                        text: t("common.activate"),
-                        onPress: () => {
-                            void setFeaturePermission("files", true).then(() => downloadRecording(translation));
-                        },
-                    },
-                ],
-            );
-            return;
-        }
-
-        const documentDirectory = FileSystem.documentDirectory;
-        if (!documentDirectory || downloadingId) return;
-        downloadSequenceRef.current += 1;
-        const target = `${documentDirectory}onelanguage-${translation.id}-${downloadSequenceRef.current}.mp4`;
-        setDownloadingId(translation.id);
-        try {
-            await FileSystem.downloadAsync(
-                getTranslationRecordingUrl(translation.id),
-                target,
-                { headers: token ? { Authorization: `Bearer ${token}` } : undefined },
-            );
-            Alert.alert(t("profile.permissions"), t("history.downloaded"));
-        } catch {
-            Alert.alert(t("profile.permissions"), t("history.downloadError"));
-        } finally {
-            setDownloadingId(null);
-        }
-    };
-
     return (
         <SwipeNavigation active="history">
         <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
@@ -223,7 +183,6 @@ export default function History() {
             <View style={styles.itemActions}>
                 <TouchableOpacity onPress={() => void speakTranslation(translation.translatedText)} style={styles.itemActionButton}><Ionicons name="volume-high-outline" size={20} color={colors.textOnSurface} /></TouchableOpacity>
                 {translation.hasRecording ? <TouchableOpacity onPress={() => setOpenRecordingId((current) => current === translation.id ? null : translation.id)} style={styles.itemActionButton}><Ionicons name={openRecordingId === translation.id ? "close" : "play-outline"} size={20} color={colors.textOnSurface} /></TouchableOpacity> : null}
-                {translation.hasRecording ? <TouchableOpacity disabled={downloadingId !== null} onPress={() => void downloadRecording(translation)} style={styles.itemActionButton}>{downloadingId === translation.id ? <ActivityIndicator size="small" color={colors.textOnSurface} /> : <Ionicons name="download-outline" size={20} color={colors.textOnSurface} />}</TouchableOpacity> : null}
                 <TouchableOpacity disabled={deletingId !== null} onPress={() => removeOne(translation)} style={styles.deleteButton}>
                     {deletingId === translation.id ? <ActivityIndicator color="#b91c1c" /> : <Ionicons name="trash-outline" size={20} color="#b91c1c" />}
                 </TouchableOpacity>
