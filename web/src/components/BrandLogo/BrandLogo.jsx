@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./BrandLogo.css";
+import logo from "../../assets/Logo.png";
 
 function BrandLogo({ className = "" }) {
     const navigate = useNavigate();
@@ -13,7 +14,8 @@ function BrandLogo({ className = "" }) {
             onClick={() => navigate("/home")}
             aria-label={t("nav.home")}
         >
-            <span>ONE<br />LANGUAGE</span>
+            <img src={logo} alt="" className="brand-logo-image" />
+            <span>One Language</span>
         </button>
     );
 }
