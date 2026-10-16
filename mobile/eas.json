@@ -1,0 +1,14 @@
+{
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://onelanguage.tech",
+        "EXPO_PUBLIC_AI_WS_URL": "wss://ai.onelanguage.tech/ws/recognize"
+      }
+    }
+  }
+}
