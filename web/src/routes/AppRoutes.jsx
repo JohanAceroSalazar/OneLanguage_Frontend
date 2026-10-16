@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ThemeBootstrap from "../components/ThemeBootstrap/ThemeBootstrap";
 import Register from "../pages/register/Register";
 import Login from "../pages/login/Login";
-import Terms from "../pages/terms/Terms";
+import Terms from "../pages/terms/terms";
 import Home from "../pages/home/Home";
 import Landing from "../pages/landing/Landing";
 import ForgotPassword from "../pages/forgotpassword/ForgotPassword";

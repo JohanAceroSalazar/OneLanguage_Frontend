@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, root, "");
     const certificatePath = env.VITE_DEV_HTTPS_CERT;
     const keyPath = env.VITE_DEV_HTTPS_KEY;
-    const https = certificatePath && keyPath
+    const https = mode === "development" && certificatePath && keyPath
         ? {
             cert: fs.readFileSync(path.resolve(certificatePath)),
             key: fs.readFileSync(path.resolve(keyPath)),

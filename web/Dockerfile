@@ -3,12 +3,15 @@ FROM node:22-alpine AS build
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 COPY . .
 
-ARG VITE_API_URL=http://localhost:8084
+ARG VITE_API_URL=/
 ENV VITE_API_URL=${VITE_API_URL}
+
+ARG VITE_AI_WS_URL=wss://ai.onelanguage.tech/ws/recognize
+ENV VITE_AI_WS_URL=${VITE_AI_WS_URL}
 
 RUN npm run build
 
