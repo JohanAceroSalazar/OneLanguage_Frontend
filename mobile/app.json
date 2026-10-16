@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mobile",
+    "name": "One Language",
     "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -67,6 +67,7 @@
       "eas": {
         "projectId": "2d5acf8e-c483-46a1-8d18-92a918ae5e19"
       }
-    }
+    },
+    "owner": "johan_acero"
   }
 }

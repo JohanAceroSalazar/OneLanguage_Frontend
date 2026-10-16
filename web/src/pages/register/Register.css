@@ -21,7 +21,6 @@ body {
         linear-gradient(135deg, var(--color-page-bg-alt) 0%, var(--color-page-bg) 55%, color-mix(in srgb, var(--color-page-bg) 72%, #000) 100%);
     position: relative;
     overflow-x: hidden;
-    overflow-y: auto;
 }
 
 .register-container::before,
@@ -340,11 +339,44 @@ body {
     text-decoration: underline;
 }
 
-@media (min-width: 981px) {
+@media (min-width: 981px) and (max-height: 820px) {
     .register-container {
-        height: calc(100dvh / var(--app-text-scale));
-        min-height: 0;
-        overflow: hidden;
+        align-items: start;
+        padding-block: clamp(16px, 3vh, 24px);
+    }
+
+    .register-shell {
+        gap: clamp(24px, 4vw, 44px);
+    }
+
+    .register-brand-copy {
+        margin-top: 12px;
+        line-height: 1.55;
+    }
+
+    .register-form-title {
+        margin-bottom: 10px;
+    }
+
+    .form-card {
+        padding: clamp(20px, 3vh, 24px);
+        gap: 6px;
+    }
+
+    .form-header {
+        margin-bottom: 6px;
+    }
+
+    .form-step {
+        margin-bottom: 8px;
+    }
+
+    .auth-submit-button {
+        margin-top: 8px;
+    }
+
+    .login-text {
+        margin: 8px 0 0;
     }
 }
 

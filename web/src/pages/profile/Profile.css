@@ -12,20 +12,6 @@
     overflow-y: auto;
 }
 
-@media (min-width: 769px) {
-    .profile-container {
-        height: calc(100dvh / var(--app-text-scale));
-        min-height: 0;
-        overflow: hidden;
-    }
-
-    .profile-card {
-        flex: 1 1 auto;
-        min-height: 0;
-        overflow-y: auto;
-    }
-}
-
 .profile-header {
     display: flex;
     justify-content: space-between;

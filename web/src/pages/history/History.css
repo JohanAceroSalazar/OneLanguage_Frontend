@@ -256,20 +256,6 @@
     scrollbar-gutter: stable;
 }
 
-@media (min-width: 769px) {
-    .history-container {
-        height: calc(100dvh / var(--app-text-scale));
-        min-height: 0;
-        overflow: hidden;
-    }
-
-    .history-header,
-    .history-title-section,
-    .history-controls {
-        flex: 0 0 auto;
-    }
-}
-
 .history-item {
     display: flex;
     align-items: center;

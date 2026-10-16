@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import "./Terms.css";
+import "./terms.css";
 
 function Terms() {
     const { t } = useTranslation();
