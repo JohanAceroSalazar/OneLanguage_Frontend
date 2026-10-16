@@ -7,11 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "mobile",
     "userInterfaceStyle": "automatic",
-    "androidNavigationBar": {
-      "visible": "visible",
-      "barStyle": "light-content",
-      "backgroundColor": "#3A78C2"
-    },
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -20,6 +15,7 @@
     },
     "android": {
       "package": "com.onelanguage.app",
+      "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -72,6 +68,6 @@
         "projectId": "2d5acf8e-c483-46a1-8d18-92a918ae5e19"
       }
     },
-    "owner": "johan_acero"
+    "owner": "onelanguage"
   }
 }
