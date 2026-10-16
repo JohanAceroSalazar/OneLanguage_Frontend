@@ -11,18 +11,6 @@
     font-family: Arial, sans-serif;
 }
 
-@media (min-width: 901px) {
-    .translate-container {
-        height: calc(100dvh / var(--app-text-scale));
-        min-height: 0;
-        overflow: hidden;
-    }
-
-    .translate-container .translate-content {
-        min-height: 0;
-    }
-}
-
 .translate-header {
     display: flex;
     align-items: center;

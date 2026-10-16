@@ -26,6 +26,11 @@
     box-shadow: none;
 }
 
+.app-nav-backdrop,
+.app-nav-drawer {
+    display: none;
+}
+
 .app-nav-item {
     display: inline-flex;
     align-items: center;
@@ -101,28 +106,98 @@
 
     .app-nav-links {
         display: none;
-        position: absolute;
-        top: calc(100% + 8px);
-        left: 0;
-        z-index: 20;
-        width: min(100%, 320px);
-        padding: 8px 0 0;
-        border-top: 1px solid color-mix(in srgb, var(--color-text-on-page) 28%, transparent);
+    }
+
+    .app-nav-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        border: 0;
         border-radius: 0;
-        background: var(--color-page-bg);
+        background: rgba(6, 20, 43, 0.46);
+        cursor: default;
         box-shadow: none;
     }
 
-    .app-nav-links.is-open {
+    .app-nav-drawer {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 101;
+        display: flex;
+        flex-direction: column;
+        width: min(82vw, 320px);
+        max-width: 100%;
+        overflow-y: auto;
+        background: var(--color-page-bg);
+        color: var(--color-text-on-page);
+        box-shadow: 16px 0 34px rgba(6, 20, 43, 0.3);
+    }
+
+    .app-nav-drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 68px;
+        padding: 14px 18px;
+        border-bottom: 1px solid color-mix(in srgb, var(--color-text-on-page) 22%, transparent);
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .app-nav-close {
+        display: inline-grid;
+        width: 44px;
+        min-width: 44px;
+        height: 44px;
+        padding: 0;
+        place-items: center;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--color-text-on-page);
+        font-size: 32px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .app-nav-drawer-links {
         display: grid;
+        gap: 4px;
+        padding: 14px 12px 24px;
     }
 
     .app-nav-item {
         justify-content: flex-start;
         width: 100%;
         min-height: 44px;
-        padding: 10px 12px;
-        font-size: 14px;
+        min-height: 48px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        color: var(--color-text-on-page);
+        font-size: 16px;
         text-align: left;
+    }
+
+    .app-nav-item::after {
+        display: none;
+    }
+
+    .app-nav-item.active {
+        background: color-mix(in srgb, var(--color-surface) 18%, transparent);
+        color: var(--color-accent);
+    }
+
+    .app-nav-item:focus-visible,
+    .app-nav-toggle:focus-visible,
+    .app-nav-close:focus-visible {
+        outline: 3px solid var(--color-accent);
+        outline-offset: 2px;
     }
 }

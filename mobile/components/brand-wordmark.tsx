@@ -16,8 +16,7 @@ export function BrandWordmark({ color, style }: BrandWordmarkProps) {
 
 const styles = StyleSheet.create({
     text: {
-        width: 128,
-        height: 44,
+        width: 140,
         fontSize: 20,
         lineHeight: 22,
         fontWeight: "800",
