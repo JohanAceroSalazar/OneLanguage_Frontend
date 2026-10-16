@@ -4,6 +4,7 @@ import Register from "../pages/register/Register";
 import Login from "../pages/login/Login";
 import Terms from "../pages/terms/terms";
 import Home from "../pages/home/Home";
+import Landing from "../pages/landing/Landing";
 import ForgotPassword from "../pages/forgotpassword/ForgotPassword";
 import Translate from "../pages/translate/Translate";
 import History from "../pages/history/History";
@@ -17,7 +18,7 @@ function AppRoutes() {
     <BrowserRouter>
         <ThemeBootstrap />
         <Routes>
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<Landing />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/terms" element={<Terms />} />
