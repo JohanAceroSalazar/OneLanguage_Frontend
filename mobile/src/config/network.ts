@@ -1,7 +1,7 @@
 import Constants from "expo-constants";
 
 const DEFAULT_API_PORT = "8084";
-const DEFAULT_AI_PORT = "8000";
+const DEFAULT_AI_PORT = "8001";
 const LOCALHOST = "127.0.0.1";
 
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
