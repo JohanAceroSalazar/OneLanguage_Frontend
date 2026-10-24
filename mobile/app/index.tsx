@@ -1,10 +1,10 @@
 import { useRouter } from "expo-router";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Animated, Image, StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
   const router = useRouter();
-  const opacity = useRef(new Animated.Value(1)).current;
+  const [opacity] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     const timer = setTimeout(() => {
