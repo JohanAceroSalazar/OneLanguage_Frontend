@@ -10,6 +10,7 @@ import { getCurrentUser } from "../../services/authService";
 import i18n from "../../i18n";
 import { readStoredAccessibility } from "../../services/accessibilityStorage";
 import { getFeaturePermissions, setFeaturePermission } from "../../services/featurePermissionService";
+import PermissionDialog from "../../components/PermissionDialog";
 
 function Profile() {
     const { t } = useTranslation();
@@ -91,9 +92,6 @@ function Profile() {
         setPermissionPrompt(null);
         void updateFeaturePermission(feature, true);
     };
-
-    const permissionPromptTitle = permissionPrompt ? t(`profile.${permissionPrompt}PermissionTitle`) : "";
-    const permissionPromptMessage = permissionPrompt ? t(`profile.${permissionPrompt}PermissionMessage`) : "";
 
     // VISTA CÁMARA
     if (view === "camera") {
@@ -216,18 +214,7 @@ function Profile() {
                 </div>
             )}
 
-            {permissionPrompt && (
-                <div className="modal-overlay" role="presentation">
-                    <section className="modal-box permission-modal" role="dialog" aria-modal="true" aria-labelledby="permission-modal-title" aria-describedby="permission-modal-message">
-                        <h2 id="permission-modal-title" className="permission-modal-title">{permissionPromptTitle}</h2>
-                        <p id="permission-modal-message" className="modal-text">{permissionPromptMessage}</p>
-                        <div className="modal-actions">
-                            <button className="permission-modal-activate" type="button" onClick={confirmFeaturePermission}>{t("common.activate")}</button>
-                            <button className="permission-modal-cancel" type="button" onClick={() => setPermissionPrompt(null)}>{t("cameraPermission.reject")}</button>
-                        </div>
-                    </section>
-                </div>
-            )}
+            <PermissionDialog feature={permissionPrompt} onActivate={confirmFeaturePermission} onClose={() => setPermissionPrompt(null)} />
         </div>
     );
 }

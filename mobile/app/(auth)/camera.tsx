@@ -1,9 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Camera as ExpoCamera, CameraType, CameraView } from "expo-camera";
-import { useRouter } from "expo-router";
 import * as Speech from "expo-speech";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BottomNav } from "../../components/bottom-nav";
+import { FeaturePermissionDialog } from "../../components/feature-permission-dialog";
 import { BrandWordmark } from "../../components/brand-wordmark";
 import { useMainPager } from "../../components/main-pager-context";
 import { SwipeNavigation } from "../../components/swipe-navigation";
@@ -22,7 +22,7 @@ import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
 import { AI_WEBSOCKET_URL } from "../../src/config/network";
 import { saveTranslation } from "../../src/services/translationService";
-import { getFeaturePermissions, setFeaturePermission } from "../../src/services/featurePermissionService";
+import { FeaturePermission, getFeaturePermissions, setFeaturePermission } from "../../src/services/featurePermissionService";
 
 // Expo Go obtains frames by taking pictures. A modest cadence prevents Android's
 // shutter animation and gives MediaPipe a sharp, correctly oriented frame.
@@ -53,9 +53,9 @@ export default function Camera() {
     const { t } = useTranslation();
     const { colors, fontScale } = useTheme();
     const mainPager = useMainPager();
+    const activeTab = mainPager?.activeTab;
     const { height } = useWindowDimensions();
     const insets = useSafeAreaInsets();
-    const router = useRouter();
     const [facing, setFacing] = useState<CameraType>("front");
     const [cameraActive, setCameraActive] = useState(false);
     const [cameraReady, setCameraReady] = useState(false);
@@ -67,6 +67,8 @@ export default function Camera() {
     const [confidence, setConfidence] = useState<number | null>(null);
     const [reviewPending, setReviewPending] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [permissionFeature, setPermissionFeature] = useState<FeaturePermission | null>(null);
+    const [permissionNotice, setPermissionNotice] = useState(false);
 
     const cameraRef = useRef<CameraView>(null);
     const socketRef = useRef<WebSocket | null>(null);
@@ -207,11 +209,39 @@ export default function Camera() {
     useEffect(() => { connectRef.current = connectModel; }, [connectModel]);
 
     useEffect(() => {
+        if (activeTab && activeTab !== "camera") return;
         getFeaturePermissions().then((permissions) => {
             speechRef.current = permissions.audio;
             setAutomaticSpeech(permissions.audio);
-        }).catch(() => undefined);
-    }, []);
+        }).catch(() => {
+            speechRef.current = false;
+            setAutomaticSpeech(false);
+        });
+    }, [activeTab]);
+
+    const showPermission = (feature: FeaturePermission) => {
+        setPermissionFeature(feature);
+        setPermissionNotice(true);
+    };
+
+    const activatePermission = async () => {
+        const feature = permissionFeature;
+        setPermissionFeature(null);
+        if (!feature) return;
+        try {
+            if (feature === "camera") {
+                const result = await ExpoCamera.requestCameraPermissionsAsync();
+                if (!result.granted) throw new Error("camera_denied");
+            }
+            const permissions = await setFeaturePermission(feature, true);
+            if (feature === "audio") {
+                speechRef.current = permissions.audio;
+                setAutomaticSpeech(permissions.audio);
+            }
+        } catch {
+            Alert.alert(t("profile.permissions"), t("profile.permissionDenied"));
+        }
+    };
 
     const resetSession = useCallback(() => {
         sessionRef.current = [];
@@ -245,53 +275,40 @@ export default function Camera() {
     }, [cameraActive, mainPager?.activeTab, stopCamera]);
 
     const startCamera = useCallback(async () => {
-        const featurePermissions = await getFeaturePermissions();
-        const devicePermission = await ExpoCamera.getCameraPermissionsAsync();
-        if (!featurePermissions.camera || !devicePermission.granted) {
+        try {
+            const featurePermissions = await getFeaturePermissions();
+            const devicePermission = await ExpoCamera.getCameraPermissionsAsync();
+            if (!featurePermissions.camera || !devicePermission.granted) {
+                setModelStatus("permission_required");
+                showPermission("camera");
+                return;
+            }
+            speechRef.current = featurePermissions.audio;
+            setAutomaticSpeech(featurePermissions.audio);
+        } catch {
             setModelStatus("permission_required");
-            Alert.alert(t("cameraPermission.title"), t("cameraPermission.message"), [
-                { text: t("common.cancel"), style: "cancel" },
-                { text: t("common.ok"), onPress: () => mainPager ? mainPager.navigate("profile") : router.push("/(auth)/user_profile") },
-            ]);
+            showPermission("camera");
             return;
         }
-        speechRef.current = featurePermissions.audio;
-        setAutomaticSpeech(featurePermissions.audio);
         resetSession();
         activeRef.current = true;
         setCameraActive(true);
         connectModel();
-    }, [connectModel, mainPager, resetSession, router, t]);
+    }, [connectModel, resetSession]);
 
     const toggleAutomaticSpeech = async () => {
         if (automaticSpeech) {
-            speechRef.current = false;
-            setAutomaticSpeech(false);
-            Speech.stop();
+            try {
+                const permissions = await setFeaturePermission("audio", false);
+                speechRef.current = permissions.audio;
+                setAutomaticSpeech(permissions.audio);
+                Speech.stop();
+            } catch {
+                showPermission("audio");
+            }
             return;
         }
-
-        if ((await getFeaturePermissions()).audio) {
-            speechRef.current = true;
-            setAutomaticSpeech(true);
-            return;
-        }
-
-        Alert.alert(
-            t("profile.audioPermissionTitle"),
-            t("profile.audioPermissionMessage"),
-            [
-                { text: t("cameraPermission.reject"), style: "cancel" },
-                {
-                    text: t("common.activate"),
-                    onPress: () => {
-                        void setFeaturePermission("audio", true);
-                        speechRef.current = true;
-                        setAutomaticSpeech(true);
-                    },
-                },
-            ],
-        );
+        showPermission("audio");
     };
 
     const finishTranslation = async () => {
@@ -418,6 +435,7 @@ export default function Camera() {
         <Text style={styles.primaryButtonText}>{cameraActive ? t("camera.finish") : t("camera.start")}</Text>
     </TouchableOpacity>}
     </ScrollView>
+    <FeaturePermissionDialog feature={permissionFeature} notice={permissionNotice} onContinue={() => setPermissionNotice(false)} onActivate={() => void activatePermission()} onClose={() => setPermissionFeature(null)} />
     <BottomNav active="camera" />
     </SafeAreaView>
     </SwipeNavigation>

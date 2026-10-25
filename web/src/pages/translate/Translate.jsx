@@ -5,8 +5,8 @@ import NavBar from "../../components/NavBar/NavBar";
 import { saveTranslation } from "../../services/translationService";
 import "./Translate.css";
 import { useTranslation } from "react-i18next";
-import { getFeaturePermissions } from "../../services/featurePermissionService";
-import { useNavigate } from "react-router-dom";
+import { getFeaturePermissions, setFeaturePermission } from "../../services/featurePermissionService";
+import PermissionDialog from "../../components/PermissionDialog";
 
 const FRAME_INTERVAL_MS = 66;
 const FRAME_TIMEOUT_MS = 10000;
@@ -33,15 +33,15 @@ function getCameraErrorStatus(error) {
 
 function Translate() {
     const { t } = useTranslation();
-    const navigate = useNavigate();
-    const [permissionAlert, setPermissionAlert] = useState(false);
+    const [permissionAlert, setPermissionAlert] = useState(null);
+    const [permissionPrompt, setPermissionPrompt] = useState(null);
     const [cameraActive, setCameraActive] = useState(false);
     const [flipped, setFlipped] = useState(false);
     const [modelStatus, setModelStatus] = useState("inactive");
     const [translation, setTranslation] = useState("");
     const [sessionTranslations, setSessionTranslations] = useState([]);
     const [confidence, setConfidence] = useState(null);
-    const [automaticSpeech, setAutomaticSpeech] = useState(true);
+    const [automaticSpeech, setAutomaticSpeech] = useState(false);
     const [reviewPending, setReviewPending] = useState(false);
     const [saving, setSaving] = useState(false);
 
@@ -62,6 +62,44 @@ function Translate() {
     const recordingBlobRef = useRef(null);
     const recordingStopResolverRef = useRef(null);
     const speechSupported = "speechSynthesis" in window;
+
+    useEffect(() => {
+        let active = true;
+        const syncAudio = () => getFeaturePermissions().then((permissions) => {
+            if (active) setAutomaticSpeech(permissions.audio && speechSupported);
+        }).catch(() => { if (active) setAutomaticSpeech(false); });
+        void syncAudio();
+        window.addEventListener("focus", syncAudio);
+        return () => { active = false; window.removeEventListener("focus", syncAudio); };
+    }, [speechSupported]);
+
+    const toggleAutomaticSpeech = async () => {
+        if (automaticSpeech) {
+            try {
+                const permissions = await setFeaturePermission("audio", false);
+                setAutomaticSpeech(permissions.audio);
+                window.speechSynthesis.cancel();
+            } catch { setPermissionAlert("audio"); }
+        } else {
+            setPermissionAlert("audio");
+        }
+    };
+
+    const activatePermission = async () => {
+        const feature = permissionPrompt;
+        setPermissionPrompt(null);
+        if (!feature) return;
+        try {
+            if (feature === "camera") {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                stream.getTracks().forEach((track) => track.stop());
+            }
+            const permissions = await setFeaturePermission(feature, true);
+            if (feature === "audio") setAutomaticSpeech(permissions.audio && speechSupported);
+        } catch {
+            setModelStatus(feature === "camera" ? "camera_denied" : "inactive");
+        }
+    };
 
     const attachVideo = useCallback((node) => {
         videoRef.current = node;
@@ -260,17 +298,19 @@ function Translate() {
     const startCamera = useCallback(async () => {
         if (reviewPending) return;
         try {
-            if (!(await getFeaturePermissions()).camera) {
-                setPermissionAlert(true);
+            const featurePermissions = await getFeaturePermissions();
+            setAutomaticSpeech(featurePermissions.audio && speechSupported);
+            if (!featurePermissions.camera) {
+                setPermissionAlert("camera");
                 return;
             }
             const browserPermission = await navigator.permissions?.query({ name: "camera" }).catch(() => null);
             if (browserPermission?.state === "denied") {
-                setPermissionAlert(true);
+                setPermissionAlert("camera");
                 return;
             }
         } catch {
-            setPermissionAlert(true);
+            setPermissionAlert("camera");
             return;
         }
         if (!window.isSecureContext && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
@@ -288,7 +328,7 @@ function Translate() {
             stream.getVideoTracks().forEach((track) => {
                 track.addEventListener("ended", () => {
                     stopCamera("camera_denied");
-                    setPermissionAlert(true);
+                    setPermissionAlert("camera");
                 });
             });
             streamRef.current = stream;
@@ -298,9 +338,9 @@ function Translate() {
             connectModel();
         } catch (error) {
             stopCamera(getCameraErrorStatus(error));
-            if (getCameraErrorStatus(error) === "camera_denied") setPermissionAlert(true);
+            if (getCameraErrorStatus(error) === "camera_denied") setPermissionAlert("camera");
         }
-    }, [connectModel, resetSession, reviewPending, startRecording, stopCamera]);
+    }, [connectModel, resetSession, reviewPending, speechSupported, startRecording, stopCamera]);
 
     const finishTranslation = useCallback(async () => {
         const recording = finishRecording();
@@ -356,7 +396,7 @@ function Translate() {
                 <div className="translate-header-main">
                     <BrandLogo className="translate-logo" />
                     <button className="icon-button" type="button" onClick={() => setFlipped((value) => !value)} aria-label={t("translate.swap")} title={t("translate.swapTitle")}><FaExchangeAlt aria-hidden="true" /></button>
-                    <button className={`speech-toggle ${automaticSpeech ? "is-active" : ""}`} type="button" onClick={() => setAutomaticSpeech((value) => !value)} aria-label={automaticSpeech ? t("translate.autoOff") : t("translate.autoOn")} disabled={!speechSupported}><FaVolumeUp aria-hidden="true" /><span>{automaticSpeech ? t("translate.voiceOn") : t("translate.voiceOff")}</span></button>
+                    <button className={`speech-toggle ${automaticSpeech ? "is-active" : ""}`} type="button" onClick={toggleAutomaticSpeech} aria-label={automaticSpeech ? t("translate.autoOff") : t("translate.autoOn")} disabled={!speechSupported}><FaVolumeUp aria-hidden="true" /><span>{automaticSpeech ? t("translate.voiceOn") : t("translate.voiceOff")}</span></button>
                 </div>
                 <NavBar />
             </header>
@@ -391,14 +431,15 @@ function Translate() {
             <canvas ref={canvasRef} className="capture-canvas" aria-hidden="true" />
             {permissionAlert ? <div className="camera-permission-backdrop" role="presentation">
                 <section className="camera-permission-dialog" role="dialog" aria-modal="true" aria-labelledby="translate-permission-title">
-                    <h2 id="translate-permission-title">{t("cameraPermission.title")}</h2>
-                    <p>{t("cameraPermission.message")}</p>
+                    <h2 id="translate-permission-title">{t(`profile.${permissionAlert}PermissionTitle`)}</h2>
+                    <p>{t(`profile.${permissionAlert}PermissionMessage`)}</p>
                     <div className="camera-permission-actions">
-                        <button type="button" className="camera-permission-button" onClick={() => navigate("/profile")}>{t("common.ok")}</button>
-                        <button type="button" className="camera-permission-button" onClick={() => setPermissionAlert(false)}>{t("common.cancel")}</button>
+                        <button type="button" className="camera-permission-button" onClick={() => { setPermissionPrompt(permissionAlert); setPermissionAlert(null); }}>{t("common.ok")}</button>
+                        <button type="button" className="camera-permission-button" onClick={() => setPermissionAlert(null)}>{t("common.cancel")}</button>
                     </div>
                 </section>
             </div> : null}
+            <PermissionDialog feature={permissionPrompt} onActivate={() => void activatePermission()} onClose={() => setPermissionPrompt(null)} />
         </div>
     );
 }
