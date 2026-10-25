@@ -111,17 +111,22 @@ html.landing-scroll {
     height: auto;
     overflow-y: scroll;
     scrollbar-width: auto;
+    scrollbar-color: var(--color-page-bg-alt) var(--color-surface);
 }
 
 body.landing-scroll,
 body.landing-scroll #root {
     height: auto;
-    overflow-y: visible;
+    overflow: visible;
 }
 
 html.landing-scroll::-webkit-scrollbar {
     display: block;
+    width: 12px;
 }
+
+html.landing-scroll::-webkit-scrollbar-track { background: var(--color-surface); }
+html.landing-scroll::-webkit-scrollbar-thumb { background: var(--color-page-bg-alt); }
 
 button,
 input,

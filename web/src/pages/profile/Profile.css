@@ -18,7 +18,9 @@
     align-items: center;
     width: 100%;
     gap: 16px;
-    flex-wrap: wrap;
+    flex: 0 0 auto;
+    min-height: 44px;
+    flex-wrap: nowrap;
 }
 
 .profile-logo {
@@ -62,7 +64,7 @@
     overflow: hidden;
     border-radius: 18px;
     padding: clamp(12px, 2vh, 24px);
-    margin-top: 16px;
+    margin-block: auto;
     width: 100%;
     max-width: 700px;
     align-self: center;
@@ -70,7 +72,7 @@
     flex-direction: column;
     gap: clamp(8px, 1.5vh, 16px);
     box-shadow: var(--color-shadow);
-    flex: 1;
+    flex: 0 1 auto;
 }
 
 .profile-section {
@@ -390,7 +392,7 @@
 
 @media (max-width: 768px) {
     .profile-container { padding: 16px; }
-    .profile-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .profile-header { flex-direction: column; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
     .navbar { gap: 10px; justify-content: flex-start; }
     .nav-item { font-size: 14px; }
     .profile-card { max-width: 100%; }
@@ -409,7 +411,7 @@
 
 @media (max-height: 760px) {
     .profile-container { padding-block: 10px; }
-    .profile-card { margin-top: 8px; gap: 8px; padding: 12px; }
+    .profile-card { gap: 8px; padding: 12px; }
     .profile-avatar-col { padding-top: 0; }
     .profile-avatar { width: 52px; height: 52px; }
     .profile-section { gap: 8px; }
