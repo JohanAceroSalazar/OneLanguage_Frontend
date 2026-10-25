@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import { hasValidSession } from "../services/authSession";
 import ThemeBootstrap from "../components/ThemeBootstrap/ThemeBootstrap";
 import Register from "../pages/register/Register";
 import Login from "../pages/login/Login";
@@ -14,13 +15,14 @@ import ResetPassword from "../pages/resetpassword/ResetPassword";
 import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute";
 
 function AppRoutes() {
+    const publicPage = (page) => hasValidSession() ? <Navigate to="/home" replace /> : page;
     return (
     <BrowserRouter>
         <ThemeBootstrap />
         <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
+            <Route path="/" element={publicPage(<Landing />)} />
+            <Route path="/register" element={publicPage(<Register />)} />
+            <Route path="/login" element={publicPage(<Login />)} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />

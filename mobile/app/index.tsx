@@ -1,21 +1,37 @@
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Animated, Image, StyleSheet, Text, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getCurrentUser } from "../src/services/authService";
 
 export default function Index() {
   const router = useRouter();
   const [opacity] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    let active = true;
+    const navigate = async () => {
+      let destination: "/(auth)/login" | "/(auth)/main" = "/(auth)/login";
+      if (await AsyncStorage.getItem("token")) {
+        try {
+          await getCurrentUser();
+          destination = "/(auth)/main";
+        } catch {
+          destination = "/(auth)/login";
+        }
+      }
+      if (!active) return;
       Animated.timing(opacity, {
         toValue: 0,
         duration: 650,
         useNativeDriver: true,
-      }).start(() => router.replace("/(auth)/login"));
-    }, 900);
+      }).start(() => {
+        if (active) router.replace(destination);
+      });
+    };
+    const timer = setTimeout(() => { void navigate(); }, 900);
 
-    return () => clearTimeout(timer);
+    return () => { active = false; clearTimeout(timer); };
   }, [opacity, router]);
 
   return (
