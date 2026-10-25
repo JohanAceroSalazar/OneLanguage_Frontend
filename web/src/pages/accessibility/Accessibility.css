@@ -51,6 +51,8 @@
 
 .access-card {
     background: var(--color-surface);
+    min-height: 0;
+    overflow-y: auto;
     border-radius: 18px;
     padding: 42px 48px;
     margin: auto;

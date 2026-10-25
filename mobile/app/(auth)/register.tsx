@@ -35,7 +35,7 @@ type AlertState = {
 export default function Register() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { colors } = useTheme();
+  const { colors, fontScale } = useTheme();
   const insets = useSafeAreaInsets();
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "", acceptedTerms: false });
   const [errors, setErrors] = useState({ name: "", email: "", password: "", confirmPassword: "", acceptedTerms: "" });
@@ -128,7 +128,7 @@ export default function Register() {
         <BrandWordmark color={colors.text} style={styles.logo} />
       </View>
 
-      <Text style={[styles.title, { color: colors.text }]}>{t("auth.register")}</Text>
+      <Text style={[styles.title, { color: colors.text, fontSize: 32 * fontScale }]}>{t("auth.register")}</Text>
 
       <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         <Text style={[styles.label, { color: colors.textOnSurface }]}>{t("common.fullName")}</Text>
@@ -220,19 +220,19 @@ export default function Register() {
         <View style={styles.termsModalBackdrop}>
           <View style={[styles.termsModalDialog, { backgroundColor: colors.surface }]} accessibilityRole="alert">
             <View style={styles.termsContentHeader}>
-              <Text style={[styles.termsContentTitle, { color: colors.textOnSurface }]}>{t("terms.title")}</Text>
+              <Text style={[styles.termsContentTitle, { color: colors.textOnSurface, fontSize: 15 * fontScale }]}>{t("terms.title")}</Text>
               <TouchableOpacity style={[styles.termsModalClose, { backgroundColor: colors.primaryStrong }]} onPress={() => setShowTerms(false)} accessibilityLabel={t("common.back")}>
                 <Ionicons name="close" size={20} color={colors.text} />
               </TouchableOpacity>
             </View>
-            <ScrollView style={styles.termsContentBody} nestedScrollEnabled showsVerticalScrollIndicator>
-              <Text style={[styles.termsContentText, { color: colors.textOnSurface }]}>{t("terms.app")}</Text>
-              <Text style={[styles.termsContentText, { color: colors.textOnSurface }]}>{t("terms.updated")}</Text>
-              <Text style={[styles.termsContentText, { color: colors.textOnSurface }]}>{t("terms.welcome")}</Text>
+            <ScrollView style={styles.termsContentBody} nestedScrollEnabled showsVerticalScrollIndicator={false}>
+              <Text style={[styles.termsContentText, { color: colors.textOnSurface, fontSize: 13 * fontScale, lineHeight: 18 * fontScale }]}>{t("terms.app")}</Text>
+              <Text style={[styles.termsContentText, { color: colors.textOnSurface, fontSize: 13 * fontScale, lineHeight: 18 * fontScale }]}>{t("terms.updated")}</Text>
+              <Text style={[styles.termsContentText, { color: colors.textOnSurface, fontSize: 13 * fontScale, lineHeight: 18 * fontScale }]}>{t("terms.welcome")}</Text>
               {[1, 2, 3, 4, 5, 6, 7].map((section) => (
                 <View key={section} style={styles.termsSection}>
-                  <Text style={[styles.termsContentSubtitle, { color: colors.textOnSurface }]}>{t(`terms.s${section}`)}</Text>
-                  <Text style={[styles.termsContentText, { color: colors.textOnSurface }]}>{t(`terms.p${section}`)}</Text>
+                  <Text style={[styles.termsContentSubtitle, { color: colors.textOnSurface, fontSize: 13 * fontScale }]}>{t(`terms.s${section}`)}</Text>
+                  <Text style={[styles.termsContentText, { color: colors.textOnSurface, fontSize: 13 * fontScale, lineHeight: 18 * fontScale }]}>{t(`terms.p${section}`)}</Text>
                 </View>
               ))}
             </ScrollView>
@@ -384,9 +384,11 @@ const styles = StyleSheet.create({
     color: "#111827",
     fontSize: 15,
     fontWeight: "700",
+    flexShrink: 1,
   },
   termsContentBody: {
     flexShrink: 1,
+    minHeight: 0,
     marginTop: 8,
   },
   termsContentText: {

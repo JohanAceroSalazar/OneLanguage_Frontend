@@ -71,13 +71,40 @@ body {
     background: var(--color-page-bg);
     color: var(--color-text);
     overflow-x: hidden;
+    overflow-y: hidden;
     zoom: var(--app-text-scale);
 }
 
 #root {
     width: 100%;
-    min-height: calc(100dvh / var(--app-text-scale));
+    height: calc(100dvh / var(--app-text-scale));
+    overflow: hidden;
     background: var(--color-page-bg);
+}
+
+body :is(.login-container, .register-container, .terms-container, .home-container,
+    .translate-container, .access-container,
+    .profile-container, .recover-container, .reset-container) {
+    height: calc(100dvh / var(--app-text-scale));
+    min-height: 0;
+    overflow-y: hidden;
+}
+
+html, body, #root, #root * {
+    scrollbar-width: none;
+}
+
+#root .history-list {
+    scrollbar-width: thin;
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar, #root *::-webkit-scrollbar {
+    display: none;
+}
+
+#root .history-list::-webkit-scrollbar {
+    display: initial;
+    width: 8px;
 }
 
 html.landing-scroll,
@@ -85,6 +112,12 @@ body.landing-scroll,
 body.landing-scroll #root {
     height: auto;
     overflow-y: auto;
+    scrollbar-width: auto;
+}
+
+html.landing-scroll::-webkit-scrollbar,
+body.landing-scroll::-webkit-scrollbar {
+    display: block;
 }
 
 button,

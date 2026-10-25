@@ -152,7 +152,7 @@ export default function History() {
     return (
         <SwipeNavigation active="history">
         <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.content}>
         <BrandWordmark color={colors.text} style={styles.logo} />
 
     <View style={styles.headerText}>
@@ -174,6 +174,7 @@ export default function History() {
                 {deletingId === "all" ? <ActivityIndicator color="#ffffff" /> : <Ionicons name="trash-outline" size={22} color="#ffffff" />}
             </TouchableOpacity>
         </View>
+        <ScrollView style={styles.savedTranslations} contentContainerStyle={styles.savedTranslationsContent} showsVerticalScrollIndicator>
         {translations.map((translation) => <View key={translation.id} style={[styles.historyItem, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.itemIcon}><Ionicons name="hand-left-outline" size={24} color="#ffffff" /></View>
             <View style={styles.itemContent}>
@@ -189,8 +190,9 @@ export default function History() {
             </View>
             {openRecordingId === translation.id ? <RecordingPlayer translationId={translation.id} token={token} /> : null}
         </View>)}
-    </View> : null}
         </ScrollView>
+    </View> : null}
+        </View>
         <BottomNav active="history" />
     </SafeAreaView>
     </SwipeNavigation>
@@ -203,7 +205,7 @@ container: {
     backgroundColor: "#2F78CC",
     },
 content: {
-    flexGrow: 1,
+    flex: 1,
     paddingHorizontal: 22,
     paddingTop: 20,
     paddingBottom: 118,
@@ -267,9 +269,13 @@ errorText: {
     },
 historyList: {
     width: "100%",
+    flex: 1,
+    minHeight: 0,
     marginTop: 18,
     gap: 10,
     },
+savedTranslations: { flex: 1, minHeight: 0 },
+savedTranslationsContent: { gap: 10, paddingBottom: 12 },
 listHeader: {
     flexDirection: "row",
     alignItems: "center",

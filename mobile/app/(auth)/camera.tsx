@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
+import { Camera as ExpoCamera, CameraType, CameraView } from "expo-camera";
+import { useRouter } from "expo-router";
 import * as Speech from "expo-speech";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BottomNav } from "../../components/bottom-nav";
@@ -54,7 +55,7 @@ export default function Camera() {
     const mainPager = useMainPager();
     const { height } = useWindowDimensions();
     const insets = useSafeAreaInsets();
-    const [permission, requestPermission] = useCameraPermissions();
+    const router = useRouter();
     const [facing, setFacing] = useState<CameraType>("front");
     const [cameraActive, setCameraActive] = useState(false);
     const [cameraReady, setCameraReady] = useState(false);
@@ -245,23 +246,22 @@ export default function Camera() {
 
     const startCamera = useCallback(async () => {
         const featurePermissions = await getFeaturePermissions();
-        if (!featurePermissions.camera) {
+        const devicePermission = await ExpoCamera.getCameraPermissionsAsync();
+        if (!featurePermissions.camera || !devicePermission.granted) {
             setModelStatus("permission_required");
+            Alert.alert(t("cameraPermission.title"), t("cameraPermission.message"), [
+                { text: t("common.cancel"), style: "cancel" },
+                { text: t("common.ok"), onPress: () => mainPager ? mainPager.navigate("profile") : router.push("/(auth)/user_profile") },
+            ]);
             return;
         }
         speechRef.current = featurePermissions.audio;
         setAutomaticSpeech(featurePermissions.audio);
-        let granted = permission?.granted;
-        if (!granted) granted = (await requestPermission()).granted;
-        if (!granted) {
-            setModelStatus("permission_required");
-            return;
-        }
         resetSession();
         activeRef.current = true;
         setCameraActive(true);
         connectModel();
-    }, [connectModel, permission?.granted, requestPermission, resetSession]);
+    }, [connectModel, mainPager, resetSession, router, t]);
 
     const toggleAutomaticSpeech = async () => {
         if (automaticSpeech) {
@@ -323,11 +323,13 @@ export default function Camera() {
         Speech.stop();
     }, [stopCamera]);
 
-    const displayedTranslations = sessionTranslations.length > 1
+    const displayedTranslations = sessionTranslations.length
         ? sessionTranslations
         : translation
             ? [translation]
             : [];
+    const resultText = displayedTranslations.join(" ");
+    const resultFontSize = Math.max(16, (27 - Math.floor(resultText.length / 24) * 2) * fontScale);
     const availableHeight = height - 112;
     const compactLayout = availableHeight < 780 || fontScale > 1;
     const cameraHeight = compactLayout
@@ -363,14 +365,7 @@ export default function Camera() {
         </View>
     </View>
 
-    <TouchableOpacity
-        activeOpacity={0.88}
-        disabled={cameraActive || reviewPending}
-        onPress={startCamera}
-        accessibilityRole={!cameraActive && !reviewPending ? "button" : undefined}
-        accessibilityLabel={t("camera.start")}
-        style={styles.cameraFrameTrigger}
-    >
+    <View style={styles.cameraFrameTrigger}>
     <View style={[styles.cameraFrame, compactLayout && styles.compactCameraFrame, { borderColor: colors.border, height: cameraHeight }]}>
         {cameraActive ? <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing={facing} pictureSize={pictureSize} animateShutter={false} mute onCameraReady={async () => {
             if (!pictureSize) {
@@ -398,13 +393,13 @@ export default function Camera() {
         </View>}
         {cameraActive && !cameraReady ? <View style={styles.cameraLoading}><ActivityIndicator color="#ffffff" size="large" /></View> : null}
     </View>
-    </TouchableOpacity>
+    </View>
 
     <View style={[styles.resultCard, compactLayout && styles.compactResultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         <Text style={[styles.eyebrow, { color: colors.primary }]}>{t("camera.realtime")}</Text>
-        {displayedTranslations.length ? displayedTranslations.map((item, index) => (
-            <Text key={`${item}-${index}`} style={[styles.resultText, { color: colors.textOnSurface, fontSize: 27 * fontScale }]}>{item}</Text>
-        )) : <Text style={[styles.resultText, { color: colors.textOnSurface, fontSize: 27 * fontScale }]}>{t("camera.empty")}</Text>}
+        <View style={styles.resultContent}>
+            <Text numberOfLines={5} adjustsFontSizeToFit minimumFontScale={0.7} style={[styles.resultText, { color: colors.textOnSurface, fontSize: resultText ? resultFontSize : 27 * fontScale, lineHeight: (resultText ? resultFontSize : 27 * fontScale) * 1.2 }]}>{resultText || t("camera.empty")}</Text>
+        </View>
         <Text style={[styles.statusText, { color: colors.textOnSurface }]}>{t(`camera.status.${modelStatus}`)}</Text>
         {confidence !== null && displayedTranslations.length ? <Text style={[styles.confidenceText, { color: colors.textOnSurface }]}>{t("camera.confidence", { value: Math.round(confidence * 100) })}</Text> : null}
     </View>
@@ -484,20 +479,22 @@ const styles = StyleSheet.create({
     },
     resultCard: {
         width: "100%",
-        minHeight: 190,
+        height: 190,
         marginTop: 12,
         borderRadius: 8,
         borderWidth: 1,
-        justifyContent: "center",
+        justifyContent: "flex-start",
         paddingHorizontal: 24,
         paddingVertical: 18,
+        overflow: "hidden",
     },
     compactResultCard: {
-        minHeight: 168,
+        height: 168,
         marginTop: 10,
         paddingVertical: 14,
     },
     eyebrow: { fontSize: 14, marginBottom: 10 },
+    resultContent: { flex: 1, minHeight: 0, justifyContent: "center" },
     resultText: { lineHeight: 34, fontWeight: "500" },
     statusText: { fontSize: 15, marginTop: 12, opacity: 0.72 },
     confidenceText: { fontSize: 14, marginTop: 6, opacity: 0.72 },

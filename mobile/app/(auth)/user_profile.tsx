@@ -4,6 +4,7 @@ import * as Speech from "expo-speech";
 import { useRouter } from "expo-router";
 import {
     Alert,
+    Linking,
     Image,
     Modal,
     ScrollView,
@@ -61,7 +62,7 @@ function PermissionItem({ icon, title, description, active, loading, onPress }: 
         accessibilityLabel={`${title}: ${active ? t("common.deactivate") : t("common.activate")}`}
         style={[styles.activateButton, active && styles.activatedButton, { backgroundColor: active ? colors.primary : colors.accent }, loading && styles.permissionButtonDisabled]}
     >
-        <Text style={[styles.activateText, { color: active ? colors.text : colors.textOnSurface, fontSize: 13 * fontScale }]}>{loading ? "..." : active ? t("common.deactivate") : t("common.activate")}</Text>
+        <Text style={[styles.activateText, { color: active ? colors.text : colors.accentText, fontSize: 13 * fontScale }]}>{loading ? "..." : active ? t("common.deactivate") : t("common.activate")}</Text>
     </TouchableOpacity>
     </View>
     );
@@ -97,12 +98,22 @@ export default function UserProfile() {
 }, [router]);
 
     useEffect(() => {
-        getFeaturePermissions().then(setFeaturePermissions).catch(() => undefined);
+        const loadPermissions = async () => {
+            const settings = await getFeaturePermissions();
+            const camera = await Camera.getCameraPermissionsAsync();
+            setFeaturePermissions({ ...settings, camera: settings.camera && camera.granted });
+        };
+        void loadPermissions().catch(() => undefined);
     }, []);
 
     useEffect(() => {
         if (mainPager?.activeTab === "profile") {
-            getFeaturePermissions().then(setFeaturePermissions).catch(() => undefined);
+            const loadPermissions = async () => {
+                const settings = await getFeaturePermissions();
+                const camera = await Camera.getCameraPermissionsAsync();
+                setFeaturePermissions({ ...settings, camera: settings.camera && camera.granted });
+            };
+            void loadPermissions().catch(() => undefined);
         }
     }, [mainPager?.activeTab]);
 
@@ -116,7 +127,10 @@ export default function UserProfile() {
             }
 
             if (!granted) {
-                Alert.alert(t("profile.permissions"), t("profile.permissionDenied"));
+                Alert.alert(t("profile.permissions"), t("profile.permissionDenied"), [
+                    { text: t("common.cancel"), style: "cancel" },
+                    { text: t("profile.openSettings", "Abrir ajustes"), onPress: () => void Linking.openSettings() },
+                ]);
                 return;
             }
             setFeaturePermissions(await setFeaturePermission(feature, true));

@@ -58,6 +58,8 @@
 
 .profile-card {
     background: var(--color-surface);
+    min-height: 0;
+    overflow-y: auto;
     border-radius: 18px;
     padding: 24px;
     margin-top: 16px;

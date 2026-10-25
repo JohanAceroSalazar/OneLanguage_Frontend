@@ -15,9 +15,9 @@ type AppAlertProps = {
 };
 
 const variantColors: Record<AppAlertVariant, string> = {
-  success: "#16a34a",
-  error: "#ef4444",
-  info: "#3A78C2",
+  success: "#15803d",
+  error: "#e53935",
+  info: "#3a78c2",
 };
 
 export function AppAlert({

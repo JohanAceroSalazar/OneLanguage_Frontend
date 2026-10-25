@@ -17,6 +17,17 @@ const text = {
   it: { translation: { "accessibility.title": "Accessibilità", "accessibility.language": "Lingua", "accessibility.save": "Salva modifiche", "accessibility.saved": "Le impostazioni di accessibilità sono state salvate.", "accessibility.light": "Chiaro", "accessibility.dark": "Scuro", "accessibility.visual": "Tema visivo", "common.ok": "Accetta", "common.email": "Email", "common.password": "Password", "common.fullName": "Nome completo", "common.confirmPassword": "Conferma password", "common.activate": "Attiva", "common.camera": "Fotocamera", "common.audio": "Audio", "common.logout": "Esci", "landing.badge": "Traduzione della lingua dei segni colombiana", "landing.value": "Dai segni al testo/audio", "landing.title": "Connetti le persone senza barriere.", "landing.description": "Traduci, consulta la cronologia e attiva l'accessibilità in un'esperienza chiara e moderna.", "landing.create": "Crea account", "landing.login": "Accedi", "landing.realtime": "Tempo reale", "landing.realtimeText": "Un flusso pensato per tradurre rapidamente.", "landing.history": "Cronologia", "landing.historyText": "Salva conversazioni e rivedi i risultati.", "landing.accessible": "Accessibile", "landing.accessibleText": "Design a contrasto e facile da usare.", "home.greeting": "Ciao utente\nbenvenuto", "home.title": "Benvenuto in\nOne Language!", "home.start": "Inizia a\ntradurre", "history.title": "Cronologia traduzioni", "history.subtitle": "Rivedi le tue traduzioni precedenti", "history.empty": "Nessuna traduzione", "auth.login": "Accedi", "auth.register": "Crea il tuo account", "auth.create": "Crea account", "auth.forgot": "Reimposta password", "auth.noAccount": "Non hai un account?", "auth.hasAccount": "Hai già un account?", "auth.passwordMin": "Minimo 8 caratteri", "auth.repeat": "Ripeti la password", "auth.terms": "Accetto termini e condizioni", "camera.result": "Il testo tradotto\napparirà qui...", "camera.finish": "Termina traduzione", "terms.title": "Termini e condizioni", "profile.title": "Profilo utente", "profile.personal": "Informazioni personali", "profile.permissions": "Permessi del dispositivo", "profile.personalText": "Visualizza i tuoi dati personali", "profile.permissionsText": "Gestisci l'accesso alle funzioni del dispositivo", "profile.cameraText": "Necessaria per il riconoscimento dei segni", "profile.audioText": "Per convertire e ascoltare l'audio" } },
 };
 
+for (const [language, labels] of Object.entries({
+  es: { greeting: "Hola {{name}}\nbienvenido", fallback: "usuario", cancel: "Cancelar" },
+  en: { greeting: "Hello {{name}}\nwelcome", fallback: "user", cancel: "Cancel" },
+  pt: { greeting: "Olá {{name}}\nbem-vindo", fallback: "usuário", cancel: "Cancelar" },
+  it: { greeting: "Ciao {{name}}\nbenvenuto", fallback: "utente", cancel: "Annulla" },
+})) {
+  (text as any)[language].translation["home.greeting"] = labels.greeting;
+  (text as any)[language].translation["home.fallbackName"] = labels.fallback;
+  (text as any)[language].translation["common.cancel"] = labels.cancel;
+}
+
 for (const [language, label] of Object.entries({ es: "Nueva contraseña", en: "New password", pt: "Nova senha", it: "Nuova password" })) {
   (text as any)[language].translation["auth.newPassword"] = label;
 }

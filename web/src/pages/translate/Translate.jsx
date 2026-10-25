@@ -5,6 +5,8 @@ import NavBar from "../../components/NavBar/NavBar";
 import { saveTranslation } from "../../services/translationService";
 import "./Translate.css";
 import { useTranslation } from "react-i18next";
+import { getFeaturePermissions } from "../../services/featurePermissionService";
+import { useNavigate } from "react-router-dom";
 
 const FRAME_INTERVAL_MS = 66;
 const FRAME_TIMEOUT_MS = 10000;
@@ -31,6 +33,8 @@ function getCameraErrorStatus(error) {
 
 function Translate() {
     const { t } = useTranslation();
+    const navigate = useNavigate();
+    const [permissionAlert, setPermissionAlert] = useState(false);
     const [cameraActive, setCameraActive] = useState(false);
     const [flipped, setFlipped] = useState(false);
     const [modelStatus, setModelStatus] = useState("inactive");
@@ -255,6 +259,20 @@ function Translate() {
 
     const startCamera = useCallback(async () => {
         if (reviewPending) return;
+        try {
+            if (!(await getFeaturePermissions()).camera) {
+                setPermissionAlert(true);
+                return;
+            }
+            const browserPermission = await navigator.permissions?.query({ name: "camera" }).catch(() => null);
+            if (browserPermission?.state === "denied") {
+                setPermissionAlert(true);
+                return;
+            }
+        } catch {
+            setPermissionAlert(true);
+            return;
+        }
         if (!window.isSecureContext && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
             setModelStatus("camera_insecure");
             return;
@@ -267,6 +285,12 @@ function Translate() {
         resetSession();
         try {
             const stream = await navigator.mediaDevices.getUserMedia(CAMERA_CONSTRAINTS);
+            stream.getVideoTracks().forEach((track) => {
+                track.addEventListener("ended", () => {
+                    stopCamera("camera_denied");
+                    setPermissionAlert(true);
+                });
+            });
             streamRef.current = stream;
             startRecording(stream);
             setCameraActive(true);
@@ -274,6 +298,7 @@ function Translate() {
             connectModel();
         } catch (error) {
             stopCamera(getCameraErrorStatus(error));
+            if (getCameraErrorStatus(error) === "camera_denied") setPermissionAlert(true);
         }
     }, [connectModel, resetSession, reviewPending, startRecording, stopCamera]);
 
@@ -316,15 +341,15 @@ function Translate() {
         if (speechSupported) window.speechSynthesis.cancel();
     }, [finishRecording, speechSupported, stopCamera]);
 
-    const displayedTranslations = sessionTranslations.length > 1
+    const displayedTranslations = sessionTranslations.length
         ? sessionTranslations
         : translation
             ? [translation]
             : [];
+    const resultText = displayedTranslations.join(" ");
+    const resultFontSize = Math.max(16, 48 - Math.floor(resultText.length / 24) * 4);
     const confidenceText = confidence === null ? null : t("translate.confidence", { value: Math.round(confidence * 100) });
     const statusText = t(`translate.status.${modelStatus}`, { defaultValue: t("translate.status.model_error") });
-    const canStartFromPreview = !cameraActive && !reviewPending;
-
     return (
         <div className="translate-container">
             <header className="translate-header">
@@ -340,23 +365,13 @@ function Translate() {
                 <section className="translate-text-box" aria-live="polite">
                     <p className="translation-eyebrow">{t("translate.realtime")}</p>
                     <div className="translation-results">
-                        {displayedTranslations.length ? displayedTranslations.map((item, index) => <p key={`${item}-${index}`}>{item}</p>) : <h1>{t("translate.empty")}</h1>}
+                        {resultText ? <p style={{ fontSize: resultFontSize }} title={resultText}>{resultText}</p> : <h1>{t("translate.empty")}</h1>}
                     </div>
                     <p className="translation-status">{statusText}</p>
                     {confidenceText && <p className="translation-confidence">{confidenceText}</p>}
                 </section>
                 <section
-                    className={`translate-camera-box ${canStartFromPreview ? "is-camera-trigger" : ""}`}
-                    role={canStartFromPreview ? "button" : undefined}
-                    tabIndex={canStartFromPreview ? 0 : undefined}
-                    onClick={canStartFromPreview ? startCamera : undefined}
-                    onKeyDown={canStartFromPreview ? (event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            void startCamera();
-                        }
-                    } : undefined}
-                    aria-label={canStartFromPreview ? t("translate.start") : undefined}
+                    className="translate-camera-box"
                 >
                     {cameraActive ? <video ref={attachVideo} autoPlay playsInline muted className="translate-video" /> : <div className="translate-camera-placeholder"><FaCamera size={48} aria-hidden="true" /><p>{t("translate.cameraHint")}</p></div>}
                 </section>
@@ -374,6 +389,16 @@ function Translate() {
                 </button>
             )}
             <canvas ref={canvasRef} className="capture-canvas" aria-hidden="true" />
+            {permissionAlert ? <div className="camera-permission-backdrop" role="presentation">
+                <section className="camera-permission-dialog" role="dialog" aria-modal="true" aria-labelledby="translate-permission-title">
+                    <h2 id="translate-permission-title">{t("cameraPermission.title")}</h2>
+                    <p>{t("cameraPermission.message")}</p>
+                    <div className="camera-permission-actions">
+                        <button type="button" className="camera-permission-button" onClick={() => navigate("/profile")}>{t("common.ok")}</button>
+                        <button type="button" className="camera-permission-button" onClick={() => setPermissionAlert(false)}>{t("common.cancel")}</button>
+                    </div>
+                </section>
+            </div> : null}
         </div>
     );
 }

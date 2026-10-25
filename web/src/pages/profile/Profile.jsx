@@ -40,8 +40,9 @@ function Profile() {
             });
 
         getFeaturePermissions()
-            .then((permissions) => {
-                if (active) setFeaturePermissions(permissions);
+            .then(async (permissions) => {
+                const browserPermission = await navigator.permissions?.query({ name: "camera" }).catch(() => null);
+                if (active) setFeaturePermissions({ ...permissions, camera: permissions.camera && browserPermission?.state !== "denied" });
             })
             .catch(() => {
                 if (active) setProfileError(t("profile.loadError", "No se pudo cargar el perfil."));
@@ -69,7 +70,7 @@ function Profile() {
             }
             setFeaturePermissions(await setFeaturePermission(feature, enabled));
         } catch {
-            setProfileError(t("profile.permissionDenied"));
+            setProfileError(t("cameraPermission.error"));
         } finally {
             setUpdatingPermission(null);
         }
