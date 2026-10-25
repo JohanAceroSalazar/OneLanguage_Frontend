@@ -10,6 +10,7 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
+    useWindowDimensions,
     View,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -77,6 +78,7 @@ function PermissionItem({ icon, title, description, active, loading, onPress }: 
 export default function UserProfile() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
+    const { height } = useWindowDimensions();
     const { colors: themeColors, theme, fontScale, setThemeMode, setFontSizeMode } = useTheme();
     const colors = theme === "light" ? {
         ...themeColors, background: "#3A78C2", surfaceAlt: "#f5f8ff", textOnSurface: "#111827",
@@ -87,6 +89,10 @@ export default function UserProfile() {
     };
     const { t } = useTranslation();
     const mainPager = useMainPager();
+    const compactProfile = fontScale > 1 || height < 800;
+    const [viewportHeight, setViewportHeight] = useState(0);
+    const [contentHeight, setContentHeight] = useState(0);
+    const profileOverflows = viewportHeight > 0 && contentHeight > viewportHeight + 2;
     const [user, setUser] = useState<any>(null);
     const [featurePermissions, setFeaturePermissions] = useState<FeaturePermissions>({ camera: false, audio: false });
     const [updatingPermission, setUpdatingPermission] = useState<FeaturePermission | null>(null);
@@ -182,8 +188,11 @@ export default function UserProfile() {
     <SwipeNavigation active="profile">
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
         <ScrollView
-        contentContainerStyle={[styles.content, { paddingBottom: 86 + Math.max(insets.bottom, 8) }]}
-        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.content, compactProfile && styles.compactContent, { paddingBottom: 86 + Math.max(insets.bottom, 8) }]}
+        onLayout={(event) => setViewportHeight(event.nativeEvent.layout.height)}
+        onContentSizeChange={(_, nextHeight) => setContentHeight(nextHeight)}
+        scrollEnabled={profileOverflows}
+        showsVerticalScrollIndicator={profileOverflows}
     >
         <View style={styles.header}>
             <BrandWordmark color={colors.text} style={styles.logo} />
@@ -194,17 +203,15 @@ export default function UserProfile() {
         />
         </View>
 
-        <Text style={[styles.title, { color: colors.text, fontSize: 26 * fontScale }]}>{t("profile.title")}</Text>
+        <Text style={[styles.title, compactProfile && styles.compactTitle, { color: colors.text, fontSize: 26 * fontScale }]}>{t("profile.title")}</Text>
 
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-            <View style={styles.sectionHeader}>
+        <View style={[styles.card, compactProfile && styles.compactCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.sectionHeader, compactProfile && styles.compactSectionHeader]}>
             <Ionicons name="person-circle" size={34} color={colors.primary} />
 
             <View>
                 <Text style={[styles.sectionTitle, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>{t("profile.personal")}</Text>
-                <Text style={[styles.sectionSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}> 
-                {t("profile.personalText")}
-            </Text>
+                {!compactProfile && <Text style={[styles.sectionSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}>{t("profile.personalText")}</Text>}
             </View>
         </View>
 
@@ -219,9 +226,7 @@ export default function UserProfile() {
         </Text>
 
         <Text style={[styles.permissionsTitle, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>{t("profile.permissions")}</Text>
-        <Text style={[styles.permissionsSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}> 
-            {t("profile.permissionsText")}
-        </Text>
+        {!compactProfile && <Text style={[styles.permissionsSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}>{t("profile.permissionsText")}</Text>}
 
         <PermissionItem
             icon="camera-outline"
@@ -243,7 +248,7 @@ export default function UserProfile() {
 
         <TouchableOpacity
             activeOpacity={0.85}
-            style={styles.logoutButton}
+            style={[styles.logoutButton, compactProfile && styles.compactLogoutButton]}
             onPress={handleLogout}
         >
           <Text
@@ -275,6 +280,7 @@ content: {
     paddingTop: 20,
     paddingBottom: 105,
     },
+compactContent: { paddingTop: 10 },
 header: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -295,6 +301,7 @@ title: {
     marginTop: 32,
     marginLeft: 8,
     },
+compactTitle: { marginTop: 10 },
 card: {
     width: "100%",
     marginTop: 18,
@@ -306,12 +313,14 @@ card: {
     paddingTop: 15,
     paddingBottom: 18,
     },
+compactCard: { marginTop: 8, paddingTop: 10, paddingBottom: 6 },
 sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: 9,
     marginBottom: 20,
     },
+compactSectionHeader: { marginBottom: 8 },
 sectionTitle: {
     color: "#000000",
     fontSize: 18,
@@ -431,6 +440,7 @@ logoutButton: {
     shadowRadius: 8,
     elevation: 3,
     },
+compactLogoutButton: { marginTop: 8, paddingVertical: 10 },
 logoutText: {
     color: "#FFFFFF",
     fontSize: 20,
