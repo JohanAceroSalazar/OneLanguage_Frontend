@@ -1,0 +1,249 @@
+/* eslint-disable import/no-named-as-default-member */
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+
+export const languageOptions = [
+  { code: "es", label: "Español" },
+  { code: "en", label: "English" },
+  { code: "pt", label: "Português" },
+  { code: "it", label: "Italiano" },
+] as const;
+
+const text = {
+  es: { translation: { "accessibility.title": "Accesibilidad", "accessibility.language": "Idioma", "accessibility.save": "Guardar cambios", "accessibility.saved": "Tus ajustes de accesibilidad se guardaron correctamente.", "accessibility.light": "Claro", "accessibility.dark": "Oscuro", "accessibility.visual": "Tema visual", "common.ok": "Aceptar", "common.email": "Correo electrónico", "common.password": "Contraseña", "common.fullName": "Nombre completo", "common.confirmPassword": "Confirmar contraseña", "common.activate": "Activar", "common.camera": "Cámara", "common.audio": "Audio", "common.logout": "Cerrar sesión", "landing.badge": "Traducción de lengua de señas colombiana", "landing.value": "De señas a texto/audio", "landing.title": "Conecta personas sin barreras.", "landing.description": "Traduce, consulta tu historial y activa accesibilidad desde una experiencia clara y moderna.", "landing.create": "Crear cuenta", "landing.login": "Iniciar sesión", "landing.realtime": "Tiempo real", "landing.realtimeText": "Flujo pensado para traducir rápido.", "landing.history": "Historial", "landing.historyText": "Guarda conversaciones y revisa resultados.", "landing.accessible": "Accesible", "landing.accessibleText": "Diseño contrastado y fácil de navegar.", "home.greeting": "Hola usuario\nbienvenido", "home.title": "¡Bienvenido a\nOne Language!", "home.start": "Comenzar a\ntraducir", "history.title": "Historial de traducción", "history.subtitle": "Revisa tus traducciones anteriores", "history.empty": "No hay traducciones", "auth.login": "Iniciar sesión", "auth.register": "Crea tu cuenta", "auth.create": "Crear cuenta", "auth.forgot": "Restablecer contraseña", "auth.noAccount": "¿No tienes una cuenta?", "auth.hasAccount": "¿Ya tienes una cuenta?", "auth.passwordMin": "Mínimo 8 caracteres", "auth.repeat": "Repite tu contraseña", "auth.terms": "Acepto los términos y condiciones", "camera.result": "El texto traducido\naparecerá aquí...", "camera.finish": "Finalizar traducción", "terms.title": "Términos y condiciones", "profile.title": "Perfil de usuario", "profile.personal": "Información personal", "profile.permissions": "Permisos del dispositivo", "profile.personalText": "Visualiza tus datos personales", "profile.permissionsText": "Gestiona los permisos de acceso a funciones del dispositivo", "profile.cameraText": "Necesaria para reconocimiento de señas", "profile.audioText": "Para funciones de convertir y escuchar el audio" } },
+  en: { translation: { "accessibility.title": "Accessibility", "accessibility.language": "Language", "accessibility.save": "Save changes", "accessibility.saved": "Your accessibility settings were saved.", "accessibility.light": "Light", "accessibility.dark": "Dark", "accessibility.visual": "Visual theme", "common.ok": "Accept", "common.email": "Email", "common.password": "Password", "common.fullName": "Full name", "common.confirmPassword": "Confirm password", "common.activate": "Activate", "common.camera": "Camera", "common.audio": "Audio", "common.logout": "Log out", "landing.badge": "Colombian Sign Language translation", "landing.value": "Signs to text/audio", "landing.title": "Connect people without barriers.", "landing.description": "Translate, review your history, and enable accessibility from a clear, modern experience.", "landing.create": "Create account", "landing.login": "Log in", "landing.realtime": "Real time", "landing.realtimeText": "A flow designed for fast translation.", "landing.history": "History", "landing.historyText": "Save conversations and review results.", "landing.accessible": "Accessible", "landing.accessibleText": "High-contrast, easy-to-navigate design.", "home.greeting": "Hello user\nwelcome", "home.title": "Welcome to\nOne Language!", "home.start": "Start\ntranslating", "history.title": "Translation history", "history.subtitle": "Review your previous translations", "history.empty": "No translations", "auth.login": "Log in", "auth.register": "Create your account", "auth.create": "Create account", "auth.forgot": "Reset password", "auth.noAccount": "Don't have an account?", "auth.hasAccount": "Already have an account?", "auth.passwordMin": "Minimum 8 characters", "auth.repeat": "Repeat your password", "auth.terms": "I accept the terms and conditions", "camera.result": "Translated text\nwill appear here...", "camera.finish": "Finish translation", "terms.title": "Terms and conditions", "profile.title": "User profile", "profile.personal": "Personal information", "profile.permissions": "Device permissions", "profile.personalText": "View your personal information", "profile.permissionsText": "Manage access to device features", "profile.cameraText": "Required for sign recognition", "profile.audioText": "For converting and listening to audio" } },
+  pt: { translation: { "accessibility.title": "Acessibilidade", "accessibility.language": "Idioma", "accessibility.save": "Salvar alterações", "accessibility.saved": "Suas configurações de acessibilidade foram salvas.", "accessibility.light": "Claro", "accessibility.dark": "Escuro", "accessibility.visual": "Tema visual", "common.ok": "Aceitar", "common.email": "E-mail", "common.password": "Senha", "common.fullName": "Nome completo", "common.confirmPassword": "Confirmar senha", "common.activate": "Ativar", "common.camera": "Câmera", "common.audio": "Áudio", "common.logout": "Sair", "landing.badge": "Tradução da Língua de Sinais Colombiana", "landing.value": "Sinais para texto/áudio", "landing.title": "Conecte pessoas sem barreiras.", "landing.description": "Traduza, consulte seu histórico e ative a acessibilidade em uma experiência clara e moderna.", "landing.create": "Criar conta", "landing.login": "Entrar", "landing.realtime": "Tempo real", "landing.realtimeText": "Fluxo pensado para traduzir rapidamente.", "landing.history": "Histórico", "landing.historyText": "Salve conversas e revise resultados.", "landing.accessible": "Acessível", "landing.accessibleText": "Design contrastado e fácil de navegar.", "home.greeting": "Olá usuário\nbem-vindo", "home.title": "Bem-vindo ao\nOne Language!", "home.start": "Começar a\ntraduzir", "history.title": "Histórico de traduções", "history.subtitle": "Revise suas traduções anteriores", "history.empty": "Não há traduções", "auth.login": "Entrar", "auth.register": "Crie sua conta", "auth.create": "Criar conta", "auth.forgot": "Redefinir senha", "auth.noAccount": "Não tem uma conta?", "auth.hasAccount": "Já tem uma conta?", "auth.passwordMin": "Mínimo de 8 caracteres", "auth.repeat": "Repita sua senha", "auth.terms": "Aceito os termos e condições", "camera.result": "O texto traduzido\naparecerá aqui...", "camera.finish": "Finalizar tradução", "terms.title": "Termos e condições", "profile.title": "Perfil do usuário", "profile.personal": "Informações pessoais", "profile.permissions": "Permissões do dispositivo", "profile.personalText": "Visualize seus dados pessoais", "profile.permissionsText": "Gerencie o acesso aos recursos do dispositivo", "profile.cameraText": "Necessária para reconhecimento de sinais", "profile.audioText": "Para converter e ouvir áudio" } },
+  it: { translation: { "accessibility.title": "Accessibilità", "accessibility.language": "Lingua", "accessibility.save": "Salva modifiche", "accessibility.saved": "Le impostazioni di accessibilità sono state salvate.", "accessibility.light": "Chiaro", "accessibility.dark": "Scuro", "accessibility.visual": "Tema visivo", "common.ok": "Accetta", "common.email": "Email", "common.password": "Password", "common.fullName": "Nome completo", "common.confirmPassword": "Conferma password", "common.activate": "Attiva", "common.camera": "Fotocamera", "common.audio": "Audio", "common.logout": "Esci", "landing.badge": "Traduzione della lingua dei segni colombiana", "landing.value": "Dai segni al testo/audio", "landing.title": "Connetti le persone senza barriere.", "landing.description": "Traduci, consulta la cronologia e attiva l'accessibilità in un'esperienza chiara e moderna.", "landing.create": "Crea account", "landing.login": "Accedi", "landing.realtime": "Tempo reale", "landing.realtimeText": "Un flusso pensato per tradurre rapidamente.", "landing.history": "Cronologia", "landing.historyText": "Salva conversazioni e rivedi i risultati.", "landing.accessible": "Accessibile", "landing.accessibleText": "Design a contrasto e facile da usare.", "home.greeting": "Ciao utente\nbenvenuto", "home.title": "Benvenuto in\nOne Language!", "home.start": "Inizia a\ntradurre", "history.title": "Cronologia traduzioni", "history.subtitle": "Rivedi le tue traduzioni precedenti", "history.empty": "Nessuna traduzione", "auth.login": "Accedi", "auth.register": "Crea il tuo account", "auth.create": "Crea account", "auth.forgot": "Reimposta password", "auth.noAccount": "Non hai un account?", "auth.hasAccount": "Hai già un account?", "auth.passwordMin": "Minimo 8 caratteri", "auth.repeat": "Ripeti la password", "auth.terms": "Accetto termini e condizioni", "camera.result": "Il testo tradotto\napparirà qui...", "camera.finish": "Termina traduzione", "terms.title": "Termini e condizioni", "profile.title": "Profilo utente", "profile.personal": "Informazioni personali", "profile.permissions": "Permessi del dispositivo", "profile.personalText": "Visualizza i tuoi dati personali", "profile.permissionsText": "Gestisci l'accesso alle funzioni del dispositivo", "profile.cameraText": "Necessaria per il riconoscimento dei segni", "profile.audioText": "Per convertire e ascoltare l'audio" } },
+};
+
+for (const [language, labels] of Object.entries({
+  es: { greeting: "Hola {{name}}\nbienvenido", fallback: "usuario", cancel: "Cancelar" },
+  en: { greeting: "Hello {{name}}\nwelcome", fallback: "user", cancel: "Cancel" },
+  pt: { greeting: "Olá {{name}}\nbem-vindo", fallback: "usuário", cancel: "Cancelar" },
+  it: { greeting: "Ciao {{name}}\nbenvenuto", fallback: "utente", cancel: "Annulla" },
+})) {
+  (text as any)[language].translation["home.greeting"] = labels.greeting;
+  (text as any)[language].translation["home.fallbackName"] = labels.fallback;
+  (text as any)[language].translation["common.cancel"] = labels.cancel;
+}
+
+for (const [language, label] of Object.entries({ es: "Nueva contraseña", en: "New password", pt: "Nova senha", it: "Nuova password" })) {
+  (text as any)[language].translation["auth.newPassword"] = label;
+}
+for (const [language, labels] of Object.entries({
+  es: { "auth.confirmNew": "Confirma tu contraseña", "misc.passwordStrength": "Fortaleza de contraseña" },
+  en: { "auth.confirmNew": "Confirm your password", "misc.passwordStrength": "Password strength" },
+  pt: { "auth.confirmNew": "Confirme sua senha", "misc.passwordStrength": "Força da senha" },
+  it: { "auth.confirmNew": "Conferma la password", "misc.passwordStrength": "Robustezza della password" }
+})) Object.assign((text as any)[language].translation, labels);
+for (const [language, labels] of Object.entries({
+  es: { "auth.loginSuccess": "Inicio de sesión exitoso", "auth.loginSuccessMessage": "Inicio de sesión exitoso. Vamos a llevarte al panel principal.", "auth.enterNow": "Entrar ahora", "auth.loginError": "No se pudo iniciar sesión", "auth.credentialsError": "Correo o contraseña incorrectos.", "auth.passwordLength": "La contraseña debe tener al menos 6 caracteres", "auth.sendLink": "Enviar enlace de recuperación", "auth.resetSuccess": "Contraseña restablecida correctamente. Te llevaremos al inicio de sesión." },
+  en: { "auth.loginSuccess": "Login successful", "auth.loginSuccessMessage": "Login successful. We will take you to the main panel.", "auth.enterNow": "Enter now", "auth.loginError": "Could not log in", "auth.credentialsError": "Incorrect email or password.", "auth.passwordLength": "Password must be at least 6 characters", "auth.sendLink": "Send recovery link", "auth.resetSuccess": "Password reset successfully. We'll take you to login." },
+  pt: { "auth.loginSuccess": "Login realizado", "auth.loginSuccessMessage": "Login realizado com sucesso. Vamos levar você ao painel principal.", "auth.enterNow": "Entrar agora", "auth.loginError": "Não foi possível entrar", "auth.credentialsError": "E-mail ou senha incorretos.", "auth.passwordLength": "A senha deve ter pelo menos 6 caracteres", "auth.sendLink": "Enviar link de recuperação", "auth.resetSuccess": "Senha redefinida com sucesso. Vamos levar você ao login." },
+  it: { "auth.loginSuccess": "Accesso riuscito", "auth.loginSuccessMessage": "Accesso riuscito. Ti porteremo al pannello principale.", "auth.enterNow": "Entra ora", "auth.loginError": "Impossibile accedere", "auth.credentialsError": "Email o password non corrette.", "auth.passwordLength": "La password deve contenere almeno 6 caratteri", "auth.sendLink": "Invia link di recupero", "auth.resetSuccess": "Password reimpostata correttamente. Ti porteremo al login." },
+})) Object.assign((text as any)[language].translation, labels);
+const mobileTerms = {
+  es: { "terms.app": "Aplicación de Traducción de Señas a Texto", "terms.updated": "Última actualización: 2025", "terms.welcome": "Bienvenido(a) a nuestra aplicación de traducción de señas a texto. Al utilizar la aplicación, usted acepta los presentes Términos y Condiciones.", "terms.s1": "1. Aceptación de los Términos", "terms.p1": "Al acceder, instalar o utilizar la Aplicación, usted declara que ha leído, comprendido y aceptado estos términos.", "terms.s2": "2. Descripción del Servicio", "terms.p2": "La aplicación permite capturar señas, interpretarlas mediante algoritmos y convertirlas en texto y audio.", "terms.s3": "3. Uso Permitido", "terms.p3": "El usuario se compromete a usar la aplicación de forma responsable, sin fines ilegales ni maliciosos.", "terms.s4": "4. Registro y Seguridad", "terms.p4": "El usuario debe proporcionar información verídica y proteger sus credenciales.", "terms.s5": "5. Privacidad", "terms.p5": "Los datos recopilados se utilizan únicamente para mejorar la experiencia del usuario.", "terms.s6": "6. Propiedad Intelectual", "terms.p6": "Todo el contenido de la aplicación pertenece a sus desarrolladores.", "terms.s7": "7. Limitación de Responsabilidad", "terms.p7": "La aplicación puede tener errores y no garantiza precisión total.", "misc.passwordMismatch": "Las contraseñas no coinciden.", "misc.passwordMatch": "Las contraseñas coinciden.", "misc.textSize": "Tamaño de texto" },
+  en: { "terms.app": "Sign Language to Text Application", "terms.updated": "Last updated: 2025", "terms.welcome": "Welcome to our sign language to text application. By using the application, you accept these Terms and Conditions.", "terms.s1": "1. Acceptance of the Terms", "terms.p1": "By accessing, installing or using the Application, you declare that you have read, understood and accepted these terms.", "terms.s2": "2. Service Description", "terms.p2": "The application can capture signs, interpret them through algorithms and convert them into text and audio.", "terms.s3": "3. Permitted Use", "terms.p3": "The user agrees to use the application responsibly and without illegal or malicious purposes.", "terms.s4": "4. Registration and Security", "terms.p4": "The user must provide truthful information and protect their credentials.", "terms.s5": "5. Privacy", "terms.p5": "Collected data is used only to improve the user experience.", "terms.s6": "6. Intellectual Property", "terms.p6": "All application content belongs to its developers.", "terms.s7": "7. Limitation of Liability", "terms.p7": "The application may contain errors and does not guarantee complete accuracy.", "misc.passwordMismatch": "Passwords do not match.", "misc.passwordMatch": "Passwords match.", "misc.textSize": "Text size" },
+  pt: { "terms.app": "Aplicativo de Tradução de Sinais para Texto", "terms.updated": "Última atualização: 2025", "terms.welcome": "Bem-vindo ao nosso aplicativo de tradução de sinais para texto. Ao usar o aplicativo, você aceita estes Termos e Condições.", "terms.s1": "1. Aceitação dos Termos", "terms.p1": "Ao acessar, instalar ou usar o Aplicativo, você declara que leu, entendeu e aceitou estes termos.", "terms.s2": "2. Descrição do Serviço", "terms.p2": "O aplicativo pode capturar sinais, interpretá-los por algoritmos e convertê-los em texto e áudio.", "terms.s3": "3. Uso Permitido", "terms.p3": "O usuário se compromete a usar o aplicativo com responsabilidade e sem fins ilegais ou maliciosos.", "terms.s4": "4. Cadastro e Segurança", "terms.p4": "O usuário deve fornecer informações verdadeiras e proteger suas credenciais.", "terms.s5": "5. Privacidade", "terms.p5": "Os dados coletados são usados somente para melhorar a experiência do usuário.", "terms.s6": "6. Propriedade Intelectual", "terms.p6": "Todo o conteúdo do aplicativo pertence aos seus desenvolvedores.", "terms.s7": "7. Limitação de Responsabilidade", "terms.p7": "O aplicativo pode conter erros e não garante precisão total.", "misc.passwordMismatch": "As senhas não coincidem.", "misc.passwordMatch": "As senhas coincidem.", "misc.textSize": "Tamanho do texto" },
+  it: { "terms.app": "Applicazione di traduzione dei segni in testo", "terms.updated": "Ultimo aggiornamento: 2025", "terms.welcome": "Benvenuto nella nostra applicazione per tradurre la lingua dei segni in testo. Utilizzando l'applicazione, accetti questi Termini e condizioni.", "terms.s1": "1. Accettazione dei termini", "terms.p1": "Accedendo, installando o utilizzando l'Applicazione, dichiari di aver letto, compreso e accettato questi termini.", "terms.s2": "2. Descrizione del servizio", "terms.p2": "L'applicazione può acquisire i segni, interpretarli tramite algoritmi e convertirli in testo e audio.", "terms.s3": "3. Uso consentito", "terms.p3": "L'utente si impegna a usare l'applicazione responsabilmente e senza scopi illegali o dannosi.", "terms.s4": "4. Registrazione e sicurezza", "terms.p4": "L'utente deve fornire informazioni veritiere e proteggere le proprie credenziali.", "terms.s5": "5. Privacy", "terms.p5": "I dati raccolti vengono utilizzati solo per migliorare l'esperienza dell'utente.", "terms.s6": "6. Proprietà intellettuale", "terms.p6": "Tutti i contenuti dell'applicazione appartengono ai suoi sviluppatori.", "terms.s7": "7. Limitazione di responsabilità", "terms.p7": "L'applicazione può contenere errori e non garantisce la precisione totale.", "misc.passwordMismatch": "Le password non coincidono.", "misc.passwordMatch": "Le password coincidono.", "misc.textSize": "Dimensione del testo" }
+};
+for (const language of Object.keys(mobileTerms)) Object.assign((text as any)[language].translation, mobileTerms[language as keyof typeof mobileTerms]);
+const accessibilityHardcodedUi = {
+  es: { "home.description": "One Language es una aplicación diseñada para traducir la lengua de señas colombiana a texto y audio en tiempo real, promoviendo la inclusión y la comunicación sin barreras en Colombia.", "profile.personalText": "Visualiza tus datos personales", "profile.permissionsText": "Gestiona los permisos de acceso a funciones del dispositivo", "profile.cameraText": "Necesaria para el reconocimiento de señas", "profile.audioText": "Para convertir y escuchar el audio", "common.noAvailable": "No disponible", "common.loading": "Cargando..." },
+  en: { "home.description": "One Language is an application designed to translate Colombian Sign Language into text and audio in real time, promoting inclusion and communication without barriers in Colombia.", "profile.personalText": "View your personal information", "profile.permissionsText": "Manage access to device features", "profile.cameraText": "Required for sign recognition", "profile.audioText": "For converting and listening to audio", "common.noAvailable": "Not available", "common.loading": "Loading..." },
+  pt: { "home.description": "One Language é um aplicativo criado para traduzir a Língua de Sinais Colombiana em texto e áudio em tempo real, promovendo inclusão e comunicação sem barreiras na Colômbia.", "profile.personalText": "Visualize suas informações pessoais", "profile.permissionsText": "Gerencie o acesso aos recursos do dispositivo", "profile.cameraText": "Necessária para o reconhecimento de sinais", "profile.audioText": "Para converter e ouvir áudio", "common.noAvailable": "Não disponível", "common.loading": "Carregando..." },
+  it: { "home.description": "One Language è un'applicazione progettata per tradurre la lingua dei segni colombiana in testo e audio in tempo reale, promuovendo inclusione e comunicazione senza barriere in Colombia.", "profile.personalText": "Visualizza le tue informazioni personali", "profile.permissionsText": "Gestisci l'accesso alle funzioni del dispositivo", "profile.cameraText": "Necessaria per il riconoscimento dei segni", "profile.audioText": "Per convertire e ascoltare l'audio", "common.noAvailable": "Non disponibile", "common.loading": "Caricamento..." },
+} as const;
+for (const [language, labels] of Object.entries(accessibilityHardcodedUi)) {
+  Object.assign((text as any)[language].translation, labels);
+}
+
+const mobileUi = {
+  es: { "auth.recoverTitle": "Restablecer contraseña", "auth.recoverHint": "Escribe tu correo y te enviaremos el enlace para crear una nueva contraseña.", "auth.backLogin": "Volver al inicio de sesión", "auth.emailRequired": "El correo es obligatorio", "auth.emailInvalid": "Ingresa un correo válido", "auth.recoverError": "No se pudo enviar el enlace de recuperación, verifica tu correo.", "auth.resetTitle": "Restablecer contraseña", "auth.resetButton": "Restablecer contraseña", "auth.resetBack": "Volver al inicio de sesión", "auth.invalidLink": "El enlace de recuperación no es válido o está incompleto.", "auth.passwordRules": "La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula y un número.", "auth.confirmRequired": "Debes confirmar tu nueva contraseña.", "auth.resetError": "No se pudo restablecer la contraseña.", "auth.loginError": "No se pudo iniciar sesión", "auth.credentialsError": "Correo o contraseña incorrectos.", "auth.registerError": "Ocurrió un problema al crear la cuenta." },
+  en: { "auth.recoverTitle": "Reset password", "auth.recoverHint": "Enter your email and we will send you a link to create a new password.", "auth.backLogin": "Back to login", "auth.emailRequired": "Email is required", "auth.emailInvalid": "Enter a valid email", "auth.recoverError": "Could not send the recovery link. Check your email.", "auth.resetTitle": "Reset password", "auth.resetButton": "Reset password", "auth.resetBack": "Back to login", "auth.invalidLink": "The recovery link is invalid or incomplete.", "auth.passwordRules": "Password must have at least 8 characters, one uppercase letter, one lowercase letter and one number.", "auth.confirmRequired": "You must confirm your new password.", "auth.resetError": "Could not reset the password.", "auth.loginError": "Could not log in", "auth.credentialsError": "Incorrect email or password.", "auth.registerError": "Something went wrong creating the account." },
+  pt: { "auth.recoverTitle": "Redefinir senha", "auth.recoverHint": "Digite seu e-mail e enviaremos o link para criar uma nova senha.", "auth.backLogin": "Voltar ao login", "auth.emailRequired": "O e-mail é obrigatório", "auth.emailInvalid": "Digite um e-mail válido", "auth.recoverError": "Não foi possível enviar o link. Verifique seu e-mail.", "auth.resetTitle": "Redefinir senha", "auth.resetButton": "Redefinir senha", "auth.resetBack": "Voltar ao login", "auth.invalidLink": "O link de recuperação é inválido ou está incompleto.", "auth.passwordRules": "A senha deve ter no mínimo 8 caracteres, uma maiúscula, uma minúscula e um número.", "auth.confirmRequired": "Você deve confirmar sua nova senha.", "auth.resetError": "Não foi possível redefinir a senha.", "auth.loginError": "Não foi possível entrar", "auth.credentialsError": "E-mail ou senha incorretos.", "auth.registerError": "Ocorreu um problema ao criar a conta." },
+  it: { "auth.recoverTitle": "Reimposta password", "auth.recoverHint": "Inserisci la tua email e ti invieremo il link per creare una nuova password.", "auth.backLogin": "Torna al login", "auth.emailRequired": "L'email è obbligatoria", "auth.emailInvalid": "Inserisci un'email valida", "auth.recoverError": "Impossibile inviare il link. Verifica la tua email.", "auth.resetTitle": "Reimposta password", "auth.resetButton": "Reimposta password", "auth.resetBack": "Torna al login", "auth.invalidLink": "Il link di recupero non è valido o incompleto.", "auth.passwordRules": "La password deve contenere almeno 8 caratteri, una maiuscola, una minuscola e un numero.", "auth.confirmRequired": "Devi confermare la nuova password.", "auth.resetError": "Impossibile reimpostare la password.", "auth.loginError": "Impossibile accedere", "auth.credentialsError": "Email o password non corrette.", "auth.registerError": "Si è verificato un problema nella creazione dell'account." }
+};
+for (const language of Object.keys(mobileUi)) Object.assign((text as any)[language].translation, mobileUi[language as keyof typeof mobileUi]);
+const mobileRecoveryUi = {
+  es: { "auth.recoverSuccess": "Enviamos el enlace de recuperación a tu correo.", "auth.recoverNotFound": "No existe una cuenta registrada con ese correo." },
+  en: { "auth.recoverSuccess": "We sent the recovery link to your email.", "auth.recoverNotFound": "No account is registered with that email." },
+  pt: { "auth.recoverSuccess": "Enviamos o link de recuperação para seu e-mail.", "auth.recoverNotFound": "Não existe uma conta registrada com esse e-mail." },
+  it: { "auth.recoverSuccess": "Abbiamo inviato il link di recupero alla tua email.", "auth.recoverNotFound": "Non esiste un account registrato con questa email." },
+};
+for (const language of Object.keys(mobileRecoveryUi)) Object.assign((text as any)[language].translation, mobileRecoveryUi[language as keyof typeof mobileRecoveryUi]);
+for (const [language, labels] of Object.entries({
+  es: { "auth.weak": "Débil", "auth.strong": "Fuerte", "auth.medium": "Media", "auth.nameRequired": "El nombre es obligatorio", "auth.minChars": "Ingresa al menos 3 caracteres", "auth.passwordRequired": "La contraseña es obligatoria", "auth.acceptTerms": "Debes aceptar los términos y condiciones", "auth.acceptPrefix": "Acepto los", "auth.registerSuccess": "Registro exitoso", "auth.registerSuccessMessage": "Tu cuenta quedó lista. Ahora puedes iniciar sesión.", "auth.goLogin": "Ir a iniciar sesión" },
+  en: { "auth.weak": "Weak", "auth.strong": "Strong", "auth.medium": "Medium", "auth.nameRequired": "Name is required", "auth.minChars": "Enter at least 3 characters", "auth.passwordRequired": "Password is required", "auth.acceptTerms": "You must accept the terms and conditions", "auth.acceptPrefix": "I accept the", "auth.registerSuccess": "Registration successful", "auth.registerSuccessMessage": "Your account is ready. You can now log in.", "auth.goLogin": "Go to login" },
+  pt: { "auth.weak": "Fraca", "auth.strong": "Forte", "auth.medium": "Média", "auth.nameRequired": "O nome é obrigatório", "auth.minChars": "Digite pelo menos 3 caracteres", "auth.passwordRequired": "A senha é obrigatória", "auth.acceptTerms": "Você deve aceitar os termos e condições", "auth.acceptPrefix": "Aceito os", "auth.registerSuccess": "Cadastro realizado", "auth.registerSuccessMessage": "Sua conta está pronta. Agora você pode entrar.", "auth.goLogin": "Ir para o login" },
+  it: { "auth.weak": "Debole", "auth.strong": "Forte", "auth.medium": "Media", "auth.nameRequired": "Il nome è obbligatorio", "auth.minChars": "Inserisci almeno 3 caratteri", "auth.passwordRequired": "La password è obbligatoria", "auth.acceptTerms": "Devi accettare termini e condizioni", "auth.acceptPrefix": "Accetto i", "auth.registerSuccess": "Registrazione riuscita", "auth.registerSuccessMessage": "Il tuo account è pronto. Ora puoi accedere.", "auth.goLogin": "Vai al login" }
+})) Object.assign((text as any)[language].translation, labels);
+
+const accessibilityLabels = {
+  es: { small: "Peque\u00f1o", medium: "Mediano", large: "Grande", changesSavedTitle: "Cambios guardados", saveError: "No se pudieron guardar tus preferencias en la cuenta." },
+  en: { small: "Small", medium: "Medium", large: "Large", changesSavedTitle: "Changes saved", saveError: "Your preferences could not be saved to your account." },
+  pt: { small: "Pequeno", medium: "M\u00e9dio", large: "Grande", changesSavedTitle: "Altera\u00e7\u00f5es salvas", saveError: "N\u00e3o foi poss\u00edvel salvar suas prefer\u00eancias na conta." },
+  it: { small: "Piccolo", medium: "Medio", large: "Grande", changesSavedTitle: "Modifiche salvate", saveError: "Non \u00e8 stato possibile salvare le preferenze nell'account." },
+} as const;
+for (const [language, labels] of Object.entries(accessibilityLabels)) {
+  const translation = (text as any)[language].translation;
+  translation["accessibility.small"] = labels.small;
+  translation["accessibility.medium"] = labels.medium;
+  translation["accessibility.large"] = labels.large;
+  translation["accessibility.changesSavedTitle"] = labels.changesSavedTitle;
+  translation["accessibility.saveError"] = labels.saveError;
+}
+
+const aiIntegrationLabels = {
+  es: {
+    "camera.realtime": "Traducción en tiempo real", "camera.empty": "Aún no hay una seña reconocida",
+    "camera.activateHint": "Activa la cámara para interpretar señas", "camera.start": "Iniciar traducción",
+    "camera.finish": "Finalizar traducción", "camera.listen": "Escuchar traducción", "camera.save": "Guardar en historial",
+    "camera.saving": "Guardando...", "camera.discard": "Descartar", "camera.switch": "Cambiar cámara",
+    "camera.enableVoice": "Activar voz automática", "camera.disableVoice": "Desactivar voz automática",
+    "camera.confidence": "{{value}}% de confianza", "camera.status.inactive": "La cámara está apagada.",
+    "camera.status.permission_required": "Debes permitir el acceso a la cámara.", "camera.status.connecting": "Conectando con el modelo de IA...",
+    "camera.status.ready": "Modelo listo. Muestra una seña a la cámara.", "camera.status.analyzing": "Analizando el movimiento...",
+    "camera.status.waiting": "La seña aún no es suficientemente clara.", "camera.status.translated": "Seña reconocida.",
+    "camera.status.no_hands": "No se detectan manos en la cámara.", "camera.status.idle": "No se está realizando una seña.",
+    "camera.status.model_error": "No fue posible conectar con el modelo de IA.", "camera.status.camera_error": "No fue posible capturar la cámara.",
+    "camera.status.saved": "Traducción guardada en el historial.", "camera.status.save_error": "No fue posible guardar la traducción.", "camera.status.recording_error": "No fue posible guardar el video de la seña.", "camera.recording": "Grabando", "camera.recordingUnavailable": "La traducción se puede guardar, pero el video no estuvo disponible.",
+    "history.emptyText": "Finaliza una traducción y guárdala para verla aquí.", "history.loadError": "No fue posible cargar el historial.",
+    "history.deleteError": "No fue posible eliminar la traducción.", "history.delete": "Eliminar traducción",
+    "history.deleteAll": "Eliminar todo", "history.deleteAllConfirm": "¿Quieres eliminar todo el historial?",
+    "history.cancel": "Cancelar", "history.dateUnavailable": "Fecha no disponible", "history.count_one": "{{count}} traducción",
+    "history.count_other": "{{count}} traducciones",
+  },
+  en: {
+    "camera.realtime": "Real-time translation", "camera.empty": "No sign has been recognized yet",
+    "camera.activateHint": "Turn on the camera to interpret signs", "camera.start": "Start translation",
+    "camera.finish": "Finish translation", "camera.listen": "Listen to translation", "camera.save": "Save to history",
+    "camera.saving": "Saving...", "camera.discard": "Discard", "camera.switch": "Switch camera",
+    "camera.enableVoice": "Enable automatic voice", "camera.disableVoice": "Disable automatic voice",
+    "camera.confidence": "{{value}}% confidence", "camera.status.inactive": "The camera is off.",
+    "camera.status.permission_required": "Camera permission is required.", "camera.status.connecting": "Connecting to the AI model...",
+    "camera.status.ready": "Model ready. Show a sign to the camera.", "camera.status.analyzing": "Analyzing movement...",
+    "camera.status.waiting": "The sign is not clear enough yet.", "camera.status.translated": "Sign recognized.",
+    "camera.status.no_hands": "No hands detected by the camera.", "camera.status.idle": "No sign is being performed.",
+    "camera.status.model_error": "Could not connect to the AI model.", "camera.status.camera_error": "Could not capture the camera.",
+    "camera.status.saved": "Translation saved to history.", "camera.status.save_error": "Could not save the translation.", "camera.status.recording_error": "The sign video could not be saved.", "camera.recording": "Recording", "camera.recordingUnavailable": "The translation can be saved, but the video was unavailable.",
+    "history.emptyText": "Finish and save a translation to see it here.", "history.loadError": "Could not load history.",
+    "history.deleteError": "Could not delete the translation.", "history.delete": "Delete translation",
+    "history.deleteAll": "Delete all", "history.deleteAllConfirm": "Do you want to delete all history?",
+    "history.cancel": "Cancel", "history.dateUnavailable": "Date unavailable", "history.count_one": "{{count}} translation",
+    "history.count_other": "{{count}} translations",
+  },
+  pt: {
+    "camera.realtime": "Tradução em tempo real", "camera.empty": "Ainda não há sinal reconhecido",
+    "camera.activateHint": "Ative a câmera para interpretar sinais", "camera.start": "Iniciar tradução",
+    "camera.finish": "Finalizar tradução", "camera.listen": "Ouvir tradução", "camera.save": "Salvar no histórico",
+    "camera.saving": "Salvando...", "camera.discard": "Descartar", "camera.switch": "Trocar câmera",
+    "camera.enableVoice": "Ativar voz automática", "camera.disableVoice": "Desativar voz automática",
+    "camera.confidence": "{{value}}% de confiança", "camera.status.inactive": "A câmera está desligada.",
+    "camera.status.permission_required": "É necessário permitir o acesso à câmera.", "camera.status.connecting": "Conectando ao modelo de IA...",
+    "camera.status.ready": "Modelo pronto. Mostre um sinal à câmera.", "camera.status.analyzing": "Analisando o movimento...",
+    "camera.status.waiting": "O sinal ainda não está claro.", "camera.status.translated": "Sinal reconhecido.",
+    "camera.status.no_hands": "Nenhuma mão detectada pela câmera.", "camera.status.idle": "Nenhum sinal está sendo feito.",
+    "camera.status.model_error": "Não foi possível conectar ao modelo de IA.", "camera.status.camera_error": "Não foi possível capturar a câmera.",
+    "camera.status.saved": "Tradução salva no histórico.", "camera.status.save_error": "Não foi possível salvar a tradução.", "camera.status.recording_error": "Não foi possível salvar o vídeo do sinal.", "camera.recording": "Gravando", "camera.recordingUnavailable": "A tradução pode ser salva, mas o vídeo não ficou disponível.",
+    "history.emptyText": "Finalize e salve uma tradução para vê-la aqui.", "history.loadError": "Não foi possível carregar o histórico.",
+    "history.deleteError": "Não foi possível excluir a tradução.", "history.delete": "Excluir tradução",
+    "history.deleteAll": "Excluir tudo", "history.deleteAllConfirm": "Deseja excluir todo o histórico?",
+    "history.cancel": "Cancelar", "history.dateUnavailable": "Data indisponível", "history.count_one": "{{count}} tradução",
+    "history.count_other": "{{count}} traduções",
+  },
+  it: {
+    "camera.realtime": "Traduzione in tempo reale", "camera.empty": "Nessun segno riconosciuto",
+    "camera.activateHint": "Attiva la fotocamera per interpretare i segni", "camera.start": "Avvia traduzione",
+    "camera.finish": "Termina traduzione", "camera.listen": "Ascolta traduzione", "camera.save": "Salva nella cronologia",
+    "camera.saving": "Salvataggio...", "camera.discard": "Scarta", "camera.switch": "Cambia fotocamera",
+    "camera.enableVoice": "Attiva voce automatica", "camera.disableVoice": "Disattiva voce automatica",
+    "camera.confidence": "{{value}}% di affidabilità", "camera.status.inactive": "La fotocamera è spenta.",
+    "camera.status.permission_required": "È necessario consentire l'accesso alla fotocamera.", "camera.status.connecting": "Connessione al modello IA...",
+    "camera.status.ready": "Modello pronto. Mostra un segno alla fotocamera.", "camera.status.analyzing": "Analisi del movimento...",
+    "camera.status.waiting": "Il segno non è ancora abbastanza chiaro.", "camera.status.translated": "Segno riconosciuto.",
+    "camera.status.no_hands": "Nessuna mano rilevata.", "camera.status.idle": "Non viene eseguito alcun segno.",
+    "camera.status.model_error": "Impossibile connettersi al modello IA.", "camera.status.camera_error": "Impossibile acquisire la fotocamera.",
+    "camera.status.saved": "Traduzione salvata nella cronologia.", "camera.status.save_error": "Impossibile salvare la traduzione.", "camera.status.recording_error": "Impossibile salvare il video del segno.", "camera.recording": "Registrazione", "camera.recordingUnavailable": "La traduzione può essere salvata, ma il video non era disponibile.",
+    "history.emptyText": "Termina e salva una traduzione per vederla qui.", "history.loadError": "Impossibile caricare la cronologia.",
+    "history.deleteError": "Impossibile eliminare la traduzione.", "history.delete": "Elimina traduzione",
+    "history.deleteAll": "Elimina tutto", "history.deleteAllConfirm": "Vuoi eliminare tutta la cronologia?",
+    "history.cancel": "Annulla", "history.dateUnavailable": "Data non disponibile", "history.count_one": "{{count}} traduzione",
+    "history.count_other": "{{count}} traduzioni",
+  },
+};
+for (const [language, labels] of Object.entries(aiIntegrationLabels)) {
+  Object.assign((text as any)[language].translation, labels);
+}
+
+const historyFilterLabels = {
+  es: { "history.recent": "Recientes", "history.old": "Antiguos", "history.all": "Todos", "history.recentHint": "Últimos 7 días", "history.olderHint": "Más de 7 días", "history.noMatches": "No hay traducciones en este período." },
+  en: { "history.recent": "Recent", "history.old": "Older", "history.all": "All", "history.recentHint": "Last 7 days", "history.olderHint": "More than 7 days ago", "history.noMatches": "No translations in this period." },
+  pt: { "history.recent": "Recentes", "history.old": "Antigos", "history.all": "Todos", "history.recentHint": "Últimos 7 dias", "history.olderHint": "Mais de 7 dias", "history.noMatches": "Nenhuma tradução neste período." },
+  it: { "history.recent": "Recenti", "history.old": "Precedenti", "history.all": "Tutti", "history.recentHint": "Ultimi 7 giorni", "history.olderHint": "Oltre 7 giorni fa", "history.noMatches": "Nessuna traduzione in questo periodo." },
+};
+for (const [language, labels] of Object.entries(historyFilterLabels)) {
+  Object.assign((text as any)[language].translation, labels);
+}
+const logoutConfirmationLabels = {
+  es: { "profile.logoutQuestion": "¿Está seguro que desea cerrar sesión?", "profile.confirmLogout": "Cerrar sesión" },
+  en: { "profile.logoutQuestion": "Are you sure you want to log out?", "profile.confirmLogout": "Log out" },
+  pt: { "profile.logoutQuestion": "Tem certeza de que deseja sair?", "profile.confirmLogout": "Sair" },
+  it: { "profile.logoutQuestion": "Sei sicuro di voler uscire?", "profile.confirmLogout": "Esci" },
+};
+for (const [language, labels] of Object.entries(logoutConfirmationLabels)) {
+  Object.assign((text as any)[language].translation, labels);
+}
+const frameProcessingLabels = {
+  es: "No se pudo procesar una imagen de la camara. Intentando de nuevo...",
+  en: "A camera image could not be processed. Retrying...",
+  pt: "Nao foi possivel processar uma imagem da camera. Tentando novamente...",
+  it: "Impossibile elaborare un'immagine della fotocamera. Nuovo tentativo...",
+};
+for (const [language, message] of Object.entries(frameProcessingLabels)) {
+  (text as any)[language].translation["camera.status.processing_error"] = message;
+}
+
+const cameraPermissionUi = {
+  es: { "cameraPermission.title": "Activar permiso de la cámara", "cameraPermission.message": "Para realizar la traducción de lengua de señas a texto en tiempo real, necesitamos acceder a la cámara de tu dispositivo.", "cameraPermission.privacy": "La cámara se usa para detectar gestos. El video solo se conserva de forma privada cuando eliges Guardar en historial; puedes descartarlo al finalizar.", "cameraPermission.reject": "Rechazar", "cameraPermission.requesting": "Solicitando...", "cameraPermission.error": "No fue posible acceder a la cámara. Revisa el permiso del dispositivo e inténtalo de nuevo." },
+  en: { "cameraPermission.title": "Enable camera permission", "cameraPermission.message": "To translate sign language into text in real time, we need access to your device camera.", "cameraPermission.privacy": "The camera is used only to detect hand movements and gestures. Images and videos are not stored or shared.", "cameraPermission.reject": "Reject", "cameraPermission.requesting": "Requesting...", "cameraPermission.error": "We could not access the camera. Check the device permission and try again." },
+  pt: { "cameraPermission.title": "Ativar permissão da câmera", "cameraPermission.message": "Para traduzir a língua de sinais em texto em tempo real, precisamos acessar a câmera do dispositivo.", "cameraPermission.privacy": "A câmera será usada apenas para detectar movimentos e gestos das mãos, sem armazenar ou compartilhar imagens ou vídeos.", "cameraPermission.reject": "Recusar", "cameraPermission.requesting": "Solicitando...", "cameraPermission.error": "Não foi possível acessar a câmera. Verifique a permissão do dispositivo e tente novamente." },
+  it: { "cameraPermission.title": "Attiva il permesso della fotocamera", "cameraPermission.message": "Per tradurre la lingua dei segni in testo in tempo reale, dobbiamo accedere alla fotocamera del dispositivo.", "cameraPermission.privacy": "La fotocamera viene usata solo per rilevare movimenti e gesti delle mani, senza salvare o condividere immagini o video.", "cameraPermission.reject": "Rifiuta", "cameraPermission.requesting": "Richiesta...", "cameraPermission.error": "Impossibile accedere alla fotocamera. Controlla il permesso del dispositivo e riprova." }
+};
+for (const [language, labels] of Object.entries(cameraPermissionUi)) {
+  Object.assign((text as any)[language].translation, labels);
+}
+
+const featurePermissionUi = {
+  es: { "common.activated": "Activado", "common.deactivate": "Desactivar", "profile.permissionDenied": "El permiso fue rechazado. Actívalo desde los ajustes del dispositivo para continuar.", "profile.cameraPermissionTitle": "Activar permiso de cámara", "profile.cameraPermissionMessage": "Usaremos la cámara únicamente para reconocer señas y convertirlas en texto en tiempo real.", "profile.audioPermissionTitle": "Activar voz", "profile.audioPermissionMessage": "La voz leerá las traducciones en vivo y las que escuches desde el historial.", "history.filePermissionRequired": "Activa Archivos desde tu perfil para descargar el video.", "history.downloaded": "El video se descargó en el almacenamiento de la aplicación.", "history.downloadError": "No fue posible descargar el video." },
+  en: { "common.activated": "Active", "common.deactivate": "Deactivate", "profile.permissionDenied": "The permission was denied. Enable it in the device settings to continue.", "profile.cameraPermissionTitle": "Enable camera permission", "profile.cameraPermissionMessage": "We will use the camera only to recognize signs and translate them into text in real time.", "profile.audioPermissionTitle": "Enable voice", "profile.audioPermissionMessage": "Voice will read live translations and translations played from history.", "history.filePermissionRequired": "Enable Files from your profile to download the video.", "history.downloaded": "The video was downloaded to the app storage.", "history.downloadError": "The video could not be downloaded." },
+  pt: { "common.activated": "Ativado", "common.deactivate": "Desativar", "profile.permissionDenied": "A permissão foi negada. Ative-a nas configurações do dispositivo para continuar.", "profile.cameraPermissionTitle": "Ativar permissão da câmera", "profile.cameraPermissionMessage": "Usaremos a câmera apenas para reconhecer sinais e convertê-los em texto em tempo real.", "profile.audioPermissionTitle": "Ativar voz", "profile.audioPermissionMessage": "A voz lerá as traduções ao vivo e as que você ouvir no histórico.", "history.filePermissionRequired": "Ative Arquivos no seu perfil para baixar o vídeo.", "history.downloaded": "O vídeo foi baixado para o armazenamento do aplicativo.", "history.downloadError": "Não foi possível baixar o vídeo." },
+  it: { "common.activated": "Attivo", "common.deactivate": "Disattiva", "profile.permissionDenied": "L'autorizzazione è stata negata. Attivala nelle impostazioni del dispositivo per continuare.", "profile.cameraPermissionTitle": "Attiva autorizzazione fotocamera", "profile.cameraPermissionMessage": "Useremo la fotocamera solo per riconoscere i segni e convertirli in testo in tempo reale.", "profile.audioPermissionTitle": "Attiva voce", "profile.audioPermissionMessage": "La voce leggerà le traduzioni dal vivo e quelle ascoltate nella cronologia.", "history.filePermissionRequired": "Attiva File dal profilo per scaricare il video.", "history.downloaded": "Il video è stato scaricato nella memoria dell'app.", "history.downloadError": "Non è stato possibile scaricare il video." },
+};
+for (const [language, labels] of Object.entries(featurePermissionUi)) {
+  Object.assign((text as any)[language].translation, labels);
+}
+
+i18n.use(initReactI18next).init({ resources: text, lng: "es", fallbackLng: "es", interpolation: { escapeValue: false } });
+
+let languageRequestVersion = 0;
+
+export async function loadLanguage() {
+  const requestVersion = ++languageRequestVersion;
+  const stored = await AsyncStorage.getItem("language");
+  const valid = languageOptions.some((option) => option.code === stored) ? stored! : "es";
+  if (requestVersion !== languageRequestVersion) return;
+  await i18n.changeLanguage(valid);
+}
+
+export async function setLanguage(language: string) {
+  if (!languageOptions.some((option) => option.code === language)) return;
+  const requestVersion = ++languageRequestVersion;
+  await AsyncStorage.setItem("language", language);
+  if (requestVersion !== languageRequestVersion) return;
+  await i18n.changeLanguage(language);
+}
+
+export default i18n;

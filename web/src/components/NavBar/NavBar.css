@@ -1,0 +1,212 @@
+.app-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 24px;
+    min-height: 44px;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+}
+
+@media (min-width: 1025px) {
+    .app-navbar {
+        position: fixed;
+        top: 20px;
+        right: 24px;
+        z-index: 50;
+    }
+}
+
+.app-navbar button {
+    box-shadow: none;
+}
+
+.app-nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: inherit;
+    min-height: 44px;
+    flex-wrap: nowrap;
+}
+
+.app-nav-toggle {
+    display: none;
+    box-shadow: none;
+}
+
+.app-nav-backdrop,
+.app-nav-drawer {
+    display: none;
+}
+
+.app-nav-item {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 0 0 7px;
+    border: 0;
+    color: var(--color-text-on-page);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    background: transparent;
+    border-radius: 0;
+    transition: color 0.2s;
+}
+
+.app-nav-item::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    content: "";
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.2s;
+}
+
+.app-nav-item:hover,
+.app-nav-item.active {
+    color: var(--color-accent);
+}
+
+.app-nav-item.active {
+    color: var(--color-accent);
+}
+
+.app-nav-item.active::after {
+    transform: scaleX(1);
+}
+
+@media (max-width: 1024px) {
+    .app-navbar { gap: 14px; }
+    .app-nav-item { font-size: 15px; }
+}
+
+@media (max-width: 768px) {
+    .app-navbar {
+        position: relative;
+        justify-content: flex-start;
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .app-nav-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 44px;
+        padding: 10px 14px;
+        border-radius: 0;
+        background: transparent;
+        color: var(--color-text-on-page);
+        font: inherit;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .app-nav-links {
+        display: none;
+    }
+
+    .app-nav-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: rgba(6, 20, 43, 0.46);
+        cursor: default;
+        box-shadow: none;
+    }
+
+    .app-nav-drawer {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 101;
+        display: flex;
+        flex-direction: column;
+        width: min(82vw, 320px);
+        max-width: 100%;
+        overflow-y: auto;
+        background: var(--color-page-bg);
+        color: var(--color-text-on-page);
+        box-shadow: 16px 0 34px rgba(6, 20, 43, 0.3);
+    }
+
+    .app-nav-drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 68px;
+        padding: 14px 18px;
+        border-bottom: 1px solid color-mix(in srgb, var(--color-text-on-page) 22%, transparent);
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .app-nav-close {
+        display: inline-grid;
+        width: 44px;
+        min-width: 44px;
+        height: 44px;
+        padding: 0;
+        place-items: center;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--color-text-on-page);
+        font-size: 32px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .app-nav-drawer-links {
+        display: grid;
+        gap: 4px;
+        padding: 14px 12px 24px;
+    }
+
+    .app-nav-item {
+        justify-content: flex-start;
+        width: 100%;
+        min-height: 44px;
+        min-height: 48px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        color: var(--color-text-on-page);
+        font-size: 16px;
+        text-align: left;
+    }
+
+    .app-nav-item::after {
+        display: none;
+    }
+
+    .app-nav-item.active {
+        background: color-mix(in srgb, var(--color-surface) 18%, transparent);
+        color: var(--color-accent);
+    }
+
+    .app-nav-item:focus-visible,
+    .app-nav-toggle:focus-visible,
+    .app-nav-close:focus-visible {
+        outline: 3px solid var(--color-accent);
+        outline-offset: 2px;
+    }
+}
