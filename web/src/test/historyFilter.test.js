@@ -16,3 +16,15 @@ it("shows only the last seven days as recent", () => {
 it("shows all translations newest first, including those without a valid date", () => {
   expect(filterTranslations(translations, "all", now).map(({ id }) => id)).toEqual(["recent", "older", "unknown"]);
 });
+
+it("uses the same inclusive seven-day boundary as mobile", () => {
+  const cutoff = now - 7 * 24 * 60 * 60 * 1000;
+  const boundary = [
+    { id: "future", createdAt: new Date(now + 1000).toISOString() },
+    { id: "at-cutoff", createdAt: new Date(cutoff).toISOString() },
+    { id: "before-cutoff", createdAt: new Date(cutoff - 1).toISOString() },
+  ];
+
+  expect(filterTranslations(boundary, "recent", now).map(({ id }) => id)).toEqual(["at-cutoff"]);
+  expect(filterTranslations(boundary, "older", now).map(({ id }) => id)).toEqual(["before-cutoff"]);
+});

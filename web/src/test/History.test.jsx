@@ -23,11 +23,14 @@ it("keeps the filter available and separates recent from older entries", async (
 
   await user.click(screen.getByRole("button", { name: "history.all" }));
   await user.click(screen.getByRole("button", { name: "history.recent" }));
+  expect(screen.getByText("history.recentHint")).toBeInTheDocument();
   expect(screen.getByText("Seña reciente")).toBeInTheDocument();
   expect(screen.queryByText("Seña antigua")).not.toBeInTheDocument();
 
   await user.click(screen.getByRole("button", { name: "history.recent" }));
   await user.click(screen.getByRole("button", { name: "history.old" }));
+  expect(screen.getByText("history.olderHint")).toBeInTheDocument();
+  expect(screen.queryByText("history.recentHint")).not.toBeInTheDocument();
   expect(screen.getByText("Seña antigua")).toBeInTheDocument();
   expect(screen.queryByText("Seña reciente")).not.toBeInTheDocument();
 });

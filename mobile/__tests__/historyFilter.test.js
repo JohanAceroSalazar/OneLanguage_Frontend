@@ -15,3 +15,15 @@ test("separates recent and older saved translations", () => {
 test("keeps all entries available in newest-first order", () => {
   expect(filterTranslations(translations, "all", now).map(({ id }) => id)).toEqual(["recent", "older", "unknown"]);
 });
+
+test("uses the same inclusive seven-day boundary as web", () => {
+  const cutoff = now - 7 * 24 * 60 * 60 * 1000;
+  const boundary = [
+    { id: "future", createdAt: new Date(now + 1000).toISOString() },
+    { id: "at-cutoff", createdAt: new Date(cutoff).toISOString() },
+    { id: "before-cutoff", createdAt: new Date(cutoff - 1).toISOString() },
+  ];
+
+  expect(filterTranslations(boundary, "recent", now).map(({ id }) => id)).toEqual(["at-cutoff"]);
+  expect(filterTranslations(boundary, "older", now).map(({ id }) => id)).toEqual(["before-cutoff"]);
+});

@@ -184,6 +184,13 @@ export default function UserProfile() {
         router.replace("/(auth)/login");
     };
 
+    const confirmLogout = () => {
+        Alert.alert(t("common.logout"), t("profile.logoutQuestion"), [
+            { text: t("common.cancel"), style: "cancel" },
+            { text: t("profile.confirmLogout"), style: "destructive", onPress: () => void handleLogout() },
+        ]);
+    };
+
     return (
     <SwipeNavigation active="profile">
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
@@ -249,7 +256,7 @@ export default function UserProfile() {
         <TouchableOpacity
             activeOpacity={0.85}
             style={[styles.logoutButton, compactProfile && styles.compactLogoutButton]}
-            onPress={handleLogout}
+            onPress={confirmLogout}
         >
           <Text
             style={[

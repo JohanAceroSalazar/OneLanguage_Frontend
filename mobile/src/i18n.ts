@@ -187,6 +187,15 @@ const historyFilterLabels = {
 for (const [language, labels] of Object.entries(historyFilterLabels)) {
   Object.assign((text as any)[language].translation, labels);
 }
+const logoutConfirmationLabels = {
+  es: { "profile.logoutQuestion": "¿Está seguro que desea cerrar sesión?", "profile.confirmLogout": "Cerrar sesión" },
+  en: { "profile.logoutQuestion": "Are you sure you want to log out?", "profile.confirmLogout": "Log out" },
+  pt: { "profile.logoutQuestion": "Tem certeza de que deseja sair?", "profile.confirmLogout": "Sair" },
+  it: { "profile.logoutQuestion": "Sei sicuro di voler uscire?", "profile.confirmLogout": "Esci" },
+};
+for (const [language, labels] of Object.entries(logoutConfirmationLabels)) {
+  Object.assign((text as any)[language].translation, labels);
+}
 const frameProcessingLabels = {
   es: "No se pudo procesar una imagen de la camara. Intentando de nuevo...",
   en: "A camera image could not be processed. Retrying...",

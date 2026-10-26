@@ -120,6 +120,13 @@
     margin-right: auto;
 }
 
+.history-filter-hint {
+    width: min(100%, 880px);
+    margin: 8px auto 0;
+    color: var(--color-text-on-page);
+    font-size: 13px;
+}
+
 .filter-wrapper {
     position: relative;
 }

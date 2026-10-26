@@ -183,6 +183,8 @@ function History() {
                         <button className="delete-all-btn" type="button" onClick={() => setDeleteAllDialogOpen(true)} disabled={deletingId === "all"} aria-label={t("history.deleteAll")} title={t("history.deleteAll")}><FaTrash aria-hidden="true" /></button>
                     </div>
 
+                    {activeFilter !== "all" && <p className="history-filter-hint">{t(`history.${activeFilter}Hint`)}</p>}
+
                     <div className="history-list">
                         {visibleTranslations.length === 0 && <p className="history-filter-empty">{t("history.noMatches")}</p>}
                         {visibleTranslations.map((translation) => (

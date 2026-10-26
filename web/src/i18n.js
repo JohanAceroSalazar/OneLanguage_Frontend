@@ -146,10 +146,10 @@ const historyFilterUi = {
 for (const language of Object.keys(historyFilterUi)) Object.assign(resources[language].translation, historyFilterUi[language]);
 
 const historyFilterDetails = {
-  es: { "history.recent": "Recientes (7 días)", "history.old": "Antiguos", "history.noMatches": "No hay traducciones en este período." },
-  en: { "history.recent": "Recent (7 days)", "history.old": "Older", "history.noMatches": "No translations in this period." },
-  pt: { "history.recent": "Recentes (7 dias)", "history.old": "Antigos", "history.noMatches": "Nenhuma tradução neste período." },
-  it: { "history.recent": "Recenti (7 giorni)", "history.old": "Precedenti", "history.noMatches": "Nessuna traduzione in questo periodo." }
+  es: { "history.recentHint": "Últimos 7 días", "history.olderHint": "Más de 7 días", "history.noMatches": "No hay traducciones en este período." },
+  en: { "history.recentHint": "Last 7 days", "history.olderHint": "More than 7 days ago", "history.noMatches": "No translations in this period." },
+  pt: { "history.recentHint": "Últimos 7 dias", "history.olderHint": "Mais de 7 dias", "history.noMatches": "Nenhuma tradução neste período." },
+  it: { "history.old": "Precedenti", "history.recentHint": "Ultimi 7 giorni", "history.olderHint": "Oltre 7 giorni fa", "history.noMatches": "Nessuna traduzione in questo periodo." }
 };
 for (const language of Object.keys(historyFilterDetails)) Object.assign(resources[language].translation, historyFilterDetails[language]);
 
