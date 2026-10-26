@@ -7,8 +7,8 @@ import BrandLogo from "../../components/BrandLogo/BrandLogo";
 import NavBar from "../../components/NavBar/NavBar";
 import { clearAuthSession } from "../../services/authSession";
 import { getCurrentUser } from "../../services/authService";
-import i18n from "../../i18n";
 import { readStoredAccessibility } from "../../services/accessibilityStorage";
+import { applyAccessibilitySettings } from "../../services/accessibilityService";
 import { getFeaturePermissions, setFeaturePermission } from "../../services/featurePermissionService";
 import PermissionDialog from "../../components/PermissionDialog";
 
@@ -56,8 +56,8 @@ function Profile() {
 
     const handleLogout = () => {
         clearAuthSession();
-        i18n.changeLanguage(readStoredAccessibility().language);
-        navigate("/login", { replace: true });
+        applyAccessibilitySettings(readStoredAccessibility(null));
+        navigate("/", { replace: true });
     };
 
     const updateFeaturePermission = async (feature, enabled) => {

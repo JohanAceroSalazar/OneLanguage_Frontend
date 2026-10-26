@@ -14,19 +14,19 @@ import Profile from "../pages/profile/Profile";
 
 beforeEach(() => localStorage.clear());
 
-it("clears the session and returns to login after confirmation", async () => {
+it("clears the session and returns to the landing page after confirmation", async () => {
   localStorage.setItem("token", "active-session");
   localStorage.setItem("user", JSON.stringify({ fullName: "Ana Perez" }));
 
   render(<MemoryRouter initialEntries={["/profile"]}><Routes>
     <Route path="/profile" element={<Profile />} />
-    <Route path="/login" element={<div>Login público</div>} />
+    <Route path="/" element={<div>Landing público</div>} />
   </Routes></MemoryRouter>);
 
   await userEvent.setup().click(screen.getByRole("button", { name: "common.logout" }));
   await userEvent.setup().click(screen.getByRole("button", { name: "profile.confirmLogout" }));
 
-  expect(screen.getByText("Login público")).toBeInTheDocument();
+  expect(screen.getByText("Landing público")).toBeInTheDocument();
   expect(localStorage.getItem("token")).toBeNull();
   expect(localStorage.getItem("user")).toBeNull();
 });

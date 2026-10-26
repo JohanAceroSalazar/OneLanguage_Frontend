@@ -1,5 +1,4 @@
-import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
-import { hasValidSession } from "../services/authSession";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ThemeBootstrap from "../components/ThemeBootstrap/ThemeBootstrap";
 import Register from "../pages/register/Register";
 import Login from "../pages/login/Login";
@@ -13,16 +12,16 @@ import Accessibility from "../pages/accessibility/Accessibility";
 import Profile from "../pages/profile/Profile";
 import ResetPassword from "../pages/resetpassword/ResetPassword";
 import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute";
+import PublicRoute from "../components/PublicRoute";
 
 function AppRoutes() {
-    const publicPage = (page) => hasValidSession() ? <Navigate to="/home" replace /> : page;
     return (
     <BrowserRouter>
         <ThemeBootstrap />
         <Routes>
-            <Route path="/" element={publicPage(<Landing />)} />
-            <Route path="/register" element={publicPage(<Register />)} />
-            <Route path="/login" element={publicPage(<Login />)} />
+            <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
+            <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+            <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
