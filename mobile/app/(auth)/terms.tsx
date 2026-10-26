@@ -3,9 +3,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
+import { PublicLanguagePicker, withPublicLanguage } from "../../components/public-language-screen";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function Terms() {
+function Terms() {
     const { t } = useTranslation();
 
     const router = useRouter();
@@ -23,6 +24,7 @@ export default function Terms() {
                 <Ionicons name="arrow-back" size={22} color={colors.textOnSurface} />
             </TouchableOpacity>
             <Text style={[styles.title, { color: colors.text, fontSize: 24 * fontScale }]}>{t("terms.title")}</Text>
+            <PublicLanguagePicker />
         </View>
 
         <Text style={[styles.paragraph, { color: colors.text, fontSize: 14 * fontScale }]}>{t("terms.app")}</Text>
@@ -114,5 +116,7 @@ const styles = StyleSheet.create({
         color: "#000",
     },
 });
+
+export default withPublicLanguage(Terms);
 
 
