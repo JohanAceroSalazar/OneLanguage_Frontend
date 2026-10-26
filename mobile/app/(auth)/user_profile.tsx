@@ -4,8 +4,8 @@ import * as Speech from "expo-speech";
 import { useRouter } from "expo-router";
 import {
     Alert,
+    Linking,
     Image,
-    Modal,
     ScrollView,
     StyleSheet,
     Text,
@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { BottomNav } from "../../components/bottom-nav";
+import { FeaturePermissionDialog } from "../../components/feature-permission-dialog";
 import { BrandWordmark } from "../../components/brand-wordmark";
 import { useMainPager } from "../../components/main-pager-context";
 import { SwipeNavigation } from "../../components/swipe-navigation";
@@ -40,7 +41,14 @@ type PermissionItemProps = {
 };
 
 function PermissionItem({ icon, title, description, active, loading, onPress }: PermissionItemProps) {
-    const { colors, fontScale } = useTheme();
+    const { colors: themeColors, theme, fontScale } = useTheme();
+    const colors = theme === "light" ? {
+        ...themeColors, surfaceAlt: "#f5f8ff", textOnSurface: "#111827", textMuted: "#4b5563",
+        primary: "#3A78C2", border: "#ffffff",
+    } : {
+        ...themeColors, textOnSurface: "#f8fafc", textMuted: "#cbd5e1",
+        primary: "#8dc5ff", border: "#e2e8f0",
+    };
     const { t } = useTranslation();
 
     return (
@@ -70,11 +78,21 @@ function PermissionItem({ icon, title, description, active, loading, onPress }: 
 export default function UserProfile() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const { colors, fontScale, setThemeMode, setFontSizeMode } = useTheme();
-    const { width } = useWindowDimensions();
-    const stackPermissionActions = width < 360 || fontScale > 1;
+    const { height } = useWindowDimensions();
+    const { colors: themeColors, theme, fontScale, setThemeMode, setFontSizeMode } = useTheme();
+    const colors = theme === "light" ? {
+        ...themeColors, background: "#3A78C2", surfaceAlt: "#f5f8ff", textOnSurface: "#111827",
+        textMuted: "#4b5563", primary: "#3A78C2", border: "#ffffff",
+    } : {
+        ...themeColors, background: "#05050B", textOnSurface: "#f8fafc", textMuted: "#cbd5e1",
+        primary: "#8dc5ff", border: "#e2e8f0",
+    };
     const { t } = useTranslation();
     const mainPager = useMainPager();
+    const compactProfile = fontScale > 1 || height < 800;
+    const [viewportHeight, setViewportHeight] = useState(0);
+    const [contentHeight, setContentHeight] = useState(0);
+    const profileOverflows = viewportHeight > 0 && contentHeight > viewportHeight + 2;
     const [user, setUser] = useState<any>(null);
     const [featurePermissions, setFeaturePermissions] = useState<FeaturePermissions>({ camera: false, audio: false });
     const [updatingPermission, setUpdatingPermission] = useState<FeaturePermission | null>(null);
@@ -97,12 +115,22 @@ export default function UserProfile() {
 }, [router]);
 
     useEffect(() => {
-        getFeaturePermissions().then(setFeaturePermissions).catch(() => undefined);
+        const loadPermissions = async () => {
+            const settings = await getFeaturePermissions();
+            const camera = await Camera.getCameraPermissionsAsync();
+            setFeaturePermissions({ ...settings, camera: settings.camera && camera.granted });
+        };
+        void loadPermissions().catch(() => undefined);
     }, []);
 
     useEffect(() => {
         if (mainPager?.activeTab === "profile") {
-            getFeaturePermissions().then(setFeaturePermissions).catch(() => undefined);
+            const loadPermissions = async () => {
+                const settings = await getFeaturePermissions();
+                const camera = await Camera.getCameraPermissionsAsync();
+                setFeaturePermissions({ ...settings, camera: settings.camera && camera.granted });
+            };
+            void loadPermissions().catch(() => undefined);
         }
     }, [mainPager?.activeTab]);
 
@@ -116,7 +144,10 @@ export default function UserProfile() {
             }
 
             if (!granted) {
-                Alert.alert(t("profile.permissions"), t("profile.permissionDenied"));
+                Alert.alert(t("profile.permissions"), t("profile.permissionDenied"), [
+                    { text: t("common.cancel"), style: "cancel" },
+                    { text: t("profile.openSettings", "Abrir ajustes"), onPress: () => void Linking.openSettings() },
+                ]);
                 return;
             }
             setFeaturePermissions(await setFeaturePermission(feature, true));
@@ -137,9 +168,6 @@ export default function UserProfile() {
         if (feature === "audio") Speech.stop();
     };
 
-    const promptTitle = permissionPrompt ? t(`profile.${permissionPrompt}PermissionTitle`) : "";
-    const promptMessage = permissionPrompt ? t(`profile.${permissionPrompt}PermissionMessage`) : "";
-
     const confirmPermission = () => {
         if (!permissionPrompt) return;
         const feature = permissionPrompt;
@@ -156,12 +184,22 @@ export default function UserProfile() {
         router.replace("/(auth)/login");
     };
 
+    const confirmLogout = () => {
+        Alert.alert(t("common.logout"), t("profile.logoutQuestion"), [
+            { text: t("common.cancel"), style: "cancel" },
+            { text: t("profile.confirmLogout"), style: "destructive", onPress: () => void handleLogout() },
+        ]);
+    };
+
     return (
     <SwipeNavigation active="profile">
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}> 
         <ScrollView
-        contentContainerStyle={[styles.content, { paddingBottom: 86 + Math.max(insets.bottom, 8) }]}
-        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.content, compactProfile && styles.compactContent, { paddingBottom: 86 + Math.max(insets.bottom, 8) }]}
+        onLayout={(event) => setViewportHeight(event.nativeEvent.layout.height)}
+        onContentSizeChange={(_, nextHeight) => setContentHeight(nextHeight)}
+        scrollEnabled={profileOverflows}
+        showsVerticalScrollIndicator={profileOverflows}
     >
         <View style={styles.header}>
             <BrandWordmark color={colors.text} style={styles.logo} />
@@ -172,17 +210,15 @@ export default function UserProfile() {
         />
         </View>
 
-        <Text style={[styles.title, { color: colors.text, fontSize: 26 * fontScale }]}>{t("profile.title")}</Text>
+        <Text style={[styles.title, compactProfile && styles.compactTitle, { color: colors.text, fontSize: 26 * fontScale }]}>{t("profile.title")}</Text>
 
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-            <View style={styles.sectionHeader}>
+        <View style={[styles.card, compactProfile && styles.compactCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.sectionHeader, compactProfile && styles.compactSectionHeader]}>
             <Ionicons name="person-circle" size={34} color={colors.primary} />
 
             <View>
                 <Text style={[styles.sectionTitle, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>{t("profile.personal")}</Text>
-                <Text style={[styles.sectionSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}> 
-                {t("profile.personalText")}
-            </Text>
+                {!compactProfile && <Text style={[styles.sectionSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}>{t("profile.personalText")}</Text>}
             </View>
         </View>
 
@@ -197,9 +233,7 @@ export default function UserProfile() {
         </Text>
 
         <Text style={[styles.permissionsTitle, { color: colors.textOnSurface, fontSize: 18 * fontScale }]}>{t("profile.permissions")}</Text>
-        <Text style={[styles.permissionsSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}> 
-            {t("profile.permissionsText")}
-        </Text>
+        {!compactProfile && <Text style={[styles.permissionsSubtitle, { color: colors.textMuted, fontSize: 13 * fontScale }]}>{t("profile.permissionsText")}</Text>}
 
         <PermissionItem
             icon="camera-outline"
@@ -221,8 +255,8 @@ export default function UserProfile() {
 
         <TouchableOpacity
             activeOpacity={0.85}
-            style={styles.logoutButton}
-            onPress={handleLogout}
+            style={[styles.logoutButton, compactProfile && styles.compactLogoutButton]}
+            onPress={confirmLogout}
         >
           <Text
             style={[
@@ -235,31 +269,7 @@ export default function UserProfile() {
         </TouchableOpacity>
     </ScrollView>
 
-        <Modal visible={permissionPrompt !== null} transparent animationType="fade" statusBarTranslucent onRequestClose={() => setPermissionPrompt(null)}>
-            <SafeAreaView edges={["top", "right", "bottom", "left"]} style={styles.permissionModalSafeArea}>
-            <View style={styles.permissionBackdrop}>
-                <View style={[styles.permissionDialogShell, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <ScrollView
-                    style={styles.permissionDialogScroll}
-                    contentContainerStyle={styles.permissionDialogContent}
-                    showsVerticalScrollIndicator={false}
-                    bounces={false}
-                >
-                    <Text style={[styles.permissionDialogTitle, { color: colors.textOnSurface, fontSize: 27 * fontScale }]}>{promptTitle}</Text>
-                    <Text style={[styles.permissionDialogText, { color: colors.textOnSurface, fontSize: 17 * fontScale }]}>{promptMessage}</Text>
-                    <View style={[styles.permissionDialogActions, stackPermissionActions && styles.permissionDialogActionsStacked]}>
-                        <TouchableOpacity activeOpacity={0.85} onPress={confirmPermission} style={[styles.permissionDialogButton, stackPermissionActions && styles.permissionDialogButtonStacked, { backgroundColor: colors.accent }]}>
-                            <Text style={[styles.permissionDialogButtonText, { color: colors.accentText, fontSize: 17 * fontScale }]}>{t("common.activate")}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity activeOpacity={0.85} onPress={() => setPermissionPrompt(null)} style={[styles.permissionDialogButton, stackPermissionActions && styles.permissionDialogButtonStacked, { backgroundColor: colors.accent }]}>
-                            <Text style={[styles.permissionDialogButtonText, { color: colors.accentText, fontSize: 17 * fontScale }]}>{t("cameraPermission.reject")}</Text>
-                        </TouchableOpacity>
-                    </View>
-                </ScrollView>
-                </View>
-            </View>
-            </SafeAreaView>
-        </Modal>
+        <FeaturePermissionDialog feature={permissionPrompt} onActivate={confirmPermission} onClose={() => setPermissionPrompt(null)} />
 
         <BottomNav active="profile" />
     </SafeAreaView>
@@ -277,6 +287,7 @@ content: {
     paddingTop: 20,
     paddingBottom: 105,
     },
+compactContent: { paddingTop: 10 },
 header: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -297,6 +308,7 @@ title: {
     marginTop: 32,
     marginLeft: 8,
     },
+compactTitle: { marginTop: 10 },
 card: {
     width: "100%",
     marginTop: 18,
@@ -308,12 +320,14 @@ card: {
     paddingTop: 15,
     paddingBottom: 18,
     },
+compactCard: { marginTop: 8, paddingTop: 10, paddingBottom: 6 },
 sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: 9,
     marginBottom: 20,
     },
+compactSectionHeader: { marginBottom: 8 },
 sectionTitle: {
     color: "#000000",
     fontSize: 18,
@@ -414,61 +428,6 @@ activatedButton: {
     opacity: 1,
     },
 permissionButtonDisabled: { opacity: 0.65 },
-permissionBackdrop: {
-    flex: 1,
-    padding: 16,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(11, 43, 80, 0.56)",
-    },
-permissionModalSafeArea: {
-    flex: 1,
-    },
-permissionDialogShell: {
-    width: "100%",
-    maxWidth: 420,
-    maxHeight: "92%",
-    borderWidth: 2,
-    borderRadius: 20,
-    overflow: "hidden",
-    },
-permissionDialogScroll: { width: "100%" },
-permissionDialogContent: {
-    paddingVertical: 24,
-    paddingHorizontal: 20,
-    flexGrow: 1,
-    },
-permissionDialogTitle: {
-    fontWeight: "700",
-    lineHeight: 33,
-    textAlign: "center",
-    },
-permissionDialogText: {
-    marginTop: 16,
-    lineHeight: 24,
-    textAlign: "center",
-    },
-permissionDialogActions: {
-    flexDirection: "row",
-    gap: 14,
-    marginTop: 28,
-    },
-permissionDialogActionsStacked: {
-    flexDirection: "column",
-    gap: 10,
-    },
-permissionDialogButton: {
-    flex: 1,
-    minHeight: 48,
-    borderWidth: 1,
-    borderColor: "#111827",
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 10,
-    },
-permissionDialogButtonStacked: { width: "100%", flex: 0 },
-permissionDialogButtonText: { fontWeight: "600", textAlign: "center" },
 activateText: {
     color: "#000000",
     fontSize: 13,
@@ -488,6 +447,7 @@ logoutButton: {
     shadowRadius: 8,
     elevation: 3,
     },
+compactLogoutButton: { marginTop: 8, paddingVertical: 10 },
 logoutText: {
     color: "#FFFFFF",
     fontSize: 20,

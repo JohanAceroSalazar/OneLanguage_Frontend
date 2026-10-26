@@ -24,6 +24,8 @@ api.interceptors.request.use(
     const token = getValidToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      // A delayed response must not redirect after the user has already logged out.
+      config.authSessionToken = token;
     }
     return config;
   },
@@ -33,9 +35,14 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    const requestToken = error.config?.authSessionToken;
+    const activeToken = getValidToken();
+
     if (
       error.response?.status === 401 &&
-      !isPublicAuthenticationRequest(error.config?.url)
+      !isPublicAuthenticationRequest(error.config?.url) &&
+      requestToken &&
+      requestToken === activeToken
     ) {
       endSessionAndRedirectToLogin();
     }

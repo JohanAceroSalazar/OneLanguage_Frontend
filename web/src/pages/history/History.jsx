@@ -5,6 +5,7 @@ import NavBar from "../../components/NavBar/NavBar";
 import { deleteAllTranslations, deleteTranslation, getTranslationRecording, getTranslations } from "../../services/translationService";
 import "./History.css";
 import { useTranslation } from "react-i18next";
+import { filterTranslations } from "./historyFilter";
 
 function formatDate(dateValue, language, t) {
     if (!dateValue) return t("history.dateUnavailable");
@@ -19,7 +20,7 @@ function History() {
     const { t, i18n } = useTranslation();
     const [translations, setTranslations] = useState([]);
     const [filterOpen, setFilterOpen] = useState(false);
-    const [sortOrder, setSortOrder] = useState("newest");
+    const [activeFilter, setActiveFilter] = useState("all");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [deletingId, setDeletingId] = useState(null);
@@ -59,24 +60,15 @@ function History() {
     }, []);
 
     const filterOptions = [
-        { value: "newest", label: t("history.recent") },
-        { value: "oldest", label: t("history.old") },
+        { value: "recent", label: t("history.recent") },
+        { value: "older", label: t("history.old") },
         { value: "all", label: t("history.all") },
     ];
 
-    const visibleTranslations = useMemo(() => {
-        const items = [...translations];
-        if (sortOrder === "all") return items;
+    const visibleTranslations = useMemo(() => filterTranslations(translations, activeFilter), [activeFilter, translations]);
 
-        return items.sort((first, second) => {
-            const firstDate = new Date(first.createdAt).getTime();
-            const secondDate = new Date(second.createdAt).getTime();
-            return sortOrder === "newest" ? secondDate - firstDate : firstDate - secondDate;
-        });
-    }, [sortOrder, translations]);
-
-    const selectSortOrder = (nextOrder) => {
-        setSortOrder(nextOrder);
+    const selectFilter = (nextFilter) => {
+        setActiveFilter(nextFilter);
         setFilterOpen(false);
     };
 
@@ -165,7 +157,7 @@ function History() {
             {error && <p className="history-error" role="alert">{error}</p>}
             {loading ? (
                 <div className="history-empty"><p className="empty-text">{t("history.loading")}</p></div>
-            ) : visibleTranslations.length === 0 ? (
+            ) : translations.length === 0 ? (
                 <div className="history-empty">
                     <div className="history-card">
                         <FaCamera size={48} color="currentColor" />
@@ -178,12 +170,12 @@ function History() {
                     <div className="history-controls">
                         <div className="filter-wrapper" ref={filterRef}>
                             <button className="filter-btn" type="button" onClick={() => setFilterOpen((open) => !open)}>
-                                {filterOptions.find((option) => option.value === sortOrder)?.label} <FaChevronDown aria-hidden="true" />
+                                {filterOptions.find((option) => option.value === activeFilter)?.label} <FaChevronDown aria-hidden="true" />
                             </button>
                             {filterOpen && (
                                 <div className="filter-dropdown">
                                     {filterOptions.map((option) => (
-                                        <button type="button" key={option.value} onClick={() => selectSortOrder(option.value)}>{option.label}</button>
+                                        <button type="button" key={option.value} onClick={() => selectFilter(option.value)}>{option.label}</button>
                                     ))}
                                 </div>
                             )}
@@ -191,7 +183,10 @@ function History() {
                         <button className="delete-all-btn" type="button" onClick={() => setDeleteAllDialogOpen(true)} disabled={deletingId === "all"} aria-label={t("history.deleteAll")} title={t("history.deleteAll")}><FaTrash aria-hidden="true" /></button>
                     </div>
 
+                    {activeFilter !== "all" && <p className="history-filter-hint">{t(`history.${activeFilter}Hint`)}</p>}
+
                     <div className="history-list">
+                        {visibleTranslations.length === 0 && <p className="history-filter-empty">{t("history.noMatches")}</p>}
                         {visibleTranslations.map((translation) => (
                             <article key={translation.id} className="history-item">
                                 <div className="history-item-img"><FaCamera size={24} color="white" aria-hidden="true" /></div>

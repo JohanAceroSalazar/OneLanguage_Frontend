@@ -31,41 +31,41 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 const lightColors = {
-  background: "#3A78C2",
+  background: "#3a78c2",
   surface: "#ffffff",
-  surfaceAlt: "#f5f8ff",
+  surfaceAlt: "#f9f9f9",
   text: "#ffffff",
-  textOnSurface: "#111827",
-  textMuted: "#4b5563",
-  primary: "#3A78C2",
-  primaryStrong: "#2f78cc",
+  textOnSurface: "#0f172a",
+  textMuted: "#5f6b7a",
+  primary: "#3a78c2",
+  primaryStrong: "#2f68b4",
   navigation: "#1D1B3D",
-  border: "#ffffff",
+  border: "#cbd5e1",
   accent: "#F4DC2E",
-  accentText: "#111827",
-  shadow: "rgba(0, 0, 0, 0.16)",
+  accentText: "#0f172a",
+  shadow: "rgba(6, 20, 43, 0.2)",
 };
 
 const darkColors = {
-  background: "#05050B",
+  background: "#081220",
   surface: "#111827",
   surfaceAlt: "#1f2937",
   text: "#f8fafc",
-  textOnSurface: "#f8fafc",
-  textMuted: "#cbd5e1",
-  primary: "#8dc5ff",
+  textOnSurface: "#e5eef9",
+  textMuted: "#a7b3c4",
+  primary: "#081220",
   primaryStrong: "#0f172a",
   navigation: "#111827",
-  border: "#e2e8f0",
+  border: "rgba(148, 163, 184, 0.24)",
   accent: "#f4dc2e",
   accentText: "#111827",
-  shadow: "rgba(0, 0, 0, 0.45)",
+  shadow: "rgba(0, 0, 0, 0.38)",
 };
 
 const fontScaleMap: Record<FontSizeMode, number> = {
-  small: 0.9,
+  small: 0.92,
   medium: 1,
-  large: 1.16,
+  large: 1.08,
 };
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {

@@ -37,8 +37,17 @@ describe("API authentication interceptors", () => {
   });
 
   it("ends the session after a protected 401", async () => {
+    getValidToken.mockReturnValue("signed-token");
     await expect(api.get("/api/users/me", { adapter: unauthorized })).rejects.toBeInstanceOf(AxiosError);
     expect(endSessionAndRedirectToLogin).toHaveBeenCalledOnce();
+  });
+
+  it("does not redirect when a protected request fails after logout", async () => {
+    getValidToken.mockReturnValueOnce("signed-token").mockReturnValueOnce(null);
+
+    await expect(api.get("/api/users/me", { adapter: unauthorized })).rejects.toBeInstanceOf(AxiosError);
+
+    expect(endSessionAndRedirectToLogin).not.toHaveBeenCalled();
   });
 
   it.each(["/auth/login", "/auth/forgot-password", "/auth/reset-password", "/api/users"])(

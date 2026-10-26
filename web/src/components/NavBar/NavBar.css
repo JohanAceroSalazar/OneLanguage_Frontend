@@ -8,6 +8,15 @@
     flex-wrap: nowrap;
 }
 
+@media (min-width: 1025px) {
+    .app-navbar {
+        position: fixed;
+        top: 20px;
+        right: 24px;
+        z-index: 50;
+    }
+}
+
 .app-navbar button {
     box-shadow: none;
 }

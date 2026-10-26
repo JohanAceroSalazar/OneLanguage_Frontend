@@ -9,7 +9,7 @@
     padding: 20px 24px;
     font-family: Arial, sans-serif;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
 .access-header {
@@ -51,6 +51,8 @@
 
 .access-card {
     background: var(--color-surface);
+    min-height: 0;
+    overflow-y: auto;
     border-radius: 18px;
     padding: 42px 48px;
     margin: auto;
@@ -259,7 +261,8 @@
     .access-card {
         max-width: 100%;
         padding: 26px 20px;
-        margin: 28px auto;
+        margin: 16px auto;
+        overflow-y: hidden;
     }
 
     .access-row {

@@ -9,7 +9,7 @@
     padding: 20px 24px;
     font-family: Arial, sans-serif;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
 .home-header {

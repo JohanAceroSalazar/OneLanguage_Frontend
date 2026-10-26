@@ -9,7 +9,7 @@
     padding: 20px 24px;
     font-family: Arial, sans-serif;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
 .profile-header {
@@ -18,7 +18,7 @@
     align-items: center;
     width: 100%;
     gap: 16px;
-    flex-wrap: wrap;
+    flex-shrink: 0;
 }
 
 .profile-logo {
@@ -58,16 +58,21 @@
 
 .profile-card {
     background: var(--color-surface);
+    min-height: 0;
+    overflow: hidden;
     border-radius: 18px;
-    padding: 24px;
-    margin-top: 16px;
+    padding: clamp(22px, 3vw, 36px);
+    margin-block: auto;
     width: 100%;
-    max-width: 700px;
+    max-width: 760px;
+    min-height: min(500px, calc(100% - 80px));
     align-self: center;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: clamp(14px, 2vh, 24px);
+    justify-content: center;
     box-shadow: var(--color-shadow);
+    flex: 0 1 auto;
 }
 
 .profile-section {
@@ -390,12 +395,32 @@
     .profile-header { flex-direction: column; align-items: flex-start; gap: 12px; }
     .navbar { gap: 10px; justify-content: flex-start; }
     .nav-item { font-size: 14px; }
-    .profile-card { max-width: 100%; }
-    .profile-section { flex-direction: column; }
+    .profile-card { max-width: 100%; min-height: 0; margin: 16px auto; overflow: hidden; }
+    .profile-section { flex-direction: row; }
+    .profile-avatar-col { display: none; }
     .profile-header-title { display: none; }
-    .permission-row { flex-direction: column; align-items: stretch; }
+    .permission-row { flex-direction: row; align-items: center; }
+    .permission-left { min-width: 0; }
+    .permission-row .perm-desc { display: none; }
+    .activate-btn { min-width: 96px; padding-inline: 8px; }
     .permission-card { max-width: 100%; min-height: 240px; padding: 48px 32px; }
     .yellow-btn { width: 100%; min-width: 0; padding: 16px 24px; font-size: 17px; }
     .modal-actions { flex-direction: column; width: 100%; }
     .modal-logout-btn, .modal-cancel-btn, .permission-modal-activate, .permission-modal-cancel { width: 100%; }
+}
+
+@media (max-width: 768px) and (max-height: 760px) {
+    .profile-container { padding-block: 10px; }
+    .profile-card { min-height: 0; gap: 8px; padding: 12px; }
+    .profile-avatar-col { padding-top: 0; }
+    .profile-avatar { width: 52px; height: 52px; }
+    .profile-section { gap: 8px; }
+    .profile-info-col { gap: 2px; }
+    .profile-value { padding: 6px 10px; }
+    .field-label { margin-top: 0; }
+    .permissions-section { gap: 6px; }
+    .permission-row { padding: 6px 10px; }
+    .section-subtitle, .perm-desc { display: none; }
+    .activate-btn { padding: 6px 12px; }
+    .logout-btn { padding: 8px; }
 }

@@ -18,7 +18,7 @@ body {
     padding: 32px 20px;
     background:
         radial-gradient(circle at top left, color-mix(in srgb, var(--color-accent) 20%, transparent), transparent 26%),
-        linear-gradient(135deg, var(--color-page-bg-alt) 0%, var(--color-page-bg) 55%, color-mix(in srgb, var(--color-page-bg) 72%, #000) 100%);
+        linear-gradient(135deg, var(--color-page-bg-alt) 0%, var(--color-page-bg) 55%, var(--color-page-bg) 100%);
     position: relative;
     overflow-x: hidden;
 }
@@ -50,6 +50,7 @@ body {
 
 .register-shell {
     width: min(100%, 1120px);
+    max-height: 100%;
     display: grid;
     grid-template-columns: 0.9fr 1.1fr;
     gap: clamp(24px, 5vw, 56px);
@@ -95,12 +96,13 @@ body {
     flex-direction: column;
     gap: 8px;
     color: var(--color-text);
-    box-shadow: var(--color-shadow);
+    box-shadow: none;
     border: 1px solid var(--color-border);
 }
 
 .register-form-column {
     width: 100%;
+    min-height: 0;
 }
 
 .register-form-title {
@@ -251,6 +253,9 @@ body {
     color: var(--color-text);
     border: 1px solid var(--color-border);
     box-shadow: var(--color-shadow);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
 .register-terms-header {
@@ -278,7 +283,8 @@ body {
 }
 
 .register-terms-body {
-    max-height: min(600px, calc(100dvh - 150px));
+    min-height: 0;
+    flex: 1;
     margin-top: 10px;
     overflow-y: auto;
     padding-right: 6px;
@@ -310,7 +316,7 @@ body {
     width: 100%;
     margin-top: 12px;
     background: var(--color-accent);
-    border:  2px solid black;;
+    border: 0;
     color: var(--color-accent-text);
     padding: 14px 18px;
     border-radius: 14px;
@@ -381,14 +387,14 @@ body {
 }
 
 @media (max-width: 980px) {
+    .register-container { padding: 10px 14px; }
     .register-shell {
         grid-template-columns: 1fr;
+        gap: 0;
     }
 
     .register-brand {
-        max-width: 100%;
-        text-align: center;
-        order: 0;
+        display: none;
     }
 
     .register-brand h1 {
@@ -397,7 +403,13 @@ body {
 
     .form-card {
         order: 1;
+        padding: 14px;
+        gap: 3px;
     }
+
+    .form-card input { padding-block: 8px; }
+    .form-step { display: none; }
+    .register-form-title { margin-bottom: 6px; font-size: 26px; }
 
     .register-form-column {
         order: 1;
@@ -406,12 +418,12 @@ body {
 
 @media (max-width: 640px) {
     .register-container {
-        padding: 18px 14px 26px;
+        padding: 8px 12px;
     }
 
     .form-card {
-        padding: 22px 18px;
-        border-radius: 24px;
+        padding: 12px;
+        border-radius: 8px;
     }
 
     .register-brand-copy {

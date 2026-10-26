@@ -8,7 +8,8 @@
     cursor: pointer;
     text-align: left;
     font: inherit;
-    width: clamp(112px, 18vw, 128px);
+    width: 150px;
+    flex: 0 0 150px;
     height: 44px;
     line-height: 22px;
 }
@@ -28,4 +29,9 @@
     outline: 2px solid var(--color-accent);
     outline-offset: 4px;
     border-radius: 8px;
+}
+
+@media (max-width: 380px) {
+    .brand-logo { width: 138px; flex-basis: 138px; }
+    .brand-logo span { font-size: 18px; }
 }

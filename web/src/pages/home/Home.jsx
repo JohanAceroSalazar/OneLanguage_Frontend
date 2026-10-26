@@ -1,49 +1,16 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BrandLogo from "../../components/BrandLogo/BrandLogo";
 import NavBar from "../../components/NavBar/NavBar";
-import { getFeaturePermissions, setFeaturePermission } from "../../services/featurePermissionService";
 import "./Home.css";
 import { useTranslation } from "react-i18next";
+import { firstName } from "../../services/displayName";
 
 function Home() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const userName = "usuario";
-    const [permissionDialogOpen, setPermissionDialogOpen] = useState(false);
-    const [permissionError, setPermissionError] = useState("");
-    const [requestingPermission, setRequestingPermission] = useState(false);
-
-    const requestCameraPermission = async () => {
-        setRequestingPermission(true);
-        setPermissionError("");
-        try {
-            if (!navigator.mediaDevices?.getUserMedia) throw new Error("camera_unavailable");
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-            stream.getTracks().forEach((track) => track.stop());
-            await setFeaturePermission("camera", true);
-            setPermissionDialogOpen(false);
-            navigate("/translate");
-        } catch {
-            setPermissionError(t("cameraPermission.error"));
-        } finally {
-            setRequestingPermission(false);
-        }
-    };
-
-    const openTranslator = async () => {
-        try {
-            if ((await getFeaturePermissions()).camera) {
-                navigate("/translate");
-                return;
-            }
-        } catch {
-            // Ask for camera access again when the persisted setting cannot be loaded.
-        }
-        setPermissionError("");
-        setPermissionDialogOpen(true);
-    };
-
+    let storedUser = null;
+    try { storedUser = JSON.parse(localStorage.getItem("user") || "null"); } catch { /* No cached profile. */ }
+    const userName = firstName(storedUser) || t("home.fallbackName", "usuario");
     return (
         <div className="home-container">
 
@@ -60,27 +27,10 @@ function Home() {
             <div className="home-card">
                 <h1>{t("home.title")}</h1>
                 <p>{t("home.description")}</p>
-                <button className="home-btn" onClick={() => void openTranslator()}>
+                <button className="home-btn" onClick={() => navigate("/translate")}>
                     {t("home.start")}
                 </button>
             </div>
-
-            {permissionDialogOpen ? <div className="camera-permission-backdrop" role="presentation">
-                <section className="camera-permission-dialog" role="dialog" aria-modal="true" aria-labelledby="camera-permission-title">
-                    <h2 id="camera-permission-title">{t("cameraPermission.title")}</h2>
-                    <p>{t("cameraPermission.message")}</p>
-                    <p className="camera-permission-privacy">{t("cameraPermission.privacy")}</p>
-                    {permissionError ? <p className="camera-permission-error" role="alert">{permissionError}</p> : null}
-                    <div className="camera-permission-actions">
-                        <button type="button" className="camera-permission-button" disabled={requestingPermission} onClick={requestCameraPermission}>
-                            {requestingPermission ? t("cameraPermission.requesting") : t("common.ok")}
-                        </button>
-                        <button type="button" className="camera-permission-button" disabled={requestingPermission} onClick={() => setPermissionDialogOpen(false)}>
-                            {t("cameraPermission.reject")}
-                        </button>
-                    </div>
-                </section>
-            </div> : null}
 
         </div>
     );

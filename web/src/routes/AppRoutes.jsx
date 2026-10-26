@@ -12,15 +12,16 @@ import Accessibility from "../pages/accessibility/Accessibility";
 import Profile from "../pages/profile/Profile";
 import ResetPassword from "../pages/resetpassword/ResetPassword";
 import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute";
+import PublicRoute from "../components/PublicRoute";
 
 function AppRoutes() {
     return (
     <BrowserRouter>
         <ThemeBootstrap />
         <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
+            <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+            <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />

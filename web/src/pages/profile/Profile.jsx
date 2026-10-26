@@ -7,9 +7,10 @@ import BrandLogo from "../../components/BrandLogo/BrandLogo";
 import NavBar from "../../components/NavBar/NavBar";
 import { clearAuthSession } from "../../services/authSession";
 import { getCurrentUser } from "../../services/authService";
-import i18n from "../../i18n";
 import { readStoredAccessibility } from "../../services/accessibilityStorage";
+import { applyAccessibilitySettings } from "../../services/accessibilityService";
 import { getFeaturePermissions, setFeaturePermission } from "../../services/featurePermissionService";
+import PermissionDialog from "../../components/PermissionDialog";
 
 function Profile() {
     const { t } = useTranslation();
@@ -40,8 +41,9 @@ function Profile() {
             });
 
         getFeaturePermissions()
-            .then((permissions) => {
-                if (active) setFeaturePermissions(permissions);
+            .then(async (permissions) => {
+                const browserPermission = await navigator.permissions?.query({ name: "camera" }).catch(() => null);
+                if (active) setFeaturePermissions({ ...permissions, camera: permissions.camera && browserPermission?.state !== "denied" });
             })
             .catch(() => {
                 if (active) setProfileError(t("profile.loadError", "No se pudo cargar el perfil."));
@@ -54,8 +56,8 @@ function Profile() {
 
     const handleLogout = () => {
         clearAuthSession();
-        i18n.changeLanguage(readStoredAccessibility().language);
-        navigate("/login", { replace: true });
+        applyAccessibilitySettings(readStoredAccessibility(null));
+        navigate("/", { replace: true });
     };
 
     const updateFeaturePermission = async (feature, enabled) => {
@@ -69,7 +71,7 @@ function Profile() {
             }
             setFeaturePermissions(await setFeaturePermission(feature, enabled));
         } catch {
-            setProfileError(t("profile.permissionDenied"));
+            setProfileError(t("cameraPermission.error"));
         } finally {
             setUpdatingPermission(null);
         }
@@ -90,9 +92,6 @@ function Profile() {
         setPermissionPrompt(null);
         void updateFeaturePermission(feature, true);
     };
-
-    const permissionPromptTitle = permissionPrompt ? t(`profile.${permissionPrompt}PermissionTitle`) : "";
-    const permissionPromptMessage = permissionPrompt ? t(`profile.${permissionPrompt}PermissionMessage`) : "";
 
     // VISTA CÁMARA
     if (view === "camera") {
@@ -215,18 +214,7 @@ function Profile() {
                 </div>
             )}
 
-            {permissionPrompt && (
-                <div className="modal-overlay" role="presentation">
-                    <section className="modal-box permission-modal" role="dialog" aria-modal="true" aria-labelledby="permission-modal-title" aria-describedby="permission-modal-message">
-                        <h2 id="permission-modal-title" className="permission-modal-title">{permissionPromptTitle}</h2>
-                        <p id="permission-modal-message" className="modal-text">{permissionPromptMessage}</p>
-                        <div className="modal-actions">
-                            <button className="permission-modal-activate" type="button" onClick={confirmFeaturePermission}>{t("common.activate")}</button>
-                            <button className="permission-modal-cancel" type="button" onClick={() => setPermissionPrompt(null)}>{t("cameraPermission.reject")}</button>
-                        </div>
-                    </section>
-                </div>
-            )}
+            <PermissionDialog feature={permissionPrompt} onActivate={confirmFeaturePermission} onClose={() => setPermissionPrompt(null)} />
         </div>
     );
 }

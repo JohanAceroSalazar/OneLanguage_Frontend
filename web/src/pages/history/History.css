@@ -2,7 +2,8 @@
 
 .history-container {
     width: 100%;
-    min-height: 100dvh;
+    height: calc(100dvh / var(--app-text-scale));
+    min-height: 0;
     background: var(--color-page-bg);
     display: flex;
     flex-direction: column;
@@ -117,6 +118,13 @@
     width: min(100%, 880px);
     margin-left: auto;
     margin-right: auto;
+}
+
+.history-filter-hint {
+    width: min(100%, 880px);
+    margin: 8px auto 0;
+    color: var(--color-text-on-page);
+    font-size: 13px;
 }
 
 .filter-wrapper {
@@ -253,7 +261,13 @@
     width: min(100%, 880px);
     align-self: center;
     overscroll-behavior: contain;
-    scrollbar-gutter: stable;
+    scrollbar-gutter: auto;
+}
+
+.history-filter-empty {
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--color-text-on-page);
 }
 
 .history-item {
@@ -356,16 +370,16 @@
 
 @media (max-width: 768px) {
     .history-container {
-        height: auto;
-        min-height: 100dvh;
+        height: calc(100dvh / var(--app-text-scale));
+        min-height: 0;
         padding: 16px;
-        overflow-y: auto;
+        overflow-y: hidden;
     }
     .history-header { flex-direction: column; align-items: flex-start; gap: 12px; }
     .navbar { gap: 10px; justify-content: flex-start; }
     .nav-item { font-size: 14px; }
     .history-title-section { margin-top: 24px; }
-    .history-controls { flex-direction: column; align-items: flex-start; width: 100%; }
+    .history-controls { flex-wrap: wrap; width: 100%; margin-top: 14px; }
     .history-card { max-width: 100%; }
     .history-item { align-items: flex-start; }
     .history-recording { padding-left: 0; }

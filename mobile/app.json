@@ -39,9 +39,9 @@
           "image": "./assets/images/Logo.png",
           "imageWidth": 140,
           "resizeMode": "contain",
-          "backgroundColor": "#06142B",
+          "backgroundColor": "#3A78C2",
           "dark": {
-            "backgroundColor": "#06142B"
+            "backgroundColor": "#3A78C2"
           }
         }
       ],
