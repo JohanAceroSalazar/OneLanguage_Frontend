@@ -17,6 +17,10 @@ jest.mock("react-native-safe-area-context", () => {
   return { SafeAreaView: View, useSafeAreaInsets: () => ({ bottom: 0 }) };
 });
 jest.mock("../components/brand-wordmark", () => ({ BrandWordmark: () => null }));
+jest.mock("../components/public-language-screen", () => ({
+  withPublicLanguage: (Screen) => Screen,
+  PublicLanguagePicker: () => null,
+}));
 jest.mock("../components/app-alert", () => {
   const React = require("react");
   const { Text, View } = require("react-native");

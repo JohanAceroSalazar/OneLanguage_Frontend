@@ -4,6 +4,7 @@ import { FiArrowRight, FiShield, FiStar, FiUsers } from "react-icons/fi";
 import logo from "../../assets/Logo.png";
 import "./Landing.css";
 import { useTranslation } from "react-i18next";
+import { PublicLanguagePicker } from "../../components/PublicLanguageLayout";
 
 function Landing() {
     const { t } = useTranslation();
@@ -33,6 +34,7 @@ function Landing() {
                 </div>
 
                 <nav className="landing-actions">
+                    <PublicLanguagePicker />
                     <button type="button" className="landing-link-button" onClick={() => navigate("/login")}>
                         {t("landing.login")}
                     </button>

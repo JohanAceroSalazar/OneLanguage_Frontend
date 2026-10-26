@@ -16,6 +16,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppAlert } from "../../components/app-alert";
 import { BrandWordmark } from "../../components/brand-wordmark";
+import { PublicLanguagePicker, withPublicLanguage } from "../../components/public-language-screen";
 import { registerUser } from "../../src/services/authService";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
@@ -32,7 +33,7 @@ type AlertState = {
   onAction: () => void;
 };
 
-export default function Register() {
+function Register() {
   const { t } = useTranslation();
   const router = useRouter();
   const { colors, fontScale } = useTheme();
@@ -126,6 +127,7 @@ export default function Register() {
         >
       <View style={styles.topBar}>
         <BrandWordmark color={colors.text} style={styles.logo} />
+        <PublicLanguagePicker />
       </View>
 
       <Text style={[styles.title, { color: colors.text, fontSize: 32 * fontScale }]}>{t("auth.register")}</Text>
@@ -469,5 +471,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+
+export default withPublicLanguage(Register);
 
 
