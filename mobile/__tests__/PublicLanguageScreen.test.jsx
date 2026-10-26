@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 import { Text } from "react-native";
 import { useTranslation } from "react-i18next";
-import { withPublicLanguage } from "../components/public-language-screen";
+import { PublicLanguagePicker, withPublicLanguage } from "../components/public-language-screen";
 import i18n from "../src/i18n";
 
 jest.mock("@react-native-async-storage/async-storage", () =>
@@ -15,7 +15,7 @@ jest.mock("react-native-safe-area-context", () => {
 
 const Probe = withPublicLanguage(() => {
   const { t } = useTranslation();
-  return <Text>{t("auth.login")}</Text>;
+  return <><PublicLanguagePicker /><Text>{t("auth.login")}</Text></>;
 });
 
 test("public language stays separate from account language", async () => {
@@ -24,6 +24,7 @@ test("public language stays separate from account language", async () => {
   render(<Probe />);
 
   await screen.findByText("Iniciar sesión");
+  fireEvent.press(screen.getByLabelText("Idioma: Español"));
   fireEvent.press(screen.getByLabelText("English"));
 
   await waitFor(() => expect(screen.getByText("Log in")).toBeTruthy());

@@ -16,7 +16,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { useRouter } from "expo-router";
 import { forgotPassword } from "../../src/services/authService";
 import { BrandWordmark } from "../../components/brand-wordmark";
-import { withPublicLanguage } from "../../components/public-language-screen";
+import { PublicLanguagePicker, withPublicLanguage } from "../../components/public-language-screen";
 import { useTheme } from "../../src/theme/ThemeContext";
 
 const emailRegex = /\S+@\S+\.\S+/;
@@ -68,7 +68,7 @@ function RecoverPassword() {
   };
 
   return (
-    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={[styles.keyboard, { backgroundColor: colors.background }]}
@@ -80,6 +80,7 @@ function RecoverPassword() {
       >
         <View style={styles.topBar}>
           <BrandWordmark color={colors.text} style={styles.logo} />
+          <PublicLanguagePicker />
         </View>
 
         <View style={styles.content}>

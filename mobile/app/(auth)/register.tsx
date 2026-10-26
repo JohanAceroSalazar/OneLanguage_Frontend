@@ -16,7 +16,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppAlert } from "../../components/app-alert";
 import { BrandWordmark } from "../../components/brand-wordmark";
-import { withPublicLanguage } from "../../components/public-language-screen";
+import { PublicLanguagePicker, withPublicLanguage } from "../../components/public-language-screen";
 import { registerUser } from "../../src/services/authService";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
@@ -112,7 +112,7 @@ function Register() {
   };
 
   return (
-    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
@@ -127,6 +127,7 @@ function Register() {
         >
       <View style={styles.topBar}>
         <BrandWordmark color={colors.text} style={styles.logo} />
+        <PublicLanguagePicker />
       </View>
 
       <Text style={[styles.title, { color: colors.text, fontSize: 32 * fontScale }]}>{t("auth.register")}</Text>

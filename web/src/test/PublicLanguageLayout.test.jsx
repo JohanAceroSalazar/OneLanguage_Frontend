@@ -17,7 +17,8 @@ test("public language does not change the account language", () => {
     const accountLanguage = i18n.language;
     render(<PublicLanguageLayout><Probe /></PublicLanguageLayout>);
 
-    fireEvent.change(screen.getByLabelText("Idioma"), { target: { value: "en" } });
+    fireEvent.click(screen.getByLabelText("Idioma: Español"));
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
 
     expect(screen.getByText("Log in")).toBeTruthy();
     expect(localStorage.getItem("publicLanguage")).toBe("en");

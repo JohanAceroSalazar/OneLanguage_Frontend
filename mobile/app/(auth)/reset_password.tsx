@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { resetPassword } from "../../src/services/authService";
 import { BrandWordmark } from "../../components/brand-wordmark";
-import { withPublicLanguage } from "../../components/public-language-screen";
+import { PublicLanguagePicker, withPublicLanguage } from "../../components/public-language-screen";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
 
@@ -101,7 +101,7 @@ function ResetPassword() {
   };
 
   return (
-    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={[styles.keyboard, { backgroundColor: colors.background }]}
@@ -113,6 +113,7 @@ function ResetPassword() {
       >
         <View style={styles.topBar}>
           <BrandWordmark color={colors.text} style={styles.logo} />
+          <PublicLanguagePicker />
         </View>
 
         <Text style={[styles.title, { color: colors.text, fontSize: 32 * fontScale }]}>{t("auth.resetTitle")}</Text>

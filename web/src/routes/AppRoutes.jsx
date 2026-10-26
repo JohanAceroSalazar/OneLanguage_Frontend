@@ -20,7 +20,7 @@ function AppRoutes() {
     <BrowserRouter>
         <ThemeBootstrap />
         <Routes>
-            <Route path="/" element={<PublicRoute><PublicLanguageLayout><Landing /></PublicLanguageLayout></PublicRoute>} />
+            <Route path="/" element={<PublicRoute><PublicLanguageLayout landing><Landing /></PublicLanguageLayout></PublicRoute>} />
             <Route path="/register" element={<PublicRoute><PublicLanguageLayout><Register /></PublicLanguageLayout></PublicRoute>} />
             <Route path="/login" element={<PublicRoute><PublicLanguageLayout><Login /></PublicLanguageLayout></PublicRoute>} />
             <Route path="/terms" element={<PublicLanguageLayout><Terms /></PublicLanguageLayout>} />

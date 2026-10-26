@@ -1,38 +1,58 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 import { createInstance } from "i18next";
 import { ComponentType, useEffect, useState } from "react";
 import { I18nextProvider, useTranslation } from "react-i18next";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { languageOptions, text } from "../src/i18n";
 
 const STORAGE_KEY = "publicLanguage";
 const publicI18n = createInstance();
 void publicI18n.init({ resources: text, lng: "es", fallbackLng: "es", interpolation: { escapeValue: false } });
 
-function LanguageFooter() {
+export function PublicLanguagePicker() {
   const { t, i18n } = useTranslation();
-  const [selected, setSelected] = useState(i18n.language);
+  const [open, setOpen] = useState(false);
+  const selected = i18n.language;
+  const active = languageOptions.find(({ code }) => code === selected) || languageOptions[0];
 
   const changeLanguage = (language: string) => {
-    setSelected(language);
     void AsyncStorage.setItem(STORAGE_KEY, language);
     void i18n.changeLanguage(language);
+    setOpen(false);
   };
 
-  return <View style={styles.footer}>
-    <Text style={styles.label}>{t("accessibility.language")}</Text>
-    <View style={styles.options}>
-      {languageOptions.map(({ code, label }) => <TouchableOpacity
-        key={code}
-        accessibilityRole="button"
-        accessibilityState={{ selected: selected === code }}
-        accessibilityLabel={label}
-        onPress={() => changeLanguage(code)}
-        style={[styles.option, selected === code && styles.selected]}
-      ><Text style={[styles.optionText, selected === code && styles.selectedText]}>{code.toUpperCase()}</Text></TouchableOpacity>)}
-    </View>
-  </View>;
+  return <>
+    <TouchableOpacity
+      style={styles.trigger}
+      accessibilityRole="button"
+      accessibilityLabel={`${t("accessibility.language")}: ${active.label}`}
+      onPress={() => setOpen(true)}
+    >
+      <Ionicons name="globe-outline" size={18} color="#FFFFFF" />
+      <Text style={styles.triggerText}>{active.code.toUpperCase()}</Text>
+      <Ionicons name="chevron-down" size={14} color="#FFFFFF" />
+    </TouchableOpacity>
+    <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+      <View style={styles.backdrop}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={() => setOpen(false)} />
+        <View style={styles.menu}>
+          <Text style={styles.menuTitle}>{t("accessibility.language")}</Text>
+          {languageOptions.map(({ code, label }) => <TouchableOpacity
+            key={code}
+            accessibilityRole="button"
+            accessibilityState={{ selected: selected === code }}
+            accessibilityLabel={label}
+            onPress={() => changeLanguage(code)}
+            style={[styles.option, selected === code && styles.selected]}
+          >
+            <Text style={styles.optionText}>{label}</Text>
+            {selected === code && <Ionicons name="checkmark" size={20} color="#285F9F" />}
+          </TouchableOpacity>)}
+        </View>
+      </View>
+    </Modal>
+  </>;
 }
 
 export function withPublicLanguage<P extends object>(Screen: ComponentType<P>) {
@@ -50,22 +70,19 @@ export function withPublicLanguage<P extends object>(Screen: ComponentType<P>) {
 
     if (!ready) return null;
     return <I18nextProvider i18n={publicI18n}>
-      <SafeAreaView edges={["bottom"]} style={styles.container}>
-        <View style={styles.content}><Screen {...props} /></View>
-        <LanguageFooter />
-      </SafeAreaView>
+      <View style={styles.container}><Screen {...props} /></View>
     </I18nextProvider>;
   };
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#3A78C2" },
-  content: { flex: 1, minHeight: 0 },
-  footer: { minHeight: 58, flexDirection: "row", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: 10, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: "#285F9F" },
-  label: { color: "#FFFFFF", fontWeight: "700", fontSize: 13 },
-  options: { flexDirection: "row", gap: 5 },
-  option: { minWidth: 40, minHeight: 34, justifyContent: "center", alignItems: "center", borderRadius: 4, borderWidth: 1, borderColor: "#BDD6F3" },
-  selected: { backgroundColor: "#FBE532", borderColor: "#FBE532" },
-  optionText: { color: "#FFFFFF", fontSize: 12, fontWeight: "700" },
-  selectedText: { color: "#06142B" },
+  trigger: { minHeight: 38, flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, borderRadius: 6, borderWidth: 1, borderColor: "#BDD6F3", backgroundColor: "#285F9F" },
+  triggerText: { color: "#FFFFFF", fontSize: 13, fontWeight: "700" },
+  backdrop: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24, backgroundColor: "rgba(0, 0, 0, 0.45)" },
+  menu: { width: "100%", maxWidth: 320, padding: 16, borderRadius: 8, backgroundColor: "#FFFFFF" },
+  menuTitle: { marginBottom: 10, color: "#071429", fontSize: 18, fontWeight: "700" },
+  option: { minHeight: 46, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 12, borderRadius: 5 },
+  selected: { backgroundColor: "#E7F0FA" },
+  optionText: { color: "#071429", fontSize: 15, fontWeight: "600" },
 });

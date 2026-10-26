@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
-import { withPublicLanguage } from "../../components/public-language-screen";
+import { PublicLanguagePicker, withPublicLanguage } from "../../components/public-language-screen";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 function Terms() {
@@ -13,7 +13,7 @@ function Terms() {
     const { colors, fontScale } = useTheme();
     const insets = useSafeAreaInsets();
     return (
-        <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}>
+        <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.container, { backgroundColor: colors.background }]}>
         <ScrollView
             style={styles.scrollView}
             contentContainerStyle={[styles.content, { paddingBottom: Math.max(insets.bottom, 24) + 24 }]}
@@ -24,6 +24,7 @@ function Terms() {
                 <Ionicons name="arrow-back" size={22} color={colors.textOnSurface} />
             </TouchableOpacity>
             <Text style={[styles.title, { color: colors.text, fontSize: 24 * fontScale }]}>{t("terms.title")}</Text>
+            <PublicLanguagePicker />
         </View>
 
         <Text style={[styles.paragraph, { color: colors.text, fontSize: 14 * fontScale }]}>{t("terms.app")}</Text>
