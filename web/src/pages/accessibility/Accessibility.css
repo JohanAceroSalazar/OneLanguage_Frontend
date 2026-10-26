@@ -1,0 +1,306 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.access-container {
+    width: 100%;
+    min-height: 100dvh;
+    background: var(--color-page-bg);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 24px;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.access-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 16px;
+}
+
+.access-logo {
+    color: var(--color-text-on-page);
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.nav-item {
+    color: var(--color-text-on-page);
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    padding-bottom: 4px;
+    border-bottom: 3px solid transparent;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.nav-item:hover { color: var(--color-accent); }
+
+.nav-item.active {
+    color: var(--color-accent);
+    border-bottom: 3px solid var(--color-accent);
+}
+
+.access-card {
+    background: var(--color-surface);
+    min-height: 0;
+    overflow-y: auto;
+    border-radius: 18px;
+    padding: 42px 48px;
+    margin: auto;
+    max-width: 760px;
+    width: 100%;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: var(--color-shadow);
+}
+
+.access-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    position: relative;
+    gap: 16px;
+}
+
+.access-label {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--color-text);
+}
+
+.access-control {
+    position: relative;
+}
+
+.access-btn,
+.access-save-btn,
+.access-modal-btn {
+    border: 2px solid #111;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--color-accent-text);
+    background: var(--color-accent);
+}
+
+.access-btn {
+    min-width: 130px;
+    padding: 12px 26px;
+    font-size: 17px;
+}
+
+.access-btn:hover,
+.access-save-btn:hover,
+.access-modal-btn:hover { opacity: 0.92; }
+
+.access-divider {
+    width: 100%;
+    height: 1px;
+    background: var(--color-border-soft);
+}
+
+.access-dropdown,
+.access-theme-picker {
+    position: absolute;
+    top: 46px;
+    right: 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 10px;
+    min-width: 180px;
+    z-index: 100;
+    box-shadow: var(--color-shadow);
+}
+
+.access-dropdown button {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    padding: 10px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--color-text);
+    border-radius: 10px;
+}
+
+.access-dropdown button:hover,
+.theme-option:hover {
+    background: var(--color-surface-soft);
+}
+
+.access-dropdown button.selected,
+.theme-option.selected {
+    font-weight: bold;
+    background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
+
+.access-theme-picker {
+    min-width: 260px;
+}
+
+.color-title {
+    color: var(--color-text);
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.theme-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.theme-option {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-soft);
+    color: var(--color-text);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.theme-hint {
+    margin-top: 10px;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.access-save-btn {
+    width: 100%;
+    padding: 17px;
+    font-size: 20px;
+    margin-top: 14px;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.38);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.access-modal-box {
+    background: var(--color-surface);
+    border-radius: 18px;
+    padding: 42px 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    max-width: 430px;
+    width: 100%;
+    max-height: calc(100dvh - 40px);
+    overflow-y: auto;
+    box-shadow: var(--color-shadow);
+    border: 1px solid var(--color-border);
+}
+
+.access-modal-text {
+    font-size: clamp(22px, 3vw, 34px);
+    font-weight: bold;
+    color: var(--color-text);
+    text-align: center;
+    line-height: 1.25;
+}
+
+.access-modal-btn {
+    padding: 14px 56px;
+    font-size: 20px;
+}
+
+@media (max-width: 1024px) {
+    .navbar { gap: 14px; }
+    .nav-item { font-size: 15px; }
+}
+
+@media (max-width: 768px) {
+    .access-container {
+        padding: 16px;
+    }
+
+    .access-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar {
+        justify-content: flex-start;
+    }
+
+    .access-card {
+        max-width: 100%;
+        padding: 26px 20px;
+        margin: 16px auto;
+        overflow-y: hidden;
+    }
+
+    .access-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .access-label {
+        font-size: 17px;
+        gap: 12px;
+    }
+
+    .access-btn {
+        width: 100%;
+        min-width: 0;
+        padding: 12px 16px;
+        font-size: 15px;
+    }
+
+    .access-dropdown,
+    .access-theme-picker {
+        position: static;
+        margin-top: 12px;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .theme-options {
+        grid-template-columns: 1fr;
+    }
+
+    .access-save-btn {
+        font-size: 18px;
+        padding: 15px;
+    }
+
+    .access-modal-box {
+        max-width: 100%;
+        padding: 32px 22px;
+    }
+}
