@@ -128,6 +128,24 @@ html.landing-scroll::-webkit-scrollbar {
 html.landing-scroll::-webkit-scrollbar-track { background: var(--color-surface); }
 html.landing-scroll::-webkit-scrollbar-thumb { background: var(--color-page-bg-alt); }
 
+@media (max-width: 900px), (max-height: 700px) {
+    html, body { height: auto; }
+    body { overflow-y: auto; }
+    #root {
+        height: auto;
+        min-height: calc(100dvh / var(--app-text-scale));
+        overflow: visible;
+    }
+    body :is(.login-container, .register-container, .terms-container, .home-container,
+        .translate-container, .access-container, .profile-container, .recover-container,
+        .reset-container) {
+        height: auto;
+        min-height: calc(100dvh / var(--app-text-scale));
+        overflow-x: clip;
+        overflow-y: visible;
+    }
+}
+
 button,
 input,
 select,

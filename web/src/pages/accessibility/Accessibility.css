@@ -261,7 +261,8 @@
     .access-card {
         max-width: 100%;
         padding: 26px 20px;
-        margin: 28px auto;
+        margin: 16px auto;
+        overflow-y: visible;
     }
 
     .access-row {

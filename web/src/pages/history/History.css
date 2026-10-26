@@ -372,7 +372,7 @@
     .navbar { gap: 10px; justify-content: flex-start; }
     .nav-item { font-size: 14px; }
     .history-title-section { margin-top: 24px; }
-    .history-controls { flex-direction: column; align-items: flex-start; width: 100%; }
+    .history-controls { flex-wrap: wrap; width: 100%; margin-top: 14px; }
     .history-card { max-width: 100%; }
     .history-item { align-items: flex-start; }
     .history-recording { padding-left: 0; }

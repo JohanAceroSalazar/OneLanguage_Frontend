@@ -39,3 +39,15 @@ it("keeps voice off when audio permission is disabled and offers activation in p
   await waitFor(() => expect(setFeaturePermission).toHaveBeenCalledWith("audio", true));
   expect(await screen.findByRole("button", { name: "translate.autoOff" })).toBeInTheDocument();
 });
+
+it("swaps the translation and camera panels", async () => {
+  const { container } = render(<MemoryRouter><Translate /></MemoryRouter>);
+  const panels = container.querySelector(".translate-content");
+  expect(panels).not.toHaveClass("flipped");
+
+  await userEvent.setup().click(screen.getByRole("button", { name: "translate.swap" }));
+  expect(panels).toHaveClass("flipped");
+
+  await userEvent.setup().click(screen.getByRole("button", { name: "translate.swap" }));
+  expect(panels).not.toHaveClass("flipped");
+});

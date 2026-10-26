@@ -8,7 +8,7 @@
     flex-wrap: nowrap;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 1025px) {
     .app-navbar {
         position: fixed;
         top: 20px;
