@@ -145,6 +145,14 @@ const historyFilterUi = {
 };
 for (const language of Object.keys(historyFilterUi)) Object.assign(resources[language].translation, historyFilterUi[language]);
 
+const historyFilterDetails = {
+  es: { "history.recent": "Recientes (7 días)", "history.old": "Antiguos", "history.noMatches": "No hay traducciones en este período." },
+  en: { "history.recent": "Recent (7 days)", "history.old": "Older", "history.noMatches": "No translations in this period." },
+  pt: { "history.recent": "Recentes (7 dias)", "history.old": "Antigos", "history.noMatches": "Nenhuma tradução neste período." },
+  it: { "history.recent": "Recenti (7 giorni)", "history.old": "Precedenti", "history.noMatches": "Nessuna traduzione in questo periodo." }
+};
+for (const language of Object.keys(historyFilterDetails)) Object.assign(resources[language].translation, historyFilterDetails[language]);
+
 const featurePermissionUi = {
   es: { "common.deactivate": "Desactivar", "profile.permissionDenied": "El permiso fue rechazado. Actívalo desde los ajustes del dispositivo para continuar.", "profile.cameraPermissionTitle": "Activar permiso de cámara", "profile.cameraPermissionMessage": "Usaremos la cámara únicamente para reconocer señas y convertirlas en texto en tiempo real.", "profile.audioPermissionTitle": "Activar voz", "profile.audioPermissionMessage": "La voz leerá las traducciones en vivo y las que escuches desde el historial." },
   en: { "common.deactivate": "Deactivate", "profile.permissionDenied": "The permission was denied. Enable it in the device settings to continue.", "profile.cameraPermissionTitle": "Enable camera permission", "profile.cameraPermissionMessage": "We will use the camera only to recognize signs and translate them into text in real time.", "profile.audioPermissionTitle": "Enable voice", "profile.audioPermissionMessage": "Voice will read live translations and translations played from history." },

@@ -257,6 +257,12 @@
     scrollbar-gutter: auto;
 }
 
+.history-filter-empty {
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--color-text-on-page);
+}
+
 .history-item {
     display: flex;
     align-items: center;

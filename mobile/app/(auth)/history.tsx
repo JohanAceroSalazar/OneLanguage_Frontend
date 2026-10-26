@@ -20,6 +20,7 @@ import {
     Translation,
 } from "../../src/services/translationService";
 import { getFeaturePermissions, setFeaturePermission } from "../../src/services/featurePermissionService";
+import { filterTranslations, HistoryFilter } from "../../src/services/historyFilter";
 
 function RecordingPlayer({ translationId, token }: { translationId: string; token: string | null }) {
     const player = useVideoPlayer({
@@ -40,6 +41,9 @@ export default function History() {
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [openRecordingId, setOpenRecordingId] = useState<string | null>(null);
     const [token, setToken] = useState<string | null>(null);
+    const [activeFilter, setActiveFilter] = useState<HistoryFilter>("all");
+    const visibleTranslations = filterTranslations(translations, activeFilter);
+    const filterOptions: HistoryFilter[] = ["recent", "older", "all"];
 
     useEffect(() => {
         AsyncStorage.getItem("token").then(setToken).catch(() => setToken(null));
@@ -169,13 +173,27 @@ export default function History() {
     </View> : null}
     {!loading && translations.length > 0 ? <View style={styles.historyList}>
         <View style={styles.listHeader}>
-            <Text style={[styles.countText, { color: colors.text }]}>{t("history.count", { count: translations.length })}</Text>
+            <Text style={[styles.countText, { color: colors.text }]}>{t("history.count", { count: visibleTranslations.length })}</Text>
             <TouchableOpacity disabled={deletingId !== null} onPress={removeAll} style={styles.deleteAllButton}>
                 {deletingId === "all" ? <ActivityIndicator color="#ffffff" /> : <Ionicons name="trash-outline" size={22} color="#ffffff" />}
             </TouchableOpacity>
         </View>
+        <View style={[styles.filterControl, { borderColor: colors.border }]}>
+            {filterOptions.map((filter) => <TouchableOpacity
+                key={filter}
+                activeOpacity={0.85}
+                accessibilityRole="button"
+                accessibilityState={{ selected: activeFilter === filter }}
+                onPress={() => setActiveFilter(filter)}
+                style={[styles.filterOption, activeFilter === filter && { backgroundColor: colors.accent }]}
+            >
+                <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.filterText, { color: activeFilter === filter ? colors.accentText : colors.text, fontSize: 13 * fontScale }]}>{t(`history.${filter === "older" ? "old" : filter}`)}</Text>
+            </TouchableOpacity>)}
+        </View>
+        {activeFilter !== "all" && <Text style={[styles.filterHint, { color: colors.text }]}>{t(`history.${activeFilter}Hint`)}</Text>}
         <ScrollView style={styles.savedTranslations} contentContainerStyle={styles.savedTranslationsContent} showsVerticalScrollIndicator>
-        {translations.map((translation) => <View key={translation.id} style={[styles.historyItem, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        {visibleTranslations.length === 0 && <Text style={[styles.filterEmpty, { color: colors.text }]}>{t("history.noMatches")}</Text>}
+        {visibleTranslations.map((translation) => <View key={translation.id} style={[styles.historyItem, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.itemIcon}><Ionicons name="hand-left-outline" size={24} color="#ffffff" /></View>
             <View style={styles.itemContent}>
                 <Text style={[styles.itemText, { color: colors.textOnSurface }]}>{translation.translatedText}</Text>
@@ -283,6 +301,11 @@ listHeader: {
     marginBottom: 4,
     },
 countText: { fontSize: 15, fontWeight: "600" },
+filterControl: { flexDirection: "row", width: "100%", height: 44, borderWidth: 1, borderRadius: 8, overflow: "hidden" },
+filterOption: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 },
+filterText: { fontWeight: "700", textAlign: "center" },
+filterHint: { fontSize: 12, opacity: 0.9, textAlign: "center" },
+filterEmpty: { paddingTop: 30, textAlign: "center", fontSize: 15 },
 deleteAllButton: {
     width: 44,
     height: 44,

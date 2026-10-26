@@ -64,8 +64,8 @@
     padding: clamp(22px, 3vw, 36px);
     margin-block: auto;
     width: 100%;
-    max-width: 900px;
-    min-height: min(560px, calc(100% - 80px));
+    max-width: 760px;
+    min-height: min(500px, calc(100% - 80px));
     align-self: center;
     display: flex;
     flex-direction: column;
@@ -409,7 +409,7 @@
     .modal-logout-btn, .modal-cancel-btn, .permission-modal-activate, .permission-modal-cancel { width: 100%; }
 }
 
-@media (max-height: 760px) {
+@media (max-height: 620px) {
     .profile-container { padding-block: 10px; }
     .profile-card { min-height: 0; gap: 8px; padding: 12px; }
     .profile-avatar-col { padding-top: 0; }

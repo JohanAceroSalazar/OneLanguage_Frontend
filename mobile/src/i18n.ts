@@ -177,6 +177,16 @@ const aiIntegrationLabels = {
 for (const [language, labels] of Object.entries(aiIntegrationLabels)) {
   Object.assign((text as any)[language].translation, labels);
 }
+
+const historyFilterLabels = {
+  es: { "history.recent": "Recientes", "history.old": "Antiguos", "history.all": "Todos", "history.recentHint": "Últimos 7 días", "history.olderHint": "Más de 7 días", "history.noMatches": "No hay traducciones en este período." },
+  en: { "history.recent": "Recent", "history.old": "Older", "history.all": "All", "history.recentHint": "Last 7 days", "history.olderHint": "More than 7 days ago", "history.noMatches": "No translations in this period." },
+  pt: { "history.recent": "Recentes", "history.old": "Antigos", "history.all": "Todos", "history.recentHint": "Últimos 7 dias", "history.olderHint": "Mais de 7 dias", "history.noMatches": "Nenhuma tradução neste período." },
+  it: { "history.recent": "Recenti", "history.old": "Precedenti", "history.all": "Tutti", "history.recentHint": "Ultimi 7 giorni", "history.olderHint": "Oltre 7 giorni fa", "history.noMatches": "Nessuna traduzione in questo periodo." },
+};
+for (const [language, labels] of Object.entries(historyFilterLabels)) {
+  Object.assign((text as any)[language].translation, labels);
+}
 const frameProcessingLabels = {
   es: "No se pudo procesar una imagen de la camara. Intentando de nuevo...",
   en: "A camera image could not be processed. Retrying...",
