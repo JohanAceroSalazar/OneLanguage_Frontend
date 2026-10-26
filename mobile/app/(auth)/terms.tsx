@@ -3,16 +3,17 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
+import { withPublicLanguage } from "../../components/public-language-screen";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function Terms() {
+function Terms() {
     const { t } = useTranslation();
 
     const router = useRouter();
     const { colors, fontScale } = useTheme();
     const insets = useSafeAreaInsets();
     return (
-        <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.container, { backgroundColor: colors.background }]}>
+        <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: colors.background }]}>
         <ScrollView
             style={styles.scrollView}
             contentContainerStyle={[styles.content, { paddingBottom: Math.max(insets.bottom, 24) + 24 }]}
@@ -114,5 +115,7 @@ const styles = StyleSheet.create({
         color: "#000",
     },
 });
+
+export default withPublicLanguage(Terms);
 
 

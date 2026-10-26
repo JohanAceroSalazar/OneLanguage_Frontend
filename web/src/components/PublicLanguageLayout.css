@@ -1,0 +1,42 @@
+.public-language-layout {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-page-bg, #3a78c2);
+}
+
+.public-language-content {
+    flex: 1;
+    min-height: 0;
+}
+
+.public-language-content > .landing-page,
+.public-language-content > .login-container,
+.public-language-content > .register-container,
+.public-language-content > .recover-container,
+.public-language-content > .reset-container,
+.public-language-content > .terms-container {
+    min-height: calc(100dvh - 60px);
+}
+
+.public-language-footer {
+    flex: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px 14px;
+    color: #fff;
+    background: #285f9f;
+    font: 600 14px Arial, sans-serif;
+}
+
+.public-language-footer select {
+    min-width: 140px;
+    padding: 7px 32px 7px 10px;
+    border: 1px solid #cbd8e8;
+    border-radius: 6px;
+    background: #fff;
+    color: #071429;
+    font: inherit;
+}

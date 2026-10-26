@@ -18,6 +18,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppAlert } from "../../components/app-alert";
 import { BrandWordmark } from "../../components/brand-wordmark";
+import { withPublicLanguage } from "../../components/public-language-screen";
 import { getAccessibilitySettings, hasLocalAccessibilitySettings, loginUser, persistLocalAccessibilitySettings } from "../../src/services/authService";
 import i18n, { languageOptions } from "../../src/i18n";
 import { useTheme } from "../../src/theme/ThemeContext";
@@ -33,7 +34,7 @@ type AlertState = {
   onAction: () => void;
 };
 
-export default function Login() {
+function Login() {
   const { t } = useTranslation();
   const router = useRouter();
   const { colors, theme, fontSizeMode, setThemeMode, setFontSizeMode } = useTheme();
@@ -141,7 +142,7 @@ export default function Login() {
   };
 
   return (
-    <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.keyboard}>
         <ScrollView
           contentContainerStyle={[styles.container, { paddingBottom: Math.max(insets.bottom, 24) + 24 }]}
@@ -335,3 +336,5 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+
+export default withPublicLanguage(Login);

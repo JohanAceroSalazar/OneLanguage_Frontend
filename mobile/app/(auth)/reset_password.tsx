@@ -16,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { resetPassword } from "../../src/services/authService";
 import { BrandWordmark } from "../../components/brand-wordmark";
+import { withPublicLanguage } from "../../components/public-language-screen";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
 
@@ -27,7 +28,7 @@ const getParam = (value: string | string[] | undefined) => {
   return value ?? "";
 };
 
-export default function ResetPassword() {
+function ResetPassword() {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ id?: string; token?: string }>();
@@ -100,7 +101,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={[styles.keyboard, { backgroundColor: colors.background }]}
@@ -348,5 +349,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+
+export default withPublicLanguage(ResetPassword);
 
 
