@@ -8,7 +8,7 @@ export const languageOptions = [
   { code: "it", label: "Italiano" },
 ];
 
-const resources = {
+export const resources = {
   es: { translation: {
     nav: { home: "Inicio", translate: "Traducir", history: "Historial", accessibility: "Accesibilidad", profile: "Perfil" },
     common: { save: "Guardar cambios", cancel: "Cancelar", ok: "Aceptar", loading: "Cargando...", back: "Volver", required: "Este campo es obligatorio", noAvailable: "No disponible", activate: "Activar", logout: "Cerrar sesión", audio: "Audio", camera: "Cámara", email: "Correo electrónico", password: "Contraseña", fullName: "Nombre completo", confirmPassword: "Confirmar contraseña", newPassword: "Nueva contraseña", language: "Idioma", showPassword: "Mostrar contraseña", hidePassword: "Ocultar contraseña" },

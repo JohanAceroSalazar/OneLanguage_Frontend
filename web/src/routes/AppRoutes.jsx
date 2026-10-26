@@ -13,18 +13,19 @@ import Profile from "../pages/profile/Profile";
 import ResetPassword from "../pages/resetpassword/ResetPassword";
 import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute";
 import PublicRoute from "../components/PublicRoute";
+import PublicLanguageLayout from "../components/PublicLanguageLayout";
 
 function AppRoutes() {
     return (
     <BrowserRouter>
         <ThemeBootstrap />
         <Routes>
-            <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
-            <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-            <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/forgotpassword" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/" element={<PublicRoute><PublicLanguageLayout landing><Landing /></PublicLanguageLayout></PublicRoute>} />
+            <Route path="/register" element={<PublicRoute><PublicLanguageLayout><Register /></PublicLanguageLayout></PublicRoute>} />
+            <Route path="/login" element={<PublicRoute><PublicLanguageLayout><Login /></PublicLanguageLayout></PublicRoute>} />
+            <Route path="/terms" element={<PublicLanguageLayout><Terms /></PublicLanguageLayout>} />
+            <Route path="/forgotpassword" element={<PublicLanguageLayout><ForgotPassword /></PublicLanguageLayout>} />
+            <Route path="/reset-password" element={<PublicLanguageLayout><ResetPassword /></PublicLanguageLayout>} />
             <Route element={<ProtectedRoute />}>
                 <Route path="/home" element={<Home />} />
                 <Route path="/translate" element={<Translate />} />
