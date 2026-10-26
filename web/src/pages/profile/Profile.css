@@ -395,7 +395,7 @@
     .profile-header { flex-direction: column; align-items: flex-start; gap: 12px; }
     .navbar { gap: 10px; justify-content: flex-start; }
     .nav-item { font-size: 14px; }
-    .profile-card { max-width: 100%; min-height: 0; margin: 16px auto; overflow: visible; }
+    .profile-card { max-width: 100%; min-height: 0; margin: 16px auto; overflow: hidden; }
     .profile-section { flex-direction: row; }
     .profile-avatar-col { display: none; }
     .profile-header-title { display: none; }
@@ -409,7 +409,7 @@
     .modal-logout-btn, .modal-cancel-btn, .permission-modal-activate, .permission-modal-cancel { width: 100%; }
 }
 
-@media (max-height: 620px) {
+@media (max-width: 768px) and (max-height: 760px) {
     .profile-container { padding-block: 10px; }
     .profile-card { min-height: 0; gap: 8px; padding: 12px; }
     .profile-avatar-col { padding-top: 0; }

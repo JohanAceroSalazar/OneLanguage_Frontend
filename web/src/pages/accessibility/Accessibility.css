@@ -9,7 +9,7 @@
     padding: 20px 24px;
     font-family: Arial, sans-serif;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
 .access-header {
@@ -262,7 +262,7 @@
         max-width: 100%;
         padding: 26px 20px;
         margin: 16px auto;
-        overflow-y: visible;
+        overflow-y: hidden;
     }
 
     .access-row {
