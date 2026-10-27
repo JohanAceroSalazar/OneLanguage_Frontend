@@ -1,15 +1,19 @@
-import { useRef } from "react";
+import { createContext, useContext, useState, useRef } from "react";
 import { createInstance } from "i18next";
 import { I18nextProvider, useTranslation } from "react-i18next";
-import { FiCheck, FiChevronDown, FiGlobe } from "react-icons/fi";
+import { FiCheck, FiChevronDown, FiGlobe, FiMoon, FiSun } from "react-icons/fi";
 import { languageOptions, resources } from "../i18n";
 import "./PublicLanguageLayout.css";
 
 const STORAGE_KEY = "publicLanguage";
+const THEME_STORAGE_KEY = "publicTheme";
 const stored = localStorage.getItem(STORAGE_KEY);
 const initial = languageOptions.some(({ code }) => code === stored) ? stored : "es";
+const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+const initialTheme = storedTheme === "dark" ? "dark" : "light";
 const publicI18n = createInstance();
 void publicI18n.init({ resources, lng: initial, fallbackLng: "es", interpolation: { escapeValue: false } });
+const PublicThemeContext = createContext(null);
 
 export function PublicLanguagePicker() {
     const { t, i18n } = useTranslation();
@@ -40,11 +44,47 @@ export function PublicLanguagePicker() {
     </details>;
 }
 
+export function PublicThemeToggle() {
+    const { t } = useTranslation();
+    const theme = useContext(PublicThemeContext);
+
+    if (!theme) return null;
+
+    const isDark = theme.value === "dark";
+    const nextTheme = isDark ? "light" : "dark";
+    const label = `${t("accessibility.visualTheme")}: ${t(`accessibility.${isDark ? "dark" : "light"}`)}`;
+
+    return <button
+        type="button"
+        className="public-theme-toggle"
+        aria-label={label}
+        title={label}
+        onClick={() => theme.setValue(nextTheme)}
+    >
+        {isDark ? <FiSun aria-hidden="true" /> : <FiMoon aria-hidden="true" />}
+    </button>;
+}
+
+export function PublicAppearanceControls() {
+    return <div className="public-appearance-controls">
+        <PublicLanguagePicker />
+        <PublicThemeToggle />
+    </div>;
+}
+
 export default function PublicLanguageLayout({ children, landing = false }) {
+    const [theme, setTheme] = useState(initialTheme);
+    const setPublicTheme = (value) => {
+        localStorage.setItem(THEME_STORAGE_KEY, value);
+        setTheme(value);
+    };
+
     return <I18nextProvider i18n={publicI18n}>
-        <div className={`public-language-layout${landing ? " is-landing" : ""}`}>
-            {!landing && <div className="public-language-toolbar"><PublicLanguagePicker /></div>}
-            <div className="public-language-content">{children}</div>
-        </div>
+        <PublicThemeContext.Provider value={{ value: theme, setValue: setPublicTheme }}>
+            <div className={`public-language-layout${landing ? " is-landing" : ""}`} data-public-theme={theme}>
+                {!landing && <div className="public-language-toolbar"><PublicAppearanceControls /></div>}
+                <div className="public-language-content">{children}</div>
+            </div>
+        </PublicThemeContext.Provider>
     </I18nextProvider>;
 }
