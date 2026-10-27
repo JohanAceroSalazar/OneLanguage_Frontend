@@ -375,10 +375,23 @@
         padding: 16px;
         overflow-y: hidden;
     }
-    .history-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+
+    .history-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .history-header .app-navbar {
+        width: auto;
+        min-height: 44px;
+        flex: 0 0 auto;
+    }
+
     .navbar { gap: 10px; justify-content: flex-start; }
     .nav-item { font-size: 14px; }
-    .history-title-section { margin-top: 24px; }
+    .history-title-section { margin-top: 16px; }
     .history-controls { flex-wrap: wrap; width: 100%; margin-top: 14px; }
     .history-card { max-width: 100%; }
     .history-item { align-items: flex-start; }
