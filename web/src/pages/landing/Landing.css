@@ -342,8 +342,13 @@
     }
 
     .landing-actions .public-language-picker {
+        max-width: calc(100vw - 32px);
+    }
+
+    .landing-actions .public-appearance-controls {
         grid-column: 1 / -1;
         justify-self: start;
+        max-width: 100%;
     }
 
     .landing-actions .landing-link-button,
