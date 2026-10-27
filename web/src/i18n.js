@@ -169,6 +169,14 @@ const featurePermissionUi = {
 };
 for (const language of Object.keys(featurePermissionUi)) Object.assign(resources[language].translation, featurePermissionUi[language]);
 
+const registrationValidationUi = {
+  es: { "auth.nameInvalid": "El nombre solo puede contener letras y espacios." },
+  en: { "auth.nameInvalid": "The name can only contain letters and spaces." },
+  pt: { "auth.nameInvalid": "O nome só pode conter letras e espaços." },
+  it: { "auth.nameInvalid": "Il nome può contenere solo lettere e spazi." }
+};
+for (const language of Object.keys(registrationValidationUi)) Object.assign(resources[language].translation, registrationValidationUi[language]);
+
 const saved = localStorage.getItem("language");
 const initial = languageOptions.some((option) => option.code === saved) ? saved : "es";
 i18n.use(initReactI18next).init({ resources, lng: initial, fallbackLng: "es", interpolation: { escapeValue: false } });
