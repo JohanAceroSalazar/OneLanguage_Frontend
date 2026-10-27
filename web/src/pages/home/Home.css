@@ -169,7 +169,13 @@
 
 @media (max-width: 768px) {
     .home-container { padding: 16px; overflow-y: auto; }
-    .home-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .home-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .home-header .app-navbar { width: auto; min-height: 44px; flex: 0 0 auto; }
     .navbar { gap: 10px; justify-content: flex-start; }
     .nav-item { font-size: 14px; }
     .home-greeting { font-size: 18px; margin-top: 8px; }
