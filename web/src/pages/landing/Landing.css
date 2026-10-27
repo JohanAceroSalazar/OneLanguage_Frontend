@@ -172,6 +172,41 @@
     vertical-align: middle;
 }
 
+.landing-download-link {
+    align-items: center;
+    color: var(--color-text-on-page);
+    display: inline-flex;
+    gap: 10px;
+    margin-top: 18px;
+    text-decoration: none;
+}
+
+.landing-download-link > svg {
+    background: color-mix(in srgb, var(--color-surface) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-text-on-page) 20%, transparent);
+    border-radius: 50%;
+    font-size: 38px;
+    padding: 9px;
+}
+
+.landing-download-link span {
+    display: grid;
+    gap: 2px;
+}
+
+.landing-download-link strong {
+    font-size: 15px;
+}
+
+.landing-download-link small {
+    color: color-mix(in srgb, var(--color-text-on-page) 76%, transparent);
+    font-size: 13px;
+}
+
+.landing-download-link:hover strong {
+    text-decoration: underline;
+}
+
 .landing-stats {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));

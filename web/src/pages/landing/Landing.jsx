@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiArrowRight, FiShield, FiStar, FiUsers } from "react-icons/fi";
+import { FiArrowRight, FiDownload, FiShield, FiStar, FiUsers } from "react-icons/fi";
 import logo from "../../assets/Logo.png";
 import "./Landing.css";
 import { useTranslation } from "react-i18next";
@@ -61,6 +61,14 @@ function Landing() {
                             {t("landing.hasAccount")}
                         </button>
                     </div>
+
+                    <a className="landing-download-link" href="/downloads/OneLanguage.apk" download="OneLanguage.apk">
+                        <FiDownload aria-hidden="true" />
+                        <span>
+                            <strong>{t("landing.downloadApp")}</strong>
+                            <small>{t("landing.downloadHint")}</small>
+                        </span>
+                    </a>
 
                     <div className="landing-stats">
                         <article>
