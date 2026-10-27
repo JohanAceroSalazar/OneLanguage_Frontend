@@ -47,7 +47,10 @@
 .public-language-layout:not(.is-landing) .public-language-content > .register-container,
 .public-language-layout:not(.is-landing) .public-language-content > .recover-container,
 .public-language-layout:not(.is-landing) .public-language-content > .reset-container,
-.public-language-layout:not(.is-landing) .public-language-content > .terms-container { min-height: calc(100dvh - 52px); }
+.public-language-layout:not(.is-landing) .public-language-content > .terms-container {
+    height: calc(100dvh - 52px);
+    min-height: 0;
+}
 
 .public-language-picker { position: relative; flex: none; color: #fff; font: 600 14px Arial, sans-serif; }
 .public-appearance-controls { display: inline-flex; align-items: center; gap: 8px; }
