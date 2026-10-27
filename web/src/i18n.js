@@ -109,22 +109,30 @@ const landingUi = {
   es: {
     "landing.description": "Traduce, consulta tu historial y ajusta la accesibilidad desde una experiencia moderna, clara y lista para acompañar a usuarios, familias y equipos de apoyo.",
     "landing.start": "Empezar ahora",
-    "landing.hasAccount": "Ya tengo cuenta"
+    "landing.hasAccount": "Ya tengo cuenta",
+    "landing.downloadApp": "Descargar OneLanguage.apk",
+    "landing.downloadHint": "APK para Android"
   },
   en: {
     "landing.description": "Translate, review your history and adjust accessibility from a modern, clear experience designed to support users, families and support teams.",
     "landing.start": "Get started",
-    "landing.hasAccount": "I already have an account"
+    "landing.hasAccount": "I already have an account",
+    "landing.downloadApp": "Download OneLanguage.apk",
+    "landing.downloadHint": "Android APK"
   },
   pt: {
     "landing.description": "Traduza, consulte seu histórico e ajuste a acessibilidade em uma experiência moderna, clara e preparada para acompanhar usuários, famílias e equipes de apoio.",
     "landing.start": "Começar agora",
-    "landing.hasAccount": "Já tenho uma conta"
+    "landing.hasAccount": "Já tenho uma conta",
+    "landing.downloadApp": "Baixar OneLanguage.apk",
+    "landing.downloadHint": "APK para Android"
   },
   it: {
     "landing.description": "Traduci, consulta la cronologia e regola l'accessibilità in un'esperienza moderna e chiara, pensata per utenti, famiglie e team di supporto.",
     "landing.start": "Inizia ora",
-    "landing.hasAccount": "Ho già un account"
+    "landing.hasAccount": "Ho già un account",
+    "landing.downloadApp": "Scarica OneLanguage.apk",
+    "landing.downloadHint": "APK per Android"
   }
 };
 for (const language of Object.keys(landingUi)) Object.assign(resources[language].translation, landingUi[language]);
