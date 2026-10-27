@@ -21,7 +21,8 @@ import { registerUser } from "../../src/services/authService";
 import { useTheme } from "../../src/theme/ThemeContext";
 import { useTranslation } from "react-i18next";
 
-const emailRegex = /\S+@\S+\.\S+/;
+const nameRegex = /^[\p{L}]+(?: [\p{L}]+)*$/u;
+const emailRegex = /^(?!.*\.\.)(?!.*\s)(?!.*@gail\.com$)[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*\.[A-Za-z]{2,}$/i;
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
 type AlertState = {
@@ -62,8 +63,8 @@ function Register() {
   }, [form.password, t]);
 
   const validate = (nextForm = form) => ({
-    name: !nextForm.name.trim() ? t("auth.nameRequired") : nextForm.name.trim().length < 3 ? t("auth.minChars") : "",
-    email: !nextForm.email.trim() ? t("auth.emailRequired") : !emailRegex.test(nextForm.email) ? t("auth.emailInvalid") : "",
+    name: !nextForm.name.trim() ? t("auth.nameRequired") : nextForm.name.trim().length < 3 ? t("auth.minChars") : !nameRegex.test(nextForm.name.trim()) ? t("auth.nameInvalid") : "",
+    email: !nextForm.email.trim() ? t("auth.emailRequired") : !emailRegex.test(nextForm.email.trim()) ? t("auth.emailInvalid") : "",
     password: !nextForm.password ? t("auth.passwordRequired") : !passwordRegex.test(nextForm.password) ? t("auth.passwordRules") : "",
     confirmPassword: !nextForm.confirmPassword ? t("auth.confirmRequired") : nextForm.confirmPassword !== nextForm.password ? t("auth.passwordMismatch") : "",
     acceptedTerms: nextForm.acceptedTerms ? "" : t("auth.acceptTerms"),
@@ -85,7 +86,7 @@ function Register() {
 
     setLoading(true);
     try {
-      await registerUser({ name: form.name, email: form.email, password: form.password });
+      await registerUser({ name: form.name.trim(), email: form.email.trim(), password: form.password });
       setAlert({
         visible: true,
         title: t("auth.registerSuccess"),
