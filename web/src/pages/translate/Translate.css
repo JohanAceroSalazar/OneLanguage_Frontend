@@ -300,8 +300,8 @@
 
 @media (max-width: 768px) {
     .translate-container {
-        padding: 16px;
-        gap: 12px;
+        padding: 12px 14px;
+        gap: 10px;
     }
 
     .translate-header {
@@ -316,7 +316,7 @@
 
     .translate-content {
         grid-template-columns: 1fr;
-        grid-template-rows: minmax(120px, 1fr) minmax(140px, 1fr);
+        grid-template-rows: minmax(0, 0.9fr) minmax(0, 1.1fr);
         flex: 1 1 auto;
         min-height: 0;
         margin: 0;
@@ -331,6 +331,18 @@
         height: auto;
         min-height: 0;
         aspect-ratio: auto;
+    }
+
+    .translate-text-box {
+        padding: 18px;
+    }
+
+    .translation-eyebrow {
+        margin-bottom: 10px;
+    }
+
+    .translation-status {
+        margin-top: 10px;
     }
 
     .translation-review-actions {
