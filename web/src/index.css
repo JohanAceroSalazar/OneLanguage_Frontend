@@ -135,6 +135,42 @@ textarea {
     font: inherit;
 }
 
+img,
+video,
+canvas {
+    max-inline-size: 100%;
+}
+
+@media (max-width: 768px) {
+    html,
+    body,
+    #root {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    body {
+        zoom: 1;
+        overflow-x: clip;
+    }
+
+    #root {
+        height: 100dvh;
+        overflow-x: clip;
+    }
+
+    body :is(.login-container, .register-container, .terms-container, .home-container,
+        .translate-container, .access-container, .profile-container, .recover-container,
+        .reset-container, .history-container) {
+        width: 100%;
+        height: 100dvh;
+        min-height: 0;
+        max-width: 100%;
+        overflow-x: clip;
+    }
+}
+
 /* Buttons share the same borderless, elevated treatment throughout the app. */
 button {
     border: 0 !important;
