@@ -8,7 +8,8 @@ import AuthModal from "../../components/AuthModal/AuthModal";
 import { registerUser } from "../../services/authService";
 import "./Register.css";
 
-const emailRegex = /\S+@\S+\.\S+/;
+const nameRegex = /^[\p{L}]+(?: [\p{L}]+)*$/u;
+const emailRegex = /^(?!.*\.\.)(?!.*\s)(?!.*@gail\.com$)[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*\.[A-Za-z]{2,}$/i;
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
 const initialForm = {
@@ -40,10 +41,11 @@ function validateField(field, value, form, t) {
         case "name":
             if (!value.trim()) return t("auth.nameRequired");
             if (value.trim().length < 3) return t("auth.minChars");
+            if (!nameRegex.test(value.trim())) return t("auth.nameInvalid");
             return "";
         case "email":
             if (!value.trim()) return t("auth.emailRequired");
-            if (!emailRegex.test(value)) return t("auth.emailInvalid");
+            if (!emailRegex.test(value.trim())) return t("auth.emailInvalid");
             return "";
         case "password":
             if (!value) return t("auth.passwordRequired");
@@ -175,7 +177,11 @@ function Register() {
         }
 
         try {
-            await registerUser(form);
+            await registerUser({
+                ...form,
+                name: form.name.trim(),
+                email: form.email.trim(),
+            });
             openModal({
                 title: t("auth.registerSuccess"),
                 message: t("auth.registerSuccessMessage"),
