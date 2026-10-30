@@ -52,6 +52,8 @@ VITE_DEV_HTTPS_KEY=./certs/onelanguage-key.pem
 
 VITE_API_URL configura el backend; vacío usa el proxy/origen configurado por Vite. VITE_AI_WS_URL configura el WebSocket de reconocimiento. Para exponer Vite en la red local: npm run dev -- --host 0.0.0.0.
 
+Con VITE_AI_WS_URL vacío, la web deriva ws/wss del origen actual y usa /ws/recognize; Vite reenvía esa ruta a ws://127.0.0.1:8000. Los certificados locales de web/certs no se versionan. CI genera un certificado temporal y ejecuta `npm run test:ai-ws-smoke` para validar el origen HTTPS y el proxy.
+
 La imagen se construye y sirve con Docker/Nginx:
 
 ~~~bash
