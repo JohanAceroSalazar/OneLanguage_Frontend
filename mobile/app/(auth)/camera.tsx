@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Camera as ExpoCamera, CameraType, CameraView } from "expo-camera";
 import * as Speech from "expo-speech";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -76,6 +77,7 @@ export default function Camera() {
     const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const activeRef = useRef(false);
     const readyRef = useRef(false);
+    const authFailedRef = useRef(false);
     const captureBusyRef = useRef(false);
     const framePendingRef = useRef(false);
     const frameSentAtRef = useRef(0);
@@ -149,6 +151,7 @@ export default function Camera() {
         }
         if (message.type === "ready") {
             setModelStatus("ready");
+            startCapture();
             return;
         }
         if (message.type === "error") {
@@ -179,24 +182,44 @@ export default function Camera() {
             Speech.stop();
             Speech.speak(message.text, { language: "es-CO" });
         }
-    }, [clearLivePrediction]);
+    }, [clearLivePrediction, startCapture]);
 
     const connectModel = useCallback(() => {
         const current = socketRef.current;
         if (current?.readyState === WebSocket.OPEN || current?.readyState === WebSocket.CONNECTING) return;
         setModelStatus("connecting");
+        authFailedRef.current = false;
         const socket = new WebSocket(AI_WEBSOCKET_URL);
         socketRef.current = socket;
-        socket.onopen = startCapture;
+        socket.onopen = () => {
+            void AsyncStorage.getItem("token").then((token) => {
+                if (!token || socket.readyState !== WebSocket.OPEN) {
+                    authFailedRef.current = true;
+                    setModelStatus("model_error");
+                    socket.close();
+                    return;
+                }
+                socket.send(JSON.stringify({ type: "auth", token }));
+            }).catch(() => {
+                authFailedRef.current = true;
+                setModelStatus("model_error");
+                socket.close();
+            });
+        };
         socket.onmessage = handleMessage;
         socket.onerror = () => {
             clearLivePrediction();
             setModelStatus("model_error");
         };
-        socket.onclose = () => {
+        socket.onclose = (event) => {
             if (socketRef.current !== socket) return;
             socketRef.current = null;
             clearCapture();
+            if (event.code === 1008) authFailedRef.current = true;
+            if (authFailedRef.current) {
+                setModelStatus("model_error");
+                return;
+            }
             if (!activeRef.current || reconnectTimerRef.current) return;
             setModelStatus("connecting");
             reconnectTimerRef.current = setTimeout(() => {
@@ -204,7 +227,7 @@ export default function Camera() {
                 connectRef.current();
             }, 1000);
         };
-    }, [clearCapture, clearLivePrediction, handleMessage, startCapture]);
+    }, [clearCapture, clearLivePrediction, handleMessage]);
 
     useEffect(() => { connectRef.current = connectModel; }, [connectModel]);
 
