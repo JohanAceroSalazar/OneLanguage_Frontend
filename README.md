@@ -55,9 +55,12 @@ VITE_API_URL configura el backend; vacío usa el proxy/origen configurado por Vi
 La imagen se construye y sirve con Docker/Nginx:
 
 ~~~bash
-docker build --build-arg VITE_API_URL=http://localhost:8084 -t onelanguage-web ./web
-docker run --rm -p 3000:80 onelanguage-web
+docker compose -f compose.prod.yml config
+docker compose -f compose.prod.yml build frontend
+docker compose -f compose.prod.yml up -d frontend
 ~~~
+
+El contenedor debe estar conectado a la red Docker externa `onelanguage_net`, donde debe existir `onelanguage-backend` escuchando en el puerto 8084. Nginx reenvia `/api/` y `/auth/` al backend; por eso la web usa rutas del mismo origen (`VITE_API_URL=/`) y no requiere abrir el puerto del backend al navegador. La CSP permite esas llamadas mediante `'self'`.
 
 ### Funcionalidades
 
