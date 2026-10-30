@@ -1,7 +1,7 @@
 import Constants from "expo-constants";
 
 const DEFAULT_API_PORT = "8084";
-const DEFAULT_AI_PORT = "8001";
+const DEFAULT_AI_PORT = "8000";
 const LOCALHOST = "127.0.0.1";
 const PRODUCTION_API_URL = "https://onelanguage.tech";
 const PRODUCTION_AI_URL = "wss://ai.onelanguage.tech/ws/recognize";
