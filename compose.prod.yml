@@ -1,0 +1,19 @@
+services:
+  frontend:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /
+        VITE_AI_WS_URL: wss://ai.onelanguage.tech/ws/recognize
+    image: onelanguage-frontend:prod
+    container_name: onelanguage-frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"
+    networks:
+      - onelanguage_net
+
+networks:
+  onelanguage_net:
+    external: true
