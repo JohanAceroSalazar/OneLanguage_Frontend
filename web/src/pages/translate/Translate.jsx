@@ -6,6 +6,7 @@ import { saveTranslation } from "../../services/translationService";
 import "./Translate.css";
 import { useTranslation } from "react-i18next";
 import { getFeaturePermissions, setFeaturePermission } from "../../services/featurePermissionService";
+import { getValidToken } from "../../services/authSession";
 import PermissionDialog from "../../components/PermissionDialog";
 
 const FRAME_INTERVAL_MS = 66;
@@ -264,11 +265,27 @@ function Translate() {
 
     const connectModel = useCallback(() => {
         if (socketRef.current?.readyState === WebSocket.OPEN || socketRef.current?.readyState === WebSocket.CONNECTING) return;
+        const token = getValidToken();
+        if (!token) {
+            stopCamera("model_error");
+            return;
+        }
         setModelStatus("connecting");
         const socket = new WebSocket(getAiSocketUrl());
         socketRef.current = socket;
-        socket.addEventListener("message", handleModelMessage);
-        socket.addEventListener("open", startCapture);
+        socket.addEventListener("message", (event) => {
+            try {
+                if (JSON.parse(event.data).type === "ready") startCapture();
+            } catch {
+                // handleModelMessage reports malformed server messages.
+            }
+            handleModelMessage(event);
+        });
+        socket.addEventListener("open", () => {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: "auth", token }));
+            }
+        });
         socket.addEventListener("error", () => {
             clearLivePrediction();
             void finishRecording();
