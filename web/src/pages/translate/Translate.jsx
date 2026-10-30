@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { getFeaturePermissions, setFeaturePermission } from "../../services/featurePermissionService";
 import { getValidToken } from "../../services/authSession";
 import PermissionDialog from "../../components/PermissionDialog";
+import { resolveAiSocketUrl } from "../../config/aiSocketUrl";
 
 const FRAME_INTERVAL_MS = 66;
 const FRAME_TIMEOUT_MS = 10000;
@@ -19,10 +20,7 @@ const CAMERA_CONSTRAINTS = {
 };
 
 function getAiSocketUrl() {
-    const configuredUrl = import.meta.env.VITE_AI_WS_URL?.trim();
-    if (configuredUrl) return configuredUrl;
-    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    return `${protocol}://${window.location.host}/ws/recognize`;
+    return resolveAiSocketUrl(import.meta.env.VITE_AI_WS_URL, window.location);
 }
 
 function getCameraErrorStatus(error) {

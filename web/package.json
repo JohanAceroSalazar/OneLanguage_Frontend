@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:ai-ws-smoke": "node scripts/ai-ws-proxy-smoke.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -33,6 +34,7 @@
     "globals": "^17.4.0",
     "jsdom": "^29.1.1",
     "vite": "^8.0.1",
-    "vitest": "^5.0.5"
+    "vitest": "^5.0.5",
+    "ws": "^8.22.0"
   }
 }
